@@ -21,83 +21,85 @@ module TypeScript.Api {
 		
 		public sources  : string [];
 		
-		constructor(public ioHost : IIO, public compilationSettings : TypeScript.CompilationSettings)  {
+		constructor(public ioHost : IIO)  {
 			
-			TypeScript.CompilerDiagnostics.diagnosticWriter = { Alert: (s: string) => { this.ioHost.printLine(s); } }
+			var logger = new TypeScript.Api.Logger(this.ioHost);			
 			
-			var logger = new TypeScript.Api.Logger(this.ioHost);
-			
-			this.compiler = new TypeScript.TypeScriptCompiler(TypeScript.EN_DiagnosticMessages, logger, this.compilationSettings);
+			var compilationSettings             = new TypeScript.CompilationSettings();
+
+			compilationSettings.codeGenTarget   = TypeScript.LanguageVersion.EcmaScript5;
+
+			compilationSettings.moduleGenTarget = TypeScript.ModuleGenTarget.Synchronous;			
+
+			this.compiler = new TypeScript.TypeScriptCompiler(TypeScript.EN_DiagnosticMessages, logger, compilationSettings);
 			
 			this.compiler.logger = logger; 
 		} 
 		
-		public resolve(callback: {( files:IResolvedFile[]): void; }) : void{
+		public resolve(callback: {( files:IResolvedFile[]): void; }) : void {
 			
-			var resolver = new TypeScript.Api.Resolver(this.ioHost, this.sources);
+			var resolver = new TypeScript.Api.Resolver(this.ioHost);
 			
-			resolver.resolve(callback);
+			resolver.resolve(this.sources, callback);
 		}
 		
 		public compile() : void {  
-
-			//var fs = require("fs");   
-			 
-			var filename = 'C:/input/code.ts'; 
 			
-			//var code = fs.readFileSync( filename, "ascii");
+			// bind on each compile...
+			TypeScript.CompilerDiagnostics.diagnosticWriter = { 
 			
-			var code = this.ioHost.readFile(filename);
+					Alert : (s: string) => { this.ioHost.printLine(s); } 
 			
-			// compilation proc
-			
-			var snapshot = TypeScript.ScriptSnapshot.fromString( code);
-			
-			var references = TypeScript.getReferencedFiles(filename, snapshot);
-			
-			var document = this.compiler.addSourceUnit(filename, snapshot, 0, false, references);		
-			
-			// diagnostics....
-			
-			var syntacticDiagnostics = this.compiler.getSyntacticDiagnostics(filename);
-			
-			this.compiler.reportDiagnostics(syntacticDiagnostics, new TypeScript.Api.DiagnosticReporter());
-			
-			// compilation...
-			
-			this.compiler.pullTypeCheck();
-			
-			var emitter = new TypeScript.Api.Emitter();
-			
-			this.compiler.emitAll(emitter, (inputFile: string, outputFile: string) : void => {
-				 
-				 console.log('mapInputToOutput(' + inputFile + ',' + outputFile + ')' ); 
-			});
-			
-			for(var n in emitter.files) {
-			
-				console.log(emitter.files[n].ToString());
 			}
+			
+			/*
+				var code = this.ioHost.readFile(filename);
+				
+				var snapshot = TypeScript.ScriptSnapshot.fromString( code);
+				
+				var references = TypeScript.getReferencedFiles(filename, snapshot);
+				
+				var document = this.compiler.addSourceUnit(filename, snapshot, 0, false, references);		
+				
+				// diagnostics....
+				
+				var syntacticDiagnostics = this.compiler.getSyntacticDiagnostics(filename);
+				
+				this.compiler.reportDiagnostics(syntacticDiagnostics, new TypeScript.Api.DiagnosticReporter());
+				
+				// compilation...
+				
+				this.compiler.pullTypeCheck();
+				
+				var emitter = new TypeScript.Api.Emitter();
+				
+				this.compiler.emitAll(emitter, (inputFile: string, outputFile: string) : void => {
+					 
+					 console.log('mapInputToOutput(' + inputFile + ',' + outputFile + ')' ); 
+				});
+				
+				for(var n in emitter.files) {
+				
+					console.log(emitter.files[n].ToString());
+				}
+		
+		*/
 		}
 	}
 }
 
 
-var ioHost = new TypeScript.Api.IOHost( new TypeScript.Api.TextWriter(), new TypeScript.Api.TextWriter() );
+var writer   = new TypeScript.Api.TextWriter();
 
-var compilationSettings = new TypeScript.CompilationSettings();
-			
-compilationSettings.codeGenTarget = TypeScript.LanguageVersion.EcmaScript5;
+var ioHost   = new TypeScript.Api.IOHost( writer, writer );
 
-compilationSettings.moduleGenTarget = TypeScript.ModuleGenTarget.Synchronous;
+var compiler = new TypeScript.Api.Compiler( ioHost );
 
-var compiler = new TypeScript.Api.Compiler( ioHost, compilationSettings );
+compiler.sources = ['C:/input/typescript/program.ts'];
 
-compiler.sources = ['C:/input/code.ts'];
-
-compiler.resolve(() => {
+compiler.resolve((resolved) => {
 	
-	 
+	 console.log('ere');
 	
 });
 

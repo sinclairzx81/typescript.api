@@ -11,8 +11,7 @@ module TypeScript.Api {
 			
 		arguments: string[];  
 		
-		constructor(public stdout:ITextWriter, 
-					public stderr:ITextWriter) {
+		constructor(public stdout:ITextWriter, public stderr:ITextWriter) {
 			
 		}
 		
