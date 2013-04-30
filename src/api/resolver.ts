@@ -3,18 +3,20 @@
 
 module TypeScript.Api {
 
+	var path = require('path');
+
 	export class ResolvedFile implements IResolvedFile {
 	
 		content : string;
 		
 		path    : string;
-		
-		exists  : boolean;
 	}
 	
-	export class Resolver {
+	export class AsyncCodeResolver {
 	
 		private ioHost        : IIO;
+		
+		
 		
 		private queue_open    : string[];
 		
@@ -34,11 +36,17 @@ module TypeScript.Api {
 		}
 		
 		
-		public walk(callback: {( resolved:IResolvedFile[]): void; }) : void {
+		public walk(root:string, callback: {( resolved:IResolvedFile[]): void; }) : void {
+			
+			// queue stuff
 			
 			var filename = this.queue_open.pop();
 			
 			this.queue_close.push(filename);
+			
+			console.log(filename);
+			
+			// resolve file content...
 			
 			var code        = this.ioHost.readFile(filename);
 			
@@ -46,15 +54,20 @@ module TypeScript.Api {
 			
 			var references  = TypeScript.getReferencedFiles(filename, snapshot);	
 			
+			// push references on the queue to be looked up...
+			
 			for(var n in references) {  
-				
+				 
+				console.log('      ' + references[n].path);
+				 
+				 
 				this.queue_open.push( references[n].path ); // push reference path on queue...
 						 
 			}
             
 			if(this.queue_open.length > 0) {
 			
-				this.walk(callback);
+				this.walk(root, callback);
 			
 			} else {
 			
@@ -65,9 +78,11 @@ module TypeScript.Api {
 		
 		public resolve(sources:string[], callback: {( resolved:IResolvedFile[]): void; }) : void{
 			
-			this.queue_open = sources;
+			var root = this.ioHost.dirName(sources[0]);
 			
-			this.walk(callback);
+			this.queue_open = [ sources[0] ];
+			
+			this.walk(root, callback);
 			
 			// todo: implement resolver, return files.
 			//for(var n in this.sources) {

@@ -38,7 +38,7 @@ module TypeScript.Api {
 		
 		public resolve(callback: {( files:IResolvedFile[]): void; }) : void {
 			
-			var resolver = new TypeScript.Api.Resolver(this.ioHost);
+			var resolver = new TypeScript.Api.AsyncCodeResolver(this.ioHost);
 			
 			resolver.resolve(this.sources, callback);
 		}
@@ -99,7 +99,7 @@ compiler.sources = ['C:/input/typescript/program.ts'];
 
 compiler.resolve((resolved) => {
 	
-	 console.log('ere');
+	 console.log(resolved);
 	
 });
 
