@@ -40,7 +40,7 @@ module TypeScript.Api {
 			
 			var resolver = new TypeScript.Api.AsyncCodeResolver(this.ioHost);
 			
-			resolver.resolve(this.sources, callback);
+			//resolver.resolve(this.sources, callback);
 		}
 		
 		public compile() : void {  
