@@ -9,22 +9,15 @@ module TypeScript.Api {
 	
 	var _module   = require('module');
 	
-	export interface IIOAsync extends IIO {
 	
-		readFileAsync(path, callback:{ (contents:string) : void ; } ) : void;
-	
-	}
+	// Stock standard IOHost for NodeJS. 
+	// Ripped directly from io.ts.
 	
 	export class IOHost implements IIO {
 			
 		arguments: string[];  
 		
 		constructor(public stdout:ITextWriter, public stderr:ITextWriter) { }
-		
-		
-		// IIOAsync implementation
-		
-		
 		
 		// IIO implementation - based on tsc implementation
 		

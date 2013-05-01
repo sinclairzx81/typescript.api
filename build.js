@@ -60,11 +60,13 @@ sources.push(path.join(src_dir, 'api/compiler.ts' ) );
 
 // build 
 function build () {
-	
+	for(var i = 0; i < 40; i++) console.log();
+	console.log('----------------------------------------------------------');
 	console.log('compiling......' + src_dir);
 
 	tools.builder.build(sources, path.join(bin_dir, 'typescript.api.js'), function() {
-
+		  console.log('----------------------------------------------------------');
+		  for(var i = 0; i < 3; i++) console.log();
 		  tools.nodestart.start( path.join( root, "app.js" ) );
 	});
 

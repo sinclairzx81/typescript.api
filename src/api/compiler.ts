@@ -38,7 +38,9 @@ module TypeScript.Api {
 		
 		public resolve(callback: {( files:IResolvedFile[]): void; }) : void {
 			
-			var resolver = new TypeScript.Api.AsyncCodeResolver(this.ioHost);
+			var resolver = new TypeScript.Api.CodeResolver();
+			
+			resolver.resolve(this.sources[0], callback);
 			
 			//resolver.resolve(this.sources, callback);
 		}
@@ -88,21 +90,20 @@ module TypeScript.Api {
 	}
 }
 
-
 var writer   = new TypeScript.Api.TextWriter();
 
 var ioHost   = new TypeScript.Api.IOHost( writer, writer );
 
 var compiler = new TypeScript.Api.Compiler( ioHost );
 
-compiler.sources = ['C:/input/typescript/program.ts'];
+compiler.sources = ['test/program.ts'];
 
 compiler.resolve((resolved) => {
-	
+	 
 	 console.log(resolved);
 	
 });
-
+ 
  
 
 
