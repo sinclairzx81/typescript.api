@@ -19,8 +19,6 @@ module TypeScript.Api {
 		
 		public compiler : TypeScript.TypeScriptCompiler;
 		
-		public sources  : string [];
-		
 		constructor(public ioHost : IIO)  {
 			
 			var logger = new TypeScript.Api.Logger(this.ioHost);			
@@ -36,16 +34,15 @@ module TypeScript.Api {
 			this.compiler.logger = logger; 
 		} 
 		
-		public resolve(callback: {( files:IResolvedFile[]): void; }) : void {
+		public resolve(sources:string[], callback: {( files:IResolvedFile[]): void; }) : void {
 			
+			var io       = new TypeScript.Api.IOAsyncRemoteHost();
 			
-			var resolver = new TypeScript.Api.CodeResolver( new TypeScript.Api.IOAsyncRemoteHost() );
-			
-			resolver.resolve(this.sources[0], callback);
-			 
+			var logger   = new TypeScript.Api.Logger( this.ioHost );
 
-			
-			//resolver.resolve(this.sources, callback);
+			var resolver = new TypeScript.Api.CodeResolver( io, logger );
+
+			resolver.resolve(sources, callback);
 		}
 		
 		public compile() : void {  
@@ -94,19 +91,19 @@ module TypeScript.Api {
 }
 
 var writer   = new TypeScript.Api.TextWriter();
-
 var ioHost   = new TypeScript.Api.IOHost( writer, writer );
-
 var compiler = new TypeScript.Api.Compiler( ioHost );
 
-compiler.sources = ['test/program.ts'];
+var sources = ['test/data.ts'];
 
-compiler.resolve((resolved) => {
+compiler.resolve(sources, function(files) {
 	 
 	 console.log("---------------------------------");
-	 for(var n in resolved){
 	 
-		console.log(resolved[n].path);
+	 for(var n in files) {
+	 
+		console.log(files[n].path);
+		
 	 }
 	 
 	// console.log(resolved);

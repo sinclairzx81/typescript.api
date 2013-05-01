@@ -6,6 +6,39 @@ module TypeScript.Api {
 	var _https = require('https');
 	var _url   = require('url');
 	
+	// pulled from compiler/io.tsc.
+	function processBuffer(buffer) : string {
+		switch (buffer[0]) {
+			case 0xFE:
+				if (buffer[1] == 0xFF) {
+					// utf16-be. Reading the buffer as big endian is 
+					// not supported, so convert it to Little Endian first
+					var i = 0;
+					while ((i + 1) < buffer.length) {
+						var temp = buffer[i];
+						buffer[i] = buffer[i + 1];
+						buffer[i + 1] = temp;
+						i += 2;
+					}
+					return buffer.toString("ucs2", 2);
+				}
+				break;
+			case 0xFF:
+				if (buffer[1] == 0xFE) {
+					// utf16-le 
+					return buffer.toString("ucs2", 2);
+				}
+				break;
+			case 0xEF:
+				if (buffer[1] == 0xBB) {
+					// utf-8
+					return buffer.toString("utf8", 3);
+				}
+		}
+		// Default behaviour
+		return buffer.toString();
+	}	
+	
 	// ResolvedFile..
 	export class ResolvedFile implements IResolvedFile {
 		content : string;
@@ -13,20 +46,20 @@ module TypeScript.Api {
 		remote  : boolean;
 		error   : string;
 	}
-	
+
 	export interface IIOAsync {
 		readFile(filename:string, callback:{( file:ResolvedFile) : void; }): void;
 	}	
 	
 	// IOAsyncHost:  Provides local io services.
 	export class IOAsyncHost implements IIOAsync {
-	
+		
 		public readFile (filename:string, callback:{(file:ResolvedFile) : void; }): void {
-			_fs.readFile(filename, "utf8", (err, data) => {
+			_fs.readFile(filename, (err, data) => {
 			  if (!err) {
 				var file     = new ResolvedFile();
 				file.path    = filename;
-				file.content = data;
+				file.content = processBuffer(data);
 				file.remote  = false;
 				callback( file );  
 			  } else {
@@ -41,7 +74,7 @@ module TypeScript.Api {
 	}
 	
 	// IOAsyncRemoteHost:  Provides remote io services. Probably not a good idea...
-	export class IOAsyncRemoteHost  implements IIOAsync  {
+	export class IOAsyncRemoteHost implements IIOAsync  {
 		
 		public readFile(filename:string, callback:{ (file:ResolvedFile) : void; }): void {
 			if(this.isUrl(filename)) {
@@ -52,11 +85,11 @@ module TypeScript.Api {
 		}
 		
 		private readFileFromDisk(filename:string, callback:{( file:ResolvedFile ) : void; }): void {
-			_fs.readFile(filename, "utf8", (err, data) => {
+			_fs.readFile(filename, (err, data) => {
 			  if (!err) {
 				var file     = new ResolvedFile();
 				file.path    = filename;
-				file.content = data;
+				file.content = processBuffer(data);
 				file.remote  = false;
 				callback ( file );  
 			  } else {

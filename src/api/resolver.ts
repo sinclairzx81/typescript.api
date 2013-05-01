@@ -6,102 +6,88 @@
 module TypeScript.Api {
 	
 	class LoadParameter {
-	
 		public parent_filename  : string;
-		
 		public filename			: string;
-		
 		constructor(parent_filename:string, filename:string) {
-		
 			this.parent_filename = parent_filename;
-			
 			this.filename 		 = Path.relativeToAbsolute(parent_filename, filename); 
 		} 
 	} 
 	
 	export class CodeResolver {
-		
 		private io          : TypeScript.Api.IIOAsync;
+		private logger      : TypeScript.ILogger;
 		private pending     : LoadParameter       [];
-		private closed      : LoadParameter       [];		
+		private closed      : LoadParameter       [];	
 		private resolved    : ResolvedFile 		  [];
 	 
-		constructor( io : TypeScript.Api.IIOAsync) {  
+		constructor( io:TypeScript.Api.IIOAsync, logger:TypeScript.ILogger ) {  
 			this.io		  	  = io;
+			this.logger       = logger;
 			this.pending      = [];
 			this.closed  	  = [];
 			this.resolved     = [];
 		}
 		
-		private format_reference(reference:IFileReference):IFileReference {
-			var path = reference.path;
-			
-			path = path.replace('\\', '/');
-			
-			if(path.indexOf('http:/') == 0){
-				if(!(path.indexOf('http://') == 0)) {
-					path = path.replace('http:/', 'http://');
-				}
+		public resolve(sources:string[], callback: {( resolved:ResolvedFile[]): void; }) : void {
+			for(var n in sources) {
+				var op = new LoadParameter( global.process.mainModule.filename, sources[n] );
+				this.pending.push(op);
 			}
-			
-			if(path.indexOf('https:/') == 0){
-				if(!(path.indexOf('https://') == 0)) {
-					path = path.replace('https:/', 'https://');
-				}
-			}
-			reference.path = path;
-			
-			return reference;
-		}
+			this.load ( callback );
+		}		
 		
+		// load - all the action happens here...
 		private load (callback: {( file:ResolvedFile[]): void; }) : void {
 			
 			var op = this.pending.pop();
-			
-			console.log('[loading] ' + op.filename);
+			this.logger.log('[loading] ' + op.filename);
 			
 			if(!this.visited(op)) {
-				
 				this.closed.push(op);
-				
 				this.io.readFile(op.filename, (file:ResolvedFile) => {
-				
 					this.resolved.push(file);
-					
 					if(file.error) {
-					
-						console.log("[error] cannot load " + file.path);
-						
+						this.logger.log("[error] cannot load " + file.path);
 						return;
 					}
 					
-					var snapshot    = TypeScript.ScriptSnapshot.fromString( file.content );	
-					
-					var references  = TypeScript.getReferencedFiles( file.path, snapshot );
-					
+					var references = this.get_references(file);
 					for(var n in references) {
-					
-						references[n] = this.format_reference(references[n]);
-						
-						this.pending.unshift( new LoadParameter( file.path, references[n].path ) );
+						var parameter = new LoadParameter( file.path, references[n] );
+						this.pending.push( parameter );						
 					}
 					
-					// if there are more items on the queue, keep walking..
 					this.next(callback);
 					
 				});
 			} else {
-				// if there are more items on the queue, keep walking..
+			
 				this.next(callback);
 			}			
 		}
 		
-		private visited (op:LoadParameter) : boolean {
+		private get_references(file:ResolvedFile): string[] {
+			var result:string[] = [];
+			var lines :string[] = file.content.split('\r\n');
+			if (lines.length === 1) {
+				lines = file.content.split('\n');
+			}
+			for(var n in lines) {
+				var reference_pattern = /^(\/\/\/\s*<reference\s+path=)('|")(.+?)\2\s*(static=('|")(.+?)\2\s*)*\/>/gim;
+				//var implicit_import_pattern = /^(\/\/\/\s*<implicit-import\s*)*\/>/gim;
+				//var is_no_default_lib_pattern = /^(\/\/\/\s*<reference\s+no-default-lib=)('|")(.+?)\2\s*\/>/gim;	
+				var match = reference_pattern.exec(lines[n]);
+				if(match) {
+					result.unshift( match[3] );
+				}
+			}
+			return result;
+		}	
 		
+		private visited (op:LoadParameter) : boolean {
 			for(var n in this.closed) {
-			
 				if(this.closed[n].filename == op.filename) {
-				
 					return true;
 				}
 			}
@@ -109,26 +95,12 @@ module TypeScript.Api {
 		}	
 		
 		private next (callback) : void { 
-		
 			if(this.pending.length > 0) {
-			
 				this.load ( callback );
-				
 			} else {
-			
 				callback( this.resolved );
 			}			
 		}
-		
-		public resolve(source, callback: {( resolved:ResolvedFile[]): void; }) : void {
-		
-			var op = new LoadParameter( global.process.mainModule.filename, "./test/program.ts" );
-			
-			this.pending = [ op ];
-			
-			this.load ( callback );
-		}
-		
 	}
 
 }
