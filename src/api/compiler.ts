@@ -1,10 +1,10 @@
 /// <reference path='../compiler/typescript.ts'/>
 /// <reference path='../compiler/io.ts'/>
-/// <reference path='iohost.ts' />
 /// <reference path='textwriter.ts' />
 /// <reference path='resolver.ts' />
 /// <reference path='emitter.ts' />
 /// <reference path='logger.ts' />
+/// <reference path='io.ts' />
 
 module TypeScript.Api {
 	
@@ -38,10 +38,11 @@ module TypeScript.Api {
 		
 		public resolve(callback: {( files:IResolvedFile[]): void; }) : void {
 			
-			for(var i  = 0; i < 5; i++) {
-				var resolver = new TypeScript.Api.CodeResolver();
-				resolver.resolve(this.sources[0], callback);
-			}
+			
+			var resolver = new TypeScript.Api.CodeResolver( new TypeScript.Api.IOAsyncRemoteHost() );
+			
+			resolver.resolve(this.sources[0], callback);
+			 
 
 			
 			//resolver.resolve(this.sources, callback);
