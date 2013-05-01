@@ -38,9 +38,11 @@ module TypeScript.Api {
 		
 		public resolve(callback: {( files:IResolvedFile[]): void; }) : void {
 			
-			var resolver = new TypeScript.Api.CodeResolver();
-			
-			resolver.resolve(this.sources[0], callback);
+			for(var i  = 0; i < 5; i++) {
+				var resolver = new TypeScript.Api.CodeResolver();
+				resolver.resolve(this.sources[0], callback);
+			}
+
 			
 			//resolver.resolve(this.sources, callback);
 		}
@@ -100,9 +102,16 @@ compiler.sources = ['test/program.ts'];
 
 compiler.resolve((resolved) => {
 	 
-	 console.log(resolved);
+	 console.log("---------------------------------");
+	 for(var n in resolved){
+	 
+		console.log(resolved[n].path);
+	 }
+	 
+	// console.log(resolved);
 	
 });
+
  
  
 

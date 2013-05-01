@@ -62,7 +62,7 @@ module TypeScript.Api {
 	class AsyncLoader {
 		constructor() { }
 		// loads a source file from web..
-		public fromWeb(context:any, op:LoadOp, callback:{(context:any, codefile:CodeFile) : void; }): void {
+		public fromWeb(context:any, op:LoadOp, callback:{(context:any, resolved:ResolvedFile) : void; }): void {
 			var url      = _url.parse(op.filename);
 			var protocol = _http;
 			var options = {
@@ -80,39 +80,39 @@ module TypeScript.Api {
 				var data = [];
 				response.on('data', (chunk) => { data.push(chunk); });
 				response.on('end',  ()      => { 
-					var codefile = new CodeFile();
-					codefile.path    = op.filename;
-					codefile.content = data.join('');
-					callback(context, codefile );  
+					var resolved = new ResolvedFile();
+					resolved.path    = op.filename;
+					resolved.content = data.join('');
+					callback(context, resolved );  
 				});
 			});
 			request.on('error', (err) => {
-				 var codefile = new CodeFile();
-				 codefile.path  = op.filename;
-				 codefile.error = err;
-				 callback(context, codefile );  
+				 var resolved = new ResolvedFile();
+				 resolved.path  = op.filename;
+				 resolved.error = err;
+				 callback(context, resolved );  
 			});
 			request.end();  
 		}		
 		// loads a source from local disk..
-		public fromFile(context:any, op:LoadOp, callback:{(context:any, codefile:CodeFile) : void; }): void {
+		public fromFile(context:any, op:LoadOp, callback:{(context:any, resolved:ResolvedFile) : void; }): void {
 			_fs.readFile(op.filename, "utf8", (err, data) => {
 			  if (!err) {
-				var codefile = new CodeFile();
-				codefile.path    = op.filename;
-				codefile.content = data;
-				callback(context, codefile );  
+				var resolved = new ResolvedFile();
+				resolved.path    = op.filename;
+				resolved.content = data;
+				callback(context, resolved );  
 			  } else {
-				var codefile = new CodeFile();
-				codefile.path  = op.filename;
-				codefile.error = err;
-				callback(context, codefile ); 
+				var resolved = new ResolvedFile();
+				resolved.path  = op.filename;
+				resolved.error = err;
+				callback(context, resolved ); 
 			  }
 			});			
 		}
 	}
 	
-	class CodeFile implements IResolvedFile {
+	export class ResolvedFile implements IResolvedFile {
 		content : string;
 		path    : string;
 		error   : string;
@@ -121,9 +121,9 @@ module TypeScript.Api {
 	export class CodeResolver {
 		
 		private loader        : AsyncLoader;
-		private resolved      : IResolvedFile [];
-		private queue_open    : LoadOp[];
-		private queue_close   : LoadOp[];
+		private resolved      : ResolvedFile [];
+		private queue_open    : LoadOp       [];
+		private queue_close   : LoadOp       [];
 		
 		constructor() {
 			this.loader       = new AsyncLoader();
@@ -132,7 +132,16 @@ module TypeScript.Api {
 			this.resolved     = [];
 		}
 		
-		private walk(callback: {( resolved:IResolvedFile[]): void; }) : void {
+		private visited(op:LoadOp) : boolean {
+			for(var n in this.queue_close) {
+				if(this.queue_close[n].filename == op.filename) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		private walk(callback: {( resolved:ResolvedFile[]): void; }) : void {
 			
 			// fetch filename off the queue.
 			var op = this.queue_open.pop();
@@ -147,44 +156,73 @@ module TypeScript.Api {
 				op.filename = _path.join(parent, op.filename);
 			}
 			
-			// push op on the closed queue. 
-			this.queue_close.push(op);
+			console.log('[resolving] ' + op.filename);
 			
+			if(!this.visited(op)) {
 			
-			// determine how to load the file.
-			var load:Function = this.loader.fromFile;
-			if(PathUtil.isAbsoluteUrl(op.filename)) {
-				load = this.loader.fromWeb;
-			}
-		 
-			// load
-			var that = this;
-			load(null, op, (context, codefile) => {
-				if(codefile.error) {
-					console.log("[error] cannot load " + codefile.path);
-					return;
-				}
+				// push op on the closed queue. 
+				this.queue_close.push(op);
 				
-				// get snapshot of file....
-				var snapshot    = TypeScript.ScriptSnapshot.fromString( codefile.content );
-				var references  = TypeScript.getReferencedFiles( codefile.path, snapshot );
-				for(var n in references) {
-					that.queue_open.unshift( new LoadOp(codefile.path, references[n].path) );
-				}
 				
+				// determine how to load the file.
+				var load:Function = this.loader.fromFile;
+				if(PathUtil.isAbsoluteUrl(op.filename)) {
+					load = this.loader.fromWeb;
+				}
+			 
+				// load
+				var that = this;
+				load(null, op, (context, resolved) => {
+				
+					this.resolved.push(resolved);
+					
+					if(resolved.error) {
+						console.log("[error] cannot load " + resolved.path);
+						return;
+					}
+					
+					// get snapshot of file....
+					var snapshot    = TypeScript.ScriptSnapshot.fromString( resolved.content );
+					var references  = TypeScript.getReferencedFiles( resolved.path, snapshot );
+					
+					for(var n in references) {
+						var reference = references[n].path;
+						// fix up typescript's get reference utility from messing with
+						// double slashes..
+						reference = reference.replace('\\', '/');
+						if(reference.indexOf('http:/') == 0){
+							if(!(reference.indexOf('http://') == 0)) {
+								reference = reference.replace('http:/', 'http://');
+							}
+						}
+						if(reference.indexOf('https:/') == 0){
+							if(!(reference.indexOf('https://') == 0)) {
+								reference = reference.replace('https:/', 'https://');
+							}
+						}
+						// push new op on the queue for loading..
+						that.queue_open.unshift( new LoadOp( resolved.path, reference ) );
+					}
+					
+					// if there are more items on the queue, keep walking..
+					if(that.queue_open.length > 0) {
+						that.walk( callback );
+					} else {
+						callback( that.resolved );
+					}
+					
+				});
+			} else {
 				// if there are more items on the queue, keep walking..
-				if(that.queue_open.length > 0) {
-					that.walk( callback );
-				} 
-				// other
-				else{
-					callback( that.resolved );
-				}
-				
-			});
+				if(this.queue_open.length > 0) {
+					this.walk( callback );
+				} else {
+					callback( this.resolved );
+				}		
+			}			
 		}
 		
-		public resolve(source, callback: {( resolved:IResolvedFile[]): void; }) : void {
+		public resolve(source, callback: {( resolved:ResolvedFile[]): void; }) : void {
 			var op = new LoadOp( global.process.mainModule.filename, "./test/program.ts" );
 			this.queue_open = [ op ];
 			this.walk( callback );
