@@ -1,5 +1,5 @@
-/// <reference path='../compiler/typescript.ts'/>
-/// <reference path='../compiler/io.ts'/>
+/// <reference path='decl/typescript.d.ts' />
+/// <reference path='messages.ts' />
 /// <reference path='textwriter.ts' />
 /// <reference path='resolver.ts' />
 /// <reference path='emitter.ts' />
@@ -29,7 +29,7 @@ module TypeScript.Api {
 
 			compilationSettings.moduleGenTarget = TypeScript.ModuleGenTarget.Synchronous;			
 
-			this.compiler = new TypeScript.TypeScriptCompiler(TypeScript.EN_DiagnosticMessages, logger, compilationSettings);
+			this.compiler = new TypeScript.TypeScriptCompiler(TypeScript.Api.Resources.EN.DiagnosticMessages, logger, compilationSettings);
 			
 			this.compiler.logger = logger; 
 		} 
@@ -90,25 +90,8 @@ module TypeScript.Api {
 	}
 }
 
-var writer   = new TypeScript.Api.TextWriter();
-var ioHost   = new TypeScript.Api.IOHost( writer, writer );
-var compiler = new TypeScript.Api.Compiler( ioHost );
 
-var sources = ['test/data.ts'];
 
-compiler.resolve(sources, function(files) {
-	 
-	 console.log("---------------------------------");
-	 
-	 for(var n in files) {
-	 
-		console.log(files[n].path);
-		
-	 }
-	 
-	// console.log(resolved);
-	
-});
 
  
  

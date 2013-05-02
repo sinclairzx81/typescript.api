@@ -1,5 +1,5 @@
-/// <reference path='../compiler/typescript.ts'/>
-/// <reference path='../compiler/io.ts'/>
+/// <reference path='decl/typescript.d.ts' />
+/// <reference path='logger.ts' />
 /// <reference path='ioasync.ts' />
 /// <reference path='path.ts' />
 
@@ -31,7 +31,7 @@ module TypeScript.Api {
 		
 		public resolve(sources:string[], callback: {( resolved:ResolvedFile[]): void; }) : void {
 			for(var n in sources) {
-				var op = new LoadParameter( global.process.mainModule.filename, sources[n] );
+				var op = new LoadParameter( process.mainModule.filename, sources[n] );
 				this.pending.push(op);
 			}
 			this.load ( callback );

@@ -1,3 +1,5 @@
+/// <reference path='decl/typescript.d.ts' />
+
 module TypeScript.Api {
 
 	export class Logger implements TypeScript.ILogger {

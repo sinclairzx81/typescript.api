@@ -1,17 +1,16 @@
-///<references path="../compiler/io.ts" />
-///<references path="textwriter.ts" />
+/// <reference path="decl/node.d.ts" />
+/// <reference path="textwriter.ts" />
+
+// binding for node...
+//declare var require: any;
 
 module TypeScript.Api {
  
 	var _fs 	  = require('fs');
-	
 	var _path     = require('path');
-	
 	var _module   = require('module');
 	
-	
 	// Stock standard IOHost for NodeJS. 
-	// Ripped directly from io.ts.
 	
 	export class IOHost implements IIO {
 			
@@ -69,7 +68,7 @@ module TypeScript.Api {
 				
 			} catch (e) {
 			
-				IOUtils.throwIOError("Error reading file \"" + path + "\".", e);
+				console.log("Error reading file \"" + path + "\".", e);
 			}
 		}
 		
@@ -86,7 +85,7 @@ module TypeScript.Api {
 				
 				if (stats.isFile()) {
 				
-					IOUtils.throwIOError("\"" + path + "\" exists but isn't a directory.", null);
+					console.log("\"" + path + "\" exists but isn't a directory.", null);
 					
 				} else if (stats.isDirectory()) {
 				
@@ -108,18 +107,20 @@ module TypeScript.Api {
 				
 			} catch (e) {
 			
-				IOUtils.throwIOError("Couldn't write to file '" + path + "'.", e);
+				console.log("Couldn't write to file '" + path + "'.", e);
 			}
 			
 			// Writing to a buffer to improve performance
 			
-			return new IOUtils.BufferedTextWriter({
+			return {
 			
 				Write : function (str) { _fs.writeSync(fd, str); },
 				
-				Close : function () { _fs.closeSync(fd); fd = null; }
+				Close : function () { _fs.closeSync(fd); fd = null; },
 				
-			});
+				WriteLine: function(str) { _fs.writeSync(fd, str + '\n'); }
+				
+			};
 			
 		}
 		public deleteFile(path: string) : void {
@@ -130,7 +131,7 @@ module TypeScript.Api {
 			} 
 			catch (e) 
 			{
-				IOUtils.throwIOError("Couldn't delete file '" + path + "'.", e);
+				console.log("Couldn't delete file '" + path + "'.", e);
 			}			
 		}
 		

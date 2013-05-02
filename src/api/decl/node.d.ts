@@ -12,9 +12,8 @@
 
 //declare var process: NodeProcess;
 //declare var global: any; 
- 
-declare var __filename: string; 
-declare var __dirname: string;
+//declare var __filename: string; 
+//declare var __dirname: string;
 
 
 declare function setTimeout(callback: () => void , ms: number): any;
@@ -27,6 +26,7 @@ declare var require: {
     resolve(): string;
     cache: any;
     extensions: any;
+	main: any;
 }
 
 declare var module: {
