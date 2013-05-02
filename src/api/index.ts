@@ -1,5 +1,22 @@
+/////////////////////////////////////////////////////////////
+// forward declarations
+/////////////////////////////////////////////////////////////
 
-declare var exports:any;
+declare var		 __filename : string; 
+declare var		 __dirname  : string;
+declare var 	 process    : any;
+declare var 	 global     : any;
+declare var 	 exports    : any;
+declare var      console    : any;
+declare function require (mod:string):any;
+
+/////////////////////////////////////////////////////////////
+// node modules.
+/////////////////////////////////////////////////////////////
+var _vm   = require("vm");
+var _fs   = require("fs");
+var _path = require("path");
+
 
 /////////////////////////////////////////////////////////////
 // compiler options..
@@ -50,6 +67,37 @@ export function compile(units:any[], callback :{ (compilation:any): void; }) : v
 }
 
 /////////////////////////////////////////////////////////////
+// runs a compilation
+/////////////////////////////////////////////////////////////
+
+export function run (compilation:any, sandbox:any, callback :{ (context:any): void; }) : void {
+	if(!sandbox) { sandbox = get_default_sandbox(); }
+	var source = compilation.scripts.join('');
+	var script = _vm.createScript( source, "compilation.js" );
+	script.runInNewContext( sandbox );
+	callback( sandbox );
+}
+
+
+/////////////////////////////////////////////////////////////
+// runs a compilation
+/////////////////////////////////////////////////////////////
+function get_default_sandbox(): any {
+	var sandbox:any = {};
+	if (!sandbox) {
+		sandbox = {};
+		for (var n in global) {
+			sandbox[n] = global[n];
+		}
+	}
+	sandbox.require  = require;
+	sandbox.exports  = exports;
+	sandbox.process  = process;
+	sandbox.console  = console;
+	return sandbox;
+}
+
+/////////////////////////////////////////////////////////////
 // loads the TypeScript.Api namespace
 /////////////////////////////////////////////////////////////
 
@@ -66,19 +114,6 @@ export function typescript_namespace() : any {
 /////////////////////////////////////////////////////////////
 // retro binding hack to load in typescript and api.
 /////////////////////////////////////////////////////////////
-
-// forward declarations...
-declare var		 __filename : string; 
-declare var		 __dirname  : string;
-declare var 	 process    : any;
-declare var 	 global     : any;
-declare var 	 exports    : any;
-declare function require (mod:string):any;
-
-// node modules.
-var _vm   = require("vm");
-var _fs   = require("fs");
-var _path = require("path");
 
 // js files to bind..
 var typescript_filename     = _path.join(__dirname, "typescript.js");

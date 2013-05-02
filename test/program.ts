@@ -11,14 +11,13 @@ module application {
 			
 			var mongo = new application.data.Mongo();
 			
-			var data  = mongo.GetData();
 			
-			for(var n in data){
-			
-				console.log(data[n]);
-			}
 		}
 	}
 }
+
+application.Program.Main([]);
+
+
 
  

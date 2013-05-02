@@ -97,6 +97,8 @@ module TypeScript.Api {
 				compilation.scripts.push(emitter.files[n].ToString());
 			}
 			
+			compilation.scripts.reverse();
+			
 			callback(compilation);
 		}
 	}
