@@ -1,4 +1,4 @@
-﻿var typescript = require("./bin/index.js");
+﻿var typescript = require("typescript.api");
 
 var unit = typescript.units.create("temp.ts", "export var value:number = 123;");
 

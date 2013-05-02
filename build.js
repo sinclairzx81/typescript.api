@@ -12,7 +12,7 @@ var tools = require('./build/tools.js');
 
 // variables
 var src_dir                    = path.join( path.dirname( global.process.mainModule.filename ), "/src/");
-var bin_dir           		   = path.join( path.dirname( global.process.mainModule.filename ), "/bin");
+var bin_dir           		   = path.join( path.dirname( global.process.mainModule.filename ), "/node_modules/typescript.api");
 var compiler_input_filename    = path.join(src_dir, 'api/compiler.ts' );
 var compiler_output_filename   = path.join(bin_dir, 'typescript.api.js');
 var index_input_filename       = path.join(src_dir, 'api/index.ts' );
