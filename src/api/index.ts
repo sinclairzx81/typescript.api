@@ -104,10 +104,10 @@ function get_default_sandbox(): any {
 		}
 	}
 	sandbox.require  = require;
-	sandbox.exports  = exports;
 	sandbox.process  = process;
 	sandbox.console  = console;
-	//sandbox.global   = global;
+	sandbox.global   = global;
+	sandbox.exports  = {};
 	return sandbox;
 }
 
