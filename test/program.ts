@@ -8,7 +8,7 @@ module application {
 			 list.add(123);
 			 list.add(123);
 			 list.add(123);
-			 list.each((n)=> {
+			 list.each((n)=> 
 				console.log(n.toString());
 			 });
 		}

@@ -2,22 +2,23 @@
 
 var sources = ["test/program.ts"];
 
-typescript.debug = false;
- 
-function diagnostics(compilation) {
-
-	console.log(compilation.diagnostics);
+function has_errors(compilation) {
+	
+	return compilation.diagnostics.length > 0;
 }
 
 typescript.units.resolve(sources, function(units) {
 	
 	typescript.compile(units, function(compilation) {
 		
-		diagnostics(compilation);
-		
-		typescript.run(compilation, null, function(context) {
-			 
-		});
+		if(!has_errors (compilation) ) {
+			
+			typescript.run(compilation, null, function(context) {
+				 
+				 // exported members available on the context...
+				 
+			});
+		}
 	});
 });
  
