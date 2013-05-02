@@ -3,11 +3,11 @@
 The typescript.api is a lightweight api that enables nodejs developers to compile 
 and run typescript source code. 
 
-## Compiler Version
+## compiler version
 
 TypeScript 0.9 alpha
 
-## Quick Start 
+## quick start 
 
 The following is an example of using the api to compile the source file 'program.ts'. 
 
@@ -21,31 +21,24 @@ var typescript = require("typescript.api");
 var sources = ["test/program.ts"];
 
 function has_errors(compilation) {
-	
 	// errors can be listed on the compilation.diagnostics array.
-	
 	return compilation.diagnostics.length > 0; 
 }
 
 typescript.units.resolve(sources, function(units) {
-	
 	typescript.compile(units, function(compilation) {
-		
 		if(!has_errors (compilation) ) {
-			
 			typescript.run(compilation, null, function(context) {
-				 
 				 // exported members available on the context...
-				 
 			});
 		}
 	});
 });
-'''
+```
 
-## Reference
+## reference
 
-### typescript.units.resolve(sources, callback)
+### typescript.units.resolve (sources, callback)
 
 Will resolve compilation units by crawling the document space. 
 
@@ -60,7 +53,6 @@ Will resolve 'program.ts' and print all referenced source files.
 
 ```js
 typescript.units.resolve(["program.ts"], function(units) { 
-	
 	for(var n in units) {
 		console.log( units[n].path );
 		console.log( units[n].content );
@@ -69,9 +61,9 @@ typescript.units.resolve(["program.ts"], function(units) {
 		}
 	}
 });
-'''
+```
 
-### typescript.units.create(filename, code)
+### typescript.units.create  ( filename, code )
 
 Will create a unit from the supplied filename and source code.
 
@@ -86,10 +78,58 @@ The following will create a unit. and send to the compiler for compilation.
 
 ```js
 var unit = typescript.units.create("temp.ts", "console.log('hello world');");
-	
+
 typescript.compile([unit], function(compilation) {
-	
 	typescript.run(compilation, null, function(context) { });
-	
 });
-'''
+```
+
+### typescript.compile ( units, callback )
+
+Compiles and produces javascript from the supplied units.
+
+__Arguments__
+
+* units - An array of units. 
+* callback - A callback that passes the compiled output.
+
+__Example__
+
+The following will first create and compile a unit, and compiled source is
+written to the console.
+
+```js
+var unit = typescript.units.create("temp.ts", "var value:number = 123;");
+
+typescript.compile([unit], function(compilation) {
+	for(var n in compilation.scripts){
+		console.log(compilation.scripts[n]);
+	}
+});
+```
+
+### typescript.run ( compilation, sandbox, callback )
+
+Runs a compilation. 
+
+__Arguments__
+
+* compilation - The compilation to be executed.
+* sandbox - A sandbox. pass null to inherit the current sandbox.
+* callback - A callback that passes a content containing exported 
+		     members of the executed code. 
+
+__Example__
+
+The following will first create and compile a unit, then send it off
+for compilation.
+
+```js
+var unit = typescript.units.create("temp.ts", "export var value:number = 123;");
+
+typescript.compile([unit], function(compilation) {
+	typescript.run(compilation, null, function(context) { 
+		console.log(context.value);
+	});
+});
+```

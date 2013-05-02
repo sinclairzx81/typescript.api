@@ -83,7 +83,7 @@ export function run (compilation:any, sandbox:any, callback :{ (context:any): vo
 		var source = compilation.scripts.join('');
 		var script = _vm.createScript( source, "compilation.js" );
 		script.runInNewContext( sandbox );
-		callback( sandbox );
+		callback( sandbox.exports );
 	} catch(e) {
 		// can i do source mapping here?
 		callback( null );
@@ -107,7 +107,7 @@ function get_default_sandbox(): any {
 	sandbox.exports  = exports;
 	sandbox.process  = process;
 	sandbox.console  = console;
-	sandbox.global   = global;
+	//sandbox.global   = global;
 	return sandbox;
 }
 
