@@ -4,23 +4,12 @@
 module application {
 
 	export class Program {
-		
-		public mongo : application.data.Mongo;
 	
-		public static Main(args:string) void {
+		public static Main(args:string) : void {
 		
-			console.log('application main');
-			
-			var mongo = new application.data.Mongo();
-			
-			var data  = mongo.GetData();
-			
-			for(var n in data){
-			
-				console.log(data[n]);
-			}
+			this should not compile.
 		}
 	}
 }
 
-application.Program.Main([ ]);
+ 

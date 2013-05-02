@@ -29,23 +29,11 @@ export class units {
 	public static resolve(sources:string[], callback :{ (units:any[]): void; }) : void {
 		
 		var api = load_typescript_api();
-		
 		var async_io = new api.IOAsyncHost();
-		
-		if(exports.allowRemote) {
-		
-			async_io = new api.IOAsyncRemoteHost();
-		}
-		
-		var logger = new api.NullLogger();
-		
-		if(exports.debug) {
-		
-			logger = new api.ConsoleLogger();
-		}
-		
+		var logger   = new api.NullLogger();
+		if(exports.allowRemote) { async_io = new api.IOAsyncRemoteHost(); }
+		if(exports.debug) { logger = new api.ConsoleLogger(); }
 		var resolver = new api.CodeResolver( async_io, logger );
-		
 		resolver.resolve(sources, callback);		
 	}
 }
@@ -55,18 +43,10 @@ export class units {
 /////////////////////////////////////////////////////////////
 
 export function compile(units:any[], callback :{ (compilation:any): void; }) : void {
-	
 	var api = load_typescript_api();
-	
 	var logger = new api.NullLogger();
-	
-	if(exports.debug) {
-	
-		logger = new api.ConsoleLogger();
-	}
-	
+	if(exports.debug) { logger = new api.ConsoleLogger(); }
 	var compiler = new api.Compiler( logger );
-	
 	compiler.compile(units, callback);
 }
 
@@ -140,7 +120,9 @@ function load_typescript() : any {
 		return __typescript__namespace;
 	}	
 	
-	var sandbox:any = { exports : null  };
+	var sandbox:any = { exports : null, 
+		console : console // for debugging..
+	};
 	__typescript__namespace = load_module (typescript_filename, sandbox, ["TypeScript"]);
 	return __typescript__namespace;
 }

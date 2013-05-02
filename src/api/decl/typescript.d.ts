@@ -44,6 +44,10 @@ interface IIO {
 //////////////////////////////////////////////////////////
 
 declare module TypeScript {
+	export var diagnosticMessages:any;
+}
+
+declare module TypeScript {
     class ArrayUtilities {
         static isArray(value: any): boolean;
         static sequenceEquals(array1: any[], array2: any[], equals: (v1: any, v2: any) => boolean): boolean;
@@ -6931,7 +6935,7 @@ declare module TypeScript {
         public semanticInfoChain: SemanticInfoChain;
         public emitOptions: EmitOptions;
         public fileNameToDocument: StringHashTable;
-		constructor(diagnosticMessages:any, logger:TypeScript.ILogger, compilerSettings:TypeScript.CompilationSettings);
+		constructor(logger:TypeScript.ILogger, compilerSettings:TypeScript.CompilationSettings, diagnosticMessages:any);
 		public getDocument(fileName: string): Document;
         public timeFunction(funcDescription: string, func: () => any): any;
         public addSourceUnit(fileName: string, scriptSnapshot: IScriptSnapshot, version: number, isOpen: boolean, referencedFiles?: IFileReference[]): Document;
