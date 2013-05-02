@@ -7,6 +7,18 @@
 module TypeScript.Api {
 	
 	///////////////////////////////////////////////////////////////////////
+	// LoadParameter : Response object for IIOAsync
+	///////////////////////////////////////////////////////////////////////		
+	class LoadParameter {
+		public parent_filename  : string;
+		public filename         : string;
+		constructor(parent_filename:string, filename:string) {
+			this.parent_filename = parent_filename;
+			this.filename 		 = Path.relativeToAbsolute(parent_filename, filename); 
+		} 
+	} 
+	
+	///////////////////////////////////////////////////////////////////////
 	// CodeResolver : Resolves source files and returns units.
 	///////////////////////////////////////////////////////////////////////		
 	export class CodeResolver {
@@ -82,17 +94,7 @@ module TypeScript.Api {
 		}
 	}
 	
-	///////////////////////////////////////////////////////////////////////
-	// LoadParameter : Response object for IIOAsync
-	///////////////////////////////////////////////////////////////////////		
-	class LoadParameter {
-		public parent_filename  : string;
-		public filename         : string;
-		constructor(parent_filename:string, filename:string) {
-			this.parent_filename = parent_filename;
-			this.filename 		 = Path.relativeToAbsolute(parent_filename, filename); 
-		} 
-	} 	
+	
 
 }
 

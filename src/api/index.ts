@@ -22,7 +22,7 @@ export class units {
 		unit.path    = filename;
 		unit.remote  = false;
 		unit.error   = '';
-		unit.references = [];
+		unit.load_references();
 		return unit;
 	}
 	

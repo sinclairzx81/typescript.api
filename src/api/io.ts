@@ -60,14 +60,10 @@ module TypeScript.Api {
 	export class IOAsyncRemoteHost implements IIOAsync  {
 		
 		public readFile(filename:string, callback:{ (file:ResolvedFile) : void; }): void {
-		
 			if(this.isUrl(filename)) {
-			
 				this.readFileFromHttp(filename, callback);
-				
 				return;
 			}
-			
 			this.readFileFromDisk(filename, callback);
 		}
 		
