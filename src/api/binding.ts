@@ -1,6 +1,10 @@
 
 declare var exports:any;
 
+/////////////////////////////////////////////////////////////
+// compiler options..
+/////////////////////////////////////////////////////////////
+
 export var debug       : boolean = false;
 
 export var allowRemote : boolean = true;
@@ -11,7 +15,7 @@ export var allowRemote : boolean = true;
 
 export class units {
 	
-	public static create(filename:string, source:string): any {
+	public static create (filename:string, source:string): any {
 		var api 	 = load_typescript_api();
 		var unit 	 = new api.SourceUnit();
 		unit.content = source;
@@ -22,7 +26,7 @@ export class units {
 		return unit;
 	}
 	
-	public static resolve(sources:string[], callback:Function) : void {
+	public static resolve(sources:string[], callback :{ (units:any[]): void; }) : void {
 		
 		var api = load_typescript_api();
 		
@@ -46,13 +50,11 @@ export class units {
 	}
 }
 
-
-
 /////////////////////////////////////////////////////////////
 // compiles these sources into javascript..
 /////////////////////////////////////////////////////////////
 
-export function compile(sources:any[], callback:Function) : void {
+export function compile(units:any[], callback :{ (compilation:any): void; }) : void {
 	
 	var api = load_typescript_api();
 	
@@ -65,7 +67,7 @@ export function compile(sources:any[], callback:Function) : void {
 	
 	var compiler = new api.Compiler( logger );
 	
-	compiler.compile(sources, callback);
+	compiler.compile(units, callback);
 }
 
 /////////////////////////////////////////////////////////////
