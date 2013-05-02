@@ -1,4 +1,4 @@
-﻿var typescript = require("./bin/binding.js");
+﻿var typescript = require("./bin/index.js");
 
 var sources = ["test/program.ts", "test/program.ts"];
 
