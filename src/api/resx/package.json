@@ -1,0 +1,24 @@
+{
+  "name": "typescript.api",
+  "version": "0.9.0",
+  "description": "A api that enables nodejs developers to compile and execute typescript.",
+  "main": "index.js",
+  "directories": {
+     
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sinclairzx81/typescript.api.git"
+  },
+  "keywords": [
+    "typescript"
+  ],
+  "author": "sinclair",
+  "license": "Apache License, Version 2.0",
+  "readmeFilename": "README.md"
+}

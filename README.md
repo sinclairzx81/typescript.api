@@ -3,11 +3,17 @@
 The typescript.api is a lightweight api that enables nodejs developers to compile 
 and run typescript source code. 
 
+## install
+
+```javascript
+npm install typescript.api
+```
+
 ## compiler version
 
 TypeScript 0.9 alpha
 
-## quick start 
+## quick start
 
 The following is an example of using the api to compile the source file 'program.ts'. 
 

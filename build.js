@@ -12,7 +12,7 @@ var tools = require('./build/tools.js');
 
 // variables
 var src_dir                    = path.join( path.dirname( global.process.mainModule.filename ), "/src/");
-var bin_dir           		   = path.join( path.dirname( global.process.mainModule.filename ), "/node_modules/typescript.api");
+var bin_dir           		   = path.join( path.dirname( global.process.mainModule.filename ), "/bin");
 var compiler_input_filename    = path.join(src_dir, 'api/compiler.ts' );
 var compiler_output_filename   = path.join(bin_dir, 'typescript.api.js');
 var index_input_filename       = path.join(src_dir, 'api/index.ts' );
@@ -23,6 +23,10 @@ var node_decl_input_filename   = path.join(src_dir, 'api/decl/node.d.ts');
 var node_decl_output_filename  = path.join(bin_dir, 'decl/node.d.ts');
 var lib_decl_input_filename    = path.join(src_dir, 'api/decl/lib.d.ts');
 var lib_decl_output_filename   = path.join(bin_dir, 'decl/lib.d.ts');
+var package_input_filename     = path.join(src_dir, 'api/resx/package.json');
+var package_output_filename    = path.join(bin_dir, 'package.json');
+var readme_input_filename      = path.join(src_dir, '../README.md');
+var readme_output_filename     = path.join(bin_dir, 'README.md');
 
 // thing to run after the build..
 var post_build_filename   = path.join( path.dirname( global.process.mainModule.filename ), "app.js")
@@ -49,8 +53,16 @@ function build () {
 					  console.log('copying node.d.ts');
 					  tools.builder.copyfile(node_decl_input_filename, node_decl_output_filename, function(){	
 					  
-						  console.log('running post build ');
-						  tools.nodestart.start( post_build_filename );	
+						  console.log('copying package.json');
+						  tools.builder.copyfile(package_input_filename, package_output_filename, function(){	
+						  
+							  console.log('copying README.md');
+							  tools.builder.copyfile(readme_input_filename, readme_output_filename, function(){	
+							  
+								  console.log('running post build ');
+								  tools.nodestart.start( post_build_filename );	
+							  });
+						  });
 					  });
 				  });
 			  });
