@@ -1,7 +1,6 @@
 /// <reference path='decl/typescript.d.ts' />
-/// <reference path='diagnostics.ts' />
-/// <reference path='messages.ts' />
 /// <reference path='textwriter.ts' />
+/// <reference path='diagnostics.ts' />
 /// <reference path='resolver.ts' />
 /// <reference path='emitter.ts' />
 
@@ -34,32 +33,15 @@ module TypeScript.Api {
 			
 			this.logger = logger;
 			
+			// arbitua
 			var settings = new TypeScript.CompilationSettings();
 			settings.codeGenTarget                  = TypeScript.LanguageVersion.EcmaScript5;
-			settings.moduleGenTarget                = TypeScript.ModuleGenTarget.Synchronous;			
-            settings.gatherDiagnostics              = true;
-			settings.updateTC                       = true;			
-		    settings.propagateConstants             = false;
-			settings.minWhitespace                  = false;
-			settings.emitComments                   = false;
-			settings.watch                          = false;
-			settings.exec                           = false;
-			settings.resolve                        = true;
-			settings.disallowBool                   = false;
-			settings.useDefaultLib                  = true;
-			settings.outputOption                   = 'file';
-			settings.mapSourceFiles                 = false;
-			settings.emitFullSourceMapPath          = false;
-			settings.generateDeclarationFiles       = false;
-			settings.useCaseSensitiveFileResolution = false;
-			settings.gatherDiagnostics              = true;
-			settings.updateTC                       = true;
+			settings.moduleGenTarget                = TypeScript.ModuleGenTarget.Synchronous;
 			settings.disallowBool                   = true;
 			
 			var diagnosticMessages = TypeScript.diagnosticMessages; // localize these in future...
 			
 			this.compiler = new TypeScript.TypeScriptCompiler(this.logger, settings, diagnosticMessages);
-			
 			this.compiler.logger = logger; 
 		} 
 		
@@ -75,17 +57,14 @@ module TypeScript.Api {
 				
 				// add source unit
 				var snapshot   = TypeScript.ScriptSnapshot.fromString( unit.content );
-				
 				var references = TypeScript.getReferencedFiles(unit.path, snapshot);
-				
 				var document   = this.compiler.addSourceUnit(unit.path, snapshot, 0, false, references);		
-
+				
 				// run diagnostics
 				var syntacticDiagnostics = this.compiler.getSyntacticDiagnostics(unit.path);
-				
-				var diagnostics = new TypeScript.Api.DiagnosticReporter(compilation, this.logger );
-				
-				this.compiler.reportDiagnostics(syntacticDiagnostics, diagnostics);
+				var diagnostic_reporter = new TypeScript.Api.DiagnosticReporter(unit, this.logger );
+				this.compiler.reportDiagnostics(syntacticDiagnostics, diagnostic_reporter);
+				compilation.diagnostics = diagnostic_reporter.diagnostics;
 			}
 			
 			// type check...
@@ -101,7 +80,10 @@ module TypeScript.Api {
 			
 			// build result..
 			
-			
+			for(var n in emitter.files) {
+				
+				compilation.scripts.push(emitter.files[n].ToString());
+			}
 			
 			callback(compilation);
 			

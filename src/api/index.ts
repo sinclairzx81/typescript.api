@@ -26,8 +26,7 @@ export class units {
 		return unit;
 	}
 	
-	public static resolve(sources:string[], callback :{ (units:any[]): void; }) : void {
-		
+	public static resolve (sources:string[], callback :{ (units:any[]): void; }) : void {
 		var api = load_typescript_api();
 		var async_io = new api.IOAsyncHost();
 		var logger   = new api.NullLogger();
@@ -55,15 +54,12 @@ export function compile(units:any[], callback :{ (compilation:any): void; }) : v
 /////////////////////////////////////////////////////////////
 
 export function api_namespace() : any {
-
 	return load_typescript_api();
-	
 }
 /////////////////////////////////////////////////////////////
 // loads the TypeScript namespace
 /////////////////////////////////////////////////////////////
 export function typescript_namespace() : any {
-
 	return load_typescript();
 }
 

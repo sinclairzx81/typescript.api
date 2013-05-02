@@ -7,7 +7,16 @@ module application {
 	
 		public static Main(args:string) : void {
 		
-			this should not compile.
+			console.log('application main');
+			
+			var mongo = new application.data.Mongo();
+			
+			var data  = mongo.GetData();
+			
+			for(var n in data){
+			
+				console.log(data[n]);
+			}
 		}
 	}
 }
