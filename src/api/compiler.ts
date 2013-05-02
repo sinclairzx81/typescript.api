@@ -3,15 +3,13 @@
 /// <reference path='textwriter.ts' />
 /// <reference path='resolver.ts' />
 /// <reference path='emitter.ts' />
-/// <reference path='logger.ts' />
-/// <reference path='io.ts' />
 
 module TypeScript.Api {
 	
 	export class DiagnosticReporter implements  TypeScript.IDignosticsReporter {
         
 		public addDiagnostic(diagnostic: TypeScript.IDiagnostic): void {
-			 
+			 // todo: implement this...
 		} 
     }
 	
@@ -19,73 +17,54 @@ module TypeScript.Api {
 		
 		public compiler : TypeScript.TypeScriptCompiler;
 		
-		constructor(public ioHost : IIO)  {
+		constructor(logger:TypeScript.ILogger)  {
 			
-			var logger = new TypeScript.Api.Logger(this.ioHost);			
+			var compilationSettings = new TypeScript.CompilationSettings();
 			
-			var compilationSettings             = new TypeScript.CompilationSettings();
-
-			compilationSettings.codeGenTarget   = TypeScript.LanguageVersion.EcmaScript5;
+			compilationSettings.codeGenTarget = TypeScript.LanguageVersion.EcmaScript5;
 
 			compilationSettings.moduleGenTarget = TypeScript.ModuleGenTarget.Synchronous;			
-
-			this.compiler = new TypeScript.TypeScriptCompiler(TypeScript.Api.Resources.EN.DiagnosticMessages, logger, compilationSettings);
+			
+			var language_file = TypeScript.Api.Resources.EN.DiagnosticMessages;
+			
+			this.compiler = new TypeScript.TypeScriptCompiler(language_file, logger, compilationSettings);
 			
 			this.compiler.logger = logger; 
 		} 
 		
-		public resolve(sources:string[], callback: {( files:IResolvedFile[]): void; }) : void {
-			
-			var io       = new TypeScript.Api.IOAsyncRemoteHost();
-			
-			var logger   = new TypeScript.Api.Logger( this.ioHost );
-
-			var resolver = new TypeScript.Api.CodeResolver( io, logger );
-
-			resolver.resolve(sources, callback);
-		}
-		
-		public compile() : void {  
+		public compile(files:ResolvedFile[], callback:Function) : void {  
 			
 			// bind on each compile...
-			TypeScript.CompilerDiagnostics.diagnosticWriter = { 
-			
-					Alert : (s: string) => { this.ioHost.printLine(s); } 
-			
+			TypeScript.CompilerDiagnostics.diagnosticWriter = {  Alert : (s: string) => { 
+				
+				console.log(s); 
+			}};
+						
+			for(var n in files) {
+				
+				var file = files[n];
+				
+				var snapshot   = TypeScript.ScriptSnapshot.fromString( file.content);
+				
+				var references = TypeScript.getReferencedFiles(file.path, snapshot);
+				
+				var document = this.compiler.addSourceUnit(file.path, snapshot, 0, false, references);		
+				
+				//var syntacticDiagnostics = this.compiler.getSyntacticDiagnostics(file.path);
+				
+				//this.compiler.reportDiagnostics(syntacticDiagnostics, new TypeScript.Api.DiagnosticReporter());
 			}
 			
-			/*
-				var code = this.ioHost.readFile(filename);
-				
-				var snapshot = TypeScript.ScriptSnapshot.fromString( code);
-				
-				var references = TypeScript.getReferencedFiles(filename, snapshot);
-				
-				var document = this.compiler.addSourceUnit(filename, snapshot, 0, false, references);		
-				
-				// diagnostics....
-				
-				var syntacticDiagnostics = this.compiler.getSyntacticDiagnostics(filename);
-				
-				this.compiler.reportDiagnostics(syntacticDiagnostics, new TypeScript.Api.DiagnosticReporter());
-				
-				// compilation...
-				
-				this.compiler.pullTypeCheck();
-				
-				var emitter = new TypeScript.Api.Emitter();
-				
-				this.compiler.emitAll(emitter, (inputFile: string, outputFile: string) : void => {
-					 
-					 console.log('mapInputToOutput(' + inputFile + ',' + outputFile + ')' ); 
-				});
-				
-				for(var n in emitter.files) {
-				
-					console.log(emitter.files[n].ToString());
-				}
-		
-		*/
+			this.compiler.pullTypeCheck();
+
+			var emitter = new TypeScript.Api.Emitter();
+			
+			this.compiler.emitAll(emitter, (inputFile: string, outputFile: string) : void => {
+				 
+				// todo: maybe output something here...
+			});
+			
+			callback(emitter.files);
 		}
 	}
 }

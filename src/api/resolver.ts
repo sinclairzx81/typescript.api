@@ -27,13 +27,17 @@ module TypeScript.Api {
 			this.pending      = [];
 			this.closed  	  = [];
 			this.resolved     = [];
+			
 		}
 		
 		public resolve(sources:string[], callback: {( resolved:ResolvedFile[]): void; }) : void {
+			
 			for(var n in sources) {
 				var op = new LoadParameter( process.mainModule.filename, sources[n] );
 				this.pending.push(op);
 			}
+			
+			
 			this.load ( callback );
 		}		
 		
@@ -41,22 +45,34 @@ module TypeScript.Api {
 		private load (callback: {( file:ResolvedFile[]): void; }) : void {
 			
 			var op = this.pending.pop();
-			this.logger.log('[loading] ' + op.filename);
+			this.logger.log('[resolving] ' + op.filename);
 			
 			if(!this.visited(op)) {
+			
 				this.closed.push(op);
+				
 				this.io.readFile(op.filename, (file:ResolvedFile) => {
-					this.resolved.push(file);
+					
 					if(file.error) {
+					
 						this.logger.log("[error] cannot load " + file.path);
+						
 						return;
 					}
 					
 					var references = this.get_references(file);
+					
 					for(var n in references) {
+					
 						var parameter = new LoadParameter( file.path, references[n] );
+						
 						this.pending.push( parameter );						
+						
+						// push references on the file....
+						file.references.push( Path.relativeToAbsolute(file.path, references[n] ) );
 					}
+					
+					this.resolved.push(file);
 					
 					this.next(callback);
 					

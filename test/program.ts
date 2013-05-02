@@ -1,7 +1,5 @@
 /// <reference path='decl/node.d.ts' />
 /// <reference path='data.ts' />
-/// <reference path='../src/api/compiler.ts' />
-
 
 module application {
 

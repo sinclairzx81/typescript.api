@@ -1,8 +1,66 @@
+
+
+// resolves all source for a compilation..
+export function resolve(sources:string[], allowRemote:boolean, callback:Function) : void {
+	
+	var api = load_typescript_api();
+	
+	var async_io = new api.IOAsyncHost();
+	
+	if(allowRemote) {
+	
+		async_io = new api.IOAsyncRemoteHost();
+	}
+	
+	var resolver = new api.CodeResolver( async_io, new api.ConsoleLogger() );
+	
+	resolver.resolve(sources, callback);		
+}
+// compiles these sources into javascript..
+export function compile(sources:any[], debug:boolean, callback:Function) : void {
+	
+	var api = load_typescript_api();
+	
+	var logger = new api.NullLogger();
+	
+	if(debug) {
+	
+		logger = new api.ConsoleLogger();
+	}
+	
+	var compiler = new api.Compiler( logger );
+	
+	compiler.compile(sources, callback);
+
+}
+
+/////////////////////////////////////////////////////////////
+// loads the TypeScript.Api namespace
+/////////////////////////////////////////////////////////////
+
+export function api_namespace() : any {
+
+	return load_typescript_api();
+	
+}
+/////////////////////////////////////////////////////////////
+// loads the TypeScript namespace
+/////////////////////////////////////////////////////////////
+export function typescript_namespace() : any {
+
+	return load_typescript();
+}
+
+/////////////////////////////////////////////////////////////
+// retro binding hack to load in typescript and api.
+/////////////////////////////////////////////////////////////
+
 // forward declarations...
 declare var		 __filename : string; 
 declare var		 __dirname  : string;
 declare var 	 process    : any;
 declare var 	 global     : any;
+declare var 	 exports    : any;
 declare function require (mod:string):any;
 
 // node modules.
@@ -14,59 +72,52 @@ var _path = require("path");
 var typescript_filename     = _path.join(__dirname, "typescript.js");
 var typescript_api_filename = _path.join(__dirname, "typescript.api.js");
 
-// load the api
-export function api(callback:{(ns:any):void;}) : void  {
+// namespace cache...
+var __typescript__namespace = null;
+var __typescript__api__namespace = null;
+
+function load_typescript_api() : any {
 	
-	load_typescript_api(callback);
+	if(__typescript__api__namespace) {
+		return __typescript__api__namespace;
+	}
 	
+	var sandbox = {
+		TypeScript  : load_typescript(),
+		__filename  : __filename,
+		__dirname   : __dirname,		
+		global	    : global,
+		process     : process,
+		require     : require,	
+		console     : console,
+		exports     : null
+	};
+	__typescript__api__namespace = load_module(typescript_api_filename, sandbox, ["TypeScript"]).Api;
+	
+	return __typescript__api__namespace;
 }
 
-// async typescript.api loading...
-export function load_typescript_api(callback:{(ns:any):void;}) : void  {
+// loads typescript..
+function load_typescript() : any {
 	
-	load_typescript(function(ns) {
-	
-		var sandbox = {
-			__filename  : __filename,
-			__dirname   : __dirname,		
-			global	    : global,
-			process     : process,
-			require     : require,	
-			TypeScript  : ns,
-			exports     : null
-		};
-		
-		load_module(typescript_api_filename, sandbox, ["TypeScript"], (ns:any) => {
-		
-			callback(ns.Api);
-		});
-	});
-}
-
-// async typescript loading...
-function load_typescript(callback:{(ns:any):void;}) : void {
+	if(__typescript__namespace) {
+		return __typescript__namespace;
+	}	
 	
 	var sandbox:any = { exports : null  };
-	
-	load_module (typescript_filename, sandbox, ["TypeScript"], callback);
+	__typescript__namespace = load_module (typescript_filename, sandbox, ["TypeScript"]);
+	return __typescript__namespace;
 }
 
-// async module loading...
-function load_module(filename, sandbox, export_type_names, callback:{(ns:any):void;} ) : void {
-	
-	_fs.readFile(filename, 'utf8', (err, source) => {
-
-		for(var n in export_type_names) {
-		
-			source = source.concat('\n\nexports = ' + export_type_names[n] + ';'); 
-			
-		}
-		
-		var script = _vm.createScript( source, "typescript.js" );
-		
-		script.runInNewContext( sandbox );
-
-		callback( sandbox.exports );
-	});
+// loads a module..
+function load_module(filename, sandbox, export_type_names) : any {
+	var source = _fs.readFileSync(filename, 'utf8');
+	for(var n in export_type_names) {
+		source = source.concat('\n\nexports = ' + export_type_names[n] + ';'); 
+	}
+	var script = _vm.createScript( source, "typescript.js" );
+	script.runInNewContext( sandbox );
+	return sandbox.exports;
+	 
 }
 

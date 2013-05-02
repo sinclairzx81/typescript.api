@@ -24,8 +24,6 @@ module TypeScript.Api {
 		
 		public createFile(path: string, useUTF8?: boolean): ITextWriter {
 			
-			console.log("Emitter.createFile -> " + path);
-			
 			this.files[path] = new TypeScript.Api.TextWriter();
 			
 			return this.files[path];
@@ -34,22 +32,16 @@ module TypeScript.Api {
 		
 		public directoryExists(path: string): boolean {
 		
-			console.log("Emitter.directoryExists -> " + path);
-			
 			return true;
 		}
 		
 		public fileExists(path: string): boolean {
-		
-			console.log("Emitter.fileExists -> " + path);
-			
+
 			return true;
 		}
 		
 		public resolvePath(path: string): string {
 			
-			console.log("Emitter.resolvePath -> " + path);
-		
 			return '/';
 		}
 

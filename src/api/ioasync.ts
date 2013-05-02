@@ -1,50 +1,23 @@
-module TypeScript.Api {
+/// <reference path="decl/node.d.ts" />
 
+module TypeScript.Api {
 	var _path  = require('path');
 	var _fs    = require('fs');
 	var _http  = require('http');
 	var _https = require('https');
 	var _url   = require('url');
 	
-	// pulled from compiler/io.tsc.
-	function processBuffer(buffer) : string {
-		switch (buffer[0]) {
-			case 0xFE:
-				if (buffer[1] == 0xFF) {
-					// utf16-be. Reading the buffer as big endian is 
-					// not supported, so convert it to Little Endian first
-					var i = 0;
-					while ((i + 1) < buffer.length) {
-						var temp = buffer[i];
-						buffer[i] = buffer[i + 1];
-						buffer[i + 1] = temp;
-						i += 2;
-					}
-					return buffer.toString("ucs2", 2);
-				}
-				break;
-			case 0xFF:
-				if (buffer[1] == 0xFE) {
-					// utf16-le 
-					return buffer.toString("ucs2", 2);
-				}
-				break;
-			case 0xEF:
-				if (buffer[1] == 0xBB) {
-					// utf-8
-					return buffer.toString("utf8", 3);
-				}
-		}
-		// Default behaviour
-		return buffer.toString();
-	}	
-	
-	// ResolvedFile..
+	// This shouldn't live in this file..it should be part of the resolver...oh well.
 	export class ResolvedFile implements IResolvedFile {
-		content : string;
-		path    : string;
-		remote  : boolean;
-		error   : string;
+		content    : string;
+		path       : string;
+		remote     : boolean;
+		error      : string;
+		references : string[];
+		
+		constructor() {
+			this.references = [];
+		}
 	}
 
 	export interface IIOAsync {
@@ -151,4 +124,39 @@ module TypeScript.Api {
 			return regex.test(path);
 		}		
 	}
+	
+
+	
+	// pulled from compiler/io.tsc.
+	function processBuffer(buffer) : string {
+		switch (buffer[0]) {
+			case 0xFE:
+				if (buffer[1] == 0xFF) {
+					// utf16-be. Reading the buffer as big endian is 
+					// not supported, so convert it to Little Endian first
+					var i = 0;
+					while ((i + 1) < buffer.length) {
+						var temp = buffer[i];
+						buffer[i] = buffer[i + 1];
+						buffer[i + 1] = temp;
+						i += 2;
+					}
+					return buffer.toString("ucs2", 2);
+				}
+				break;
+			case 0xFF:
+				if (buffer[1] == 0xFE) {
+					// utf16-le 
+					return buffer.toString("ucs2", 2);
+				}
+				break;
+			case 0xEF:
+				if (buffer[1] == 0xBB) {
+					// utf-8
+					return buffer.toString("utf8", 3);
+				}
+		}
+		// Default behaviour
+		return buffer.toString();
+	}		
 }
