@@ -2,9 +2,12 @@ module TypeScript.Api {
 	
 	var _path = require("path");
 	
-	// Path : static path helper utilities.
-	export class Path {
+	///////////////////////////////////////////////////////////////////////
+	// Path: Path utilities..
+	///////////////////////////////////////////////////////////////////////	
 	
+	export class Path {
+		
 		// checks to see if the path is a absolute url.
 		public static isAbsoluteUrl (path:string) : boolean {
 			var regex = new RegExp("^(http[s]?:\\/\\/(www\\.)?|ftp[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_\+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?");

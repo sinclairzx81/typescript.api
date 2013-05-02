@@ -1,16 +1,24 @@
 ﻿var typescript = require("./bin/binding.js");
 
-var sources = ["test/program.ts"];
+var sources = ["test/program.ts", "test/program.ts"];
 
-typescript.resolve(sources, false, function(sources) {
+var unit    = typescript.units.create("ads.ts", "var a = 10;");
+
+typescript.units.resolve(sources, function(units) {
 	
-	typescript.compile(sources, false, function(sources){
+	typescript.compile(units, function(compilation) {
 		
-		
-		console.log(sources);
+		console.log(compilation);
 		
 	});
-	
+});
+
+var unit = typescript.units.create("virtual", "var a = 10;");
+
+typescript.compile([unit], function(compilation) {
+
+	console.log(compilation);
+
 });
 
 

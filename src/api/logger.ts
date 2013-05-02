@@ -2,8 +2,11 @@
 /// <reference path='textwriter.ts' />
 
 module TypeScript.Api {
-	
+	///////////////////////////////////////////////////////////////////////
+	// NullLogger: A Logger that doesn't log anything.
+	///////////////////////////////////////////////////////////////////////		
 	export class NullLogger implements TypeScript.ILogger {
+		
 		public information() : boolean { 
 			return false; 
 		}
@@ -28,7 +31,9 @@ module TypeScript.Api {
 			
 		}
 	}
-	
+	///////////////////////////////////////////////////////////////////////
+	// BufferedLogger: Log messages are written into a buffer.
+	///////////////////////////////////////////////////////////////////////		
 	export class BufferedLogger implements TypeScript.ILogger {
 		
 		private writer : TypeScript.Api.TextWriter;
@@ -66,6 +71,9 @@ module TypeScript.Api {
 		}
 	}
 	
+	///////////////////////////////////////////////////////////////////////
+	// ConsoleLogger: Log messages are written out to the console.
+	///////////////////////////////////////////////////////////////////////	
 	export class ConsoleLogger implements TypeScript.ILogger {
 		
 		public information() : boolean { 

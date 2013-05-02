@@ -1,106 +1,69 @@
 /// <reference path='decl/typescript.d.ts' />
 /// <reference path='logger.ts' />
-/// <reference path='ioasync.ts' />
+/// <reference path='unit.ts' />
 /// <reference path='path.ts' />
+/// <reference path='io.ts' />
 
 module TypeScript.Api {
 	
-	class LoadParameter {
-		public parent_filename  : string;
-		public filename			: string;
-		constructor(parent_filename:string, filename:string) {
-			this.parent_filename = parent_filename;
-			this.filename 		 = Path.relativeToAbsolute(parent_filename, filename); 
-		} 
-	} 
-	
+	///////////////////////////////////////////////////////////////////////
+	// CodeResolver : Resolves source files and returns units.
+	///////////////////////////////////////////////////////////////////////		
 	export class CodeResolver {
 		private io          : TypeScript.Api.IIOAsync;
 		private logger      : TypeScript.ILogger;
 		private pending     : LoadParameter       [];
 		private closed      : LoadParameter       [];	
-		private resolved    : ResolvedFile 		  [];
+		private units       : SourceUnit 		  [];
 	 
 		constructor( io:TypeScript.Api.IIOAsync, logger:TypeScript.ILogger ) {  
 			this.io		  	  = io;
 			this.logger       = logger;
 			this.pending      = [];
 			this.closed  	  = [];
-			this.resolved     = [];
-			
+			this.units        = [];
 		}
 		
-		public resolve(sources:string[], callback: {( resolved:ResolvedFile[]): void; }) : void {
-			
+		// resolves source files...
+		public resolve(sources:string[], callback: {( units:SourceUnit[]): void; }) : void {
 			for(var n in sources) {
 				var op = new LoadParameter( process.mainModule.filename, sources[n] );
 				this.pending.push(op);
 			}
-			
-			
 			this.load ( callback );
 		}		
 		
 		// load - all the action happens here...
-		private load (callback: {( file:ResolvedFile[]): void; }) : void {
-			
+		private load (callback: {( unit:SourceUnit[]): void; }) : void {
 			var op = this.pending.pop();
 			this.logger.log('[resolving] ' + op.filename);
-			
 			if(!this.visited(op)) {
-			
 				this.closed.push(op);
-				
 				this.io.readFile(op.filename, (file:ResolvedFile) => {
-					
 					if(file.error) {
-					
 						this.logger.log("[error] cannot load " + file.path);
-						
 						return;
 					}
+					var unit = new SourceUnit();
+					unit.content    = file.content;
+					unit.path       = file.path;
+					unit.remote     = file.remote;
+					unit.error      = file.error;
+					unit.load_references();
 					
-					var references = this.get_references(file);
-					
-					for(var n in references) {
-					
-						var parameter = new LoadParameter( file.path, references[n] );
-						
-						this.pending.push( parameter );						
-						
-						// push references on the file....
-						file.references.push( Path.relativeToAbsolute(file.path, references[n] ) );
+					for(var n in unit.references) {
+						var parameter = new LoadParameter( file.path, unit.references[n] );
+						this.pending.push( parameter );
 					}
-					
-					this.resolved.push(file);
-					
+					this.units.push(unit);
 					this.next(callback);
-					
 				});
 			} else {
-			
 				this.next(callback);
 			}			
 		}
 		
-		private get_references(file:ResolvedFile): string[] {
-			var result:string[] = [];
-			var lines :string[] = file.content.split('\r\n');
-			if (lines.length === 1) {
-				lines = file.content.split('\n');
-			}
-			for(var n in lines) {
-				var reference_pattern = /^(\/\/\/\s*<reference\s+path=)('|")(.+?)\2\s*(static=('|")(.+?)\2\s*)*\/>/gim;
-				//var implicit_import_pattern = /^(\/\/\/\s*<implicit-import\s*)*\/>/gim;
-				//var is_no_default_lib_pattern = /^(\/\/\/\s*<reference\s+no-default-lib=)('|")(.+?)\2\s*\/>/gim;	
-				var match = reference_pattern.exec(lines[n]);
-				if(match) {
-					result.unshift( match[3] );
-				}
-			}
-			return result;
-		}	
-		
+		// checks to see if this file has been loaded...
 		private visited (op:LoadParameter) : boolean {
 			for(var n in this.closed) {
 				if(this.closed[n].filename == op.filename) {
@@ -109,15 +72,27 @@ module TypeScript.Api {
 			}
 			return false;
 		}	
-		
+		// next or callback..
 		private next (callback) : void { 
 			if(this.pending.length > 0) {
 				this.load ( callback );
 			} else {
-				callback( this.resolved );
+				callback( this.units );
 			}			
 		}
 	}
+	
+	///////////////////////////////////////////////////////////////////////
+	// LoadParameter : Response object for IIOAsync
+	///////////////////////////////////////////////////////////////////////		
+	class LoadParameter {
+		public parent_filename  : string;
+		public filename         : string;
+		constructor(parent_filename:string, filename:string) {
+			this.parent_filename = parent_filename;
+			this.filename 		 = Path.relativeToAbsolute(parent_filename, filename); 
+		} 
+	} 	
 
 }
 

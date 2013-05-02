@@ -1,29 +1,64 @@
 
+declare var exports:any;
 
+export var debug       : boolean = false;
+
+export var allowRemote : boolean = true;
+
+/////////////////////////////////////////////////////////////
 // resolves all source for a compilation..
-export function resolve(sources:string[], allowRemote:boolean, callback:Function) : void {
+/////////////////////////////////////////////////////////////
+
+export class units {
 	
-	var api = load_typescript_api();
-	
-	var async_io = new api.IOAsyncHost();
-	
-	if(allowRemote) {
-	
-		async_io = new api.IOAsyncRemoteHost();
+	public static create(filename:string, source:string): any {
+		var api 	 = load_typescript_api();
+		var unit 	 = new api.SourceUnit();
+		unit.content = source;
+		unit.path    = filename;
+		unit.remote  = false;
+		unit.error   = '';
+		unit.references = [];
+		return unit;
 	}
 	
-	var resolver = new api.CodeResolver( async_io, new api.ConsoleLogger() );
-	
-	resolver.resolve(sources, callback);		
+	public static resolve(sources:string[], callback:Function) : void {
+		
+		var api = load_typescript_api();
+		
+		var async_io = new api.IOAsyncHost();
+		
+		if(exports.allowRemote) {
+		
+			async_io = new api.IOAsyncRemoteHost();
+		}
+		
+		var logger = new api.NullLogger();
+		
+		if(exports.debug) {
+		
+			logger = new api.ConsoleLogger();
+		}
+		
+		var resolver = new api.CodeResolver( async_io, logger );
+		
+		resolver.resolve(sources, callback);		
+	}
 }
+
+
+
+/////////////////////////////////////////////////////////////
 // compiles these sources into javascript..
-export function compile(sources:any[], debug:boolean, callback:Function) : void {
+/////////////////////////////////////////////////////////////
+
+export function compile(sources:any[], callback:Function) : void {
 	
 	var api = load_typescript_api();
 	
 	var logger = new api.NullLogger();
 	
-	if(debug) {
+	if(exports.debug) {
 	
 		logger = new api.ConsoleLogger();
 	}
@@ -31,7 +66,6 @@ export function compile(sources:any[], debug:boolean, callback:Function) : void 
 	var compiler = new api.Compiler( logger );
 	
 	compiler.compile(sources, callback);
-
 }
 
 /////////////////////////////////////////////////////////////
