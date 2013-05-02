@@ -1,13 +1,16 @@
+/// <reference path="collections.ts" />
 
 
-declare var console:any;
 module application {
-	
 	export class program {
-	
-		public static main(args:string) : void  {
-			 console.log('inside main');
-			 var n:number = "1s23";
+		public static main(args:string[]) : void  {
+			 var list = new application.collections.List<number>();
+			 list.add(123);
+			 list.add(123);
+			 list.add(123);
+			 list.each((n)=> {
+				console.log(n.toString());
+			 });
 		}
 	}
 }

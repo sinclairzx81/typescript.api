@@ -59,7 +59,14 @@ export class units {
 /////////////////////////////////////////////////////////////
 
 export function compile(units:any[], callback :{ (compilation:any): void; }) : void {
-	var api = load_typescript_api();
+	var api 	   = load_typescript_api();
+	var typescript = load_typescript();
+	var a = exports.units.create('lib.d.ts',  _fs.readFileSync( _path.join(__dirname, "decl/lib.d.ts") , "utf8" ) );
+	var b = exports.units.create('node.d.ts', _fs.readFileSync( _path.join(__dirname, "decl/node.d.ts") , "utf8" ) );
+	
+	units.unshift(b);
+	units.unshift(a);
+	
 	var logger = new api.NullLogger();
 	if(exports.debug) { logger = new api.ConsoleLogger(); }
 	var compiler = new api.Compiler( logger );
@@ -100,6 +107,7 @@ function get_default_sandbox(): any {
 	sandbox.exports  = exports;
 	sandbox.process  = process;
 	sandbox.console  = console;
+	sandbox.global   = global;
 	return sandbox;
 }
 
@@ -158,7 +166,7 @@ function load_typescript() : any {
 	}	
 	
 	var sandbox:any = { exports : null, 
-		console : console // for debugging..
+		//console : console // for debugging..
 	};
 	__typescript__namespace = load_module (typescript_filename, sandbox, ["TypeScript"]);
 	return __typescript__namespace;

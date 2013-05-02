@@ -3,7 +3,7 @@
 var sources = ["test/program.ts"];
 
 typescript.debug = false;
-
+ 
 function diagnostics(compilation) {
 
 	console.log(compilation.diagnostics);
@@ -20,6 +20,7 @@ typescript.units.resolve(sources, function(units) {
 		});
 	});
 });
+ 
 
 
 
