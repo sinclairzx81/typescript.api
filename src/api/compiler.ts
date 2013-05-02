@@ -10,11 +10,19 @@ module TypeScript.Api {
 	// Compilation : What a compiler outputs.
 	///////////////////////////////////////////////////////////////////////	
 	
+	export class CompiledSourceUnit {
+		public ast      : TypeScript.AST;
+		public filename : string;
+		public content  : string;
+		
+	}
+	
 	export class Compilation {
-		public ast          : AST;
-		public scripts      : string[];
-		public diagnostics  : TypeScript.Api.Diagnostic[];
+		public astlist	   : TypeScript.AST[];
+		public diagnostics : TypeScript.Api.Diagnostic[];
+		public scripts     : string[];
 		constructor() {
+			this.astlist     = [];
 			this.scripts     = [];
 			this.diagnostics = [];
 		}
@@ -78,16 +86,18 @@ module TypeScript.Api {
 				this.logger.log('[emitting] ' + outputFile);
 			});
 			
-			// build result..
+			// push script ast on astlist
+			
+			compilation.astlist = this.compiler.getScripts();
+			
+			// iterate files, push output on compilation scripts.
 			
 			for(var n in emitter.files) {
-				
+			
 				compilation.scripts.push(emitter.files[n].ToString());
 			}
 			
 			callback(compilation);
-			
-			//callback(emitter.files);
 		}
 	}
 	
