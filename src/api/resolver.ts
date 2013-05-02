@@ -89,6 +89,7 @@ module TypeScript.Api {
 			if(this.pending.length > 0) {
 				this.load ( callback );
 			} else {
+				this.units.reverse();
 				callback( this.units );
 			}			
 		}

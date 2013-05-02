@@ -1,22 +1,22 @@
-/// <reference path='decl/node.d.ts' />
-/// <reference path='data.ts' />
 
+
+declare var console:any;
 module application {
-
-	export class Program {
 	
-		public static Main(args:string) : void {
-		
-			console.log('application main');
-			
-			var mongo = new application.data.Mongo();
-			
-			
+	export class program {
+	
+		public static main(args:string) : void  {
+			 console.log('inside main');
+			 var n:number = "1s23";
 		}
 	}
 }
 
-application.Program.Main([]);
+
+application.program.main([]);
+
+
+
 
 
 

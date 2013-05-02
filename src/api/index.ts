@@ -71,11 +71,17 @@ export function compile(units:any[], callback :{ (compilation:any): void; }) : v
 /////////////////////////////////////////////////////////////
 
 export function run (compilation:any, sandbox:any, callback :{ (context:any): void; }) : void {
-	if(!sandbox) { sandbox = get_default_sandbox(); }
-	var source = compilation.scripts.join('');
-	var script = _vm.createScript( source, "compilation.js" );
-	script.runInNewContext( sandbox );
-	callback( sandbox );
+	try {
+		if(!sandbox) { sandbox = get_default_sandbox(); }
+		var source = compilation.scripts.join('');
+		var script = _vm.createScript( source, "compilation.js" );
+		script.runInNewContext( sandbox );
+		callback( sandbox );
+	} catch(e) {
+		// can i do source mapping here?
+		callback( null );
+		console.log(e);
+	}
 }
 
 

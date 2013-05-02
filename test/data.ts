@@ -2,16 +2,16 @@
 
 module application.data {
 	
-	export class Mongo {
+	export interface IDataStore {
+		get(): string[];
+	}
 	
-		constructor() {
-			
-		}
+	export class Mock implements IDataStore {
+	
+		constructor() { }
 		
-		public GetData():string[] {
-			
+		public get():string[] {
 			return ['a','b','c'];
-			
 		}
 	}
 

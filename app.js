@@ -2,14 +2,21 @@
 
 var sources = ["test/program.ts"];
 
+typescript.debug = false;
+
+function diagnostics(compilation) {
+
+	console.log(compilation.diagnostics);
+}
+
 typescript.units.resolve(sources, function(units) {
 	
 	typescript.compile(units, function(compilation) {
-	
-		typescript.run(compilation, null, function(context) {
 		
-			
-			
+		diagnostics(compilation);
+		
+		typescript.run(compilation, null, function(context) {
+			 
 		});
 	});
 });

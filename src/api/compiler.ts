@@ -41,64 +41,61 @@ module TypeScript.Api {
 			
 			this.logger = logger;
 			
-			// arbitua
+			// settings...might be better to make these available to caller?
 			var settings = new TypeScript.CompilationSettings();
 			settings.codeGenTarget                  = TypeScript.LanguageVersion.EcmaScript5;
 			settings.moduleGenTarget                = TypeScript.ModuleGenTarget.Synchronous;
 			settings.disallowBool                   = true;
 			
-			var diagnosticMessages = TypeScript.diagnosticMessages; // localize these in future...
-			
-			this.compiler = new TypeScript.TypeScriptCompiler(this.logger, settings, diagnosticMessages);
+			// the compiler...
+			this.compiler = new TypeScript.TypeScriptCompiler(this.logger, settings, TypeScript.diagnosticMessages);
 			this.compiler.logger = logger; 
 		} 
 		
 		public compile(units:SourceUnit [], callback: { (compilation:Compilation) : void;} ) : void {  
 			
-			//TypeScript.CompilerDiagnostics.diagnosticWriter = {  Alert : (message: string) => { this.logger.log(message); }};
-			
 			var compilation = new Compilation();
 			
+			// add source units
 			for(var n in units) {
-				
 				var unit = units[n];
-				
-				// add source unit
 				var snapshot   = TypeScript.ScriptSnapshot.fromString( unit.content );
 				var references = TypeScript.getReferencedFiles(unit.path, snapshot);
 				var document   = this.compiler.addSourceUnit(unit.path, snapshot, 0, false, references);		
-				
-				// run diagnostics
-				var syntacticDiagnostics = this.compiler.getSyntacticDiagnostics(unit.path);
-				var diagnostic_reporter = new TypeScript.Api.DiagnosticReporter(unit, this.logger );
-				this.compiler.reportDiagnostics(syntacticDiagnostics, diagnostic_reporter);
-				compilation.diagnostics = diagnostic_reporter.diagnostics;
 			}
+			// syntax check
+			for(var n in units) {
+				var unit = units[n];
+				var diagnostics = this.compiler.getSyntacticDiagnostics(unit.path);
+				for(var m in diagnostics) {
+					compilation.diagnostics.push( Diagnostic.create("syntax", unit, diagnostics[m]) );
+				}					 
+			}		
 			
 			// type check...
 			this.compiler.pullTypeCheck();
-
+			var keys = this.compiler.fileNameToDocument.getAllKeys();
+			for(var n in keys) {
+				var key = keys[n];
+				var diagnostics = this.compiler.getSemanticDiagnostics(key);
+				for(var m in diagnostics){
+					compilation.diagnostics.push( Diagnostic.create("typecheck", unit, diagnostics[m]) );
+				}
+			}
+			
 			// emit the source code...
 			var emitter = new TypeScript.Api.Emitter();
-			
 			this.compiler.emitAll(emitter, (inputFile: string, outputFile: string) : void => {
-				 
 				this.logger.log('[emitting] ' + outputFile);
 			});
 			
-			// push script ast on astlist
-			
+			// push ast and scripts on compilation..
 			compilation.astlist = this.compiler.getScripts();
-			
-			// iterate files, push output on compilation scripts.
-			
 			for(var n in emitter.files) {
-			
 				compilation.scripts.push(emitter.files[n].ToString());
 			}
 			
-			compilation.scripts.reverse();
-			
+			// return..
 			callback(compilation);
 		}
 	}
