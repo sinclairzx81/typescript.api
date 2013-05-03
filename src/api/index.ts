@@ -34,11 +34,19 @@ var _path = require("path");
 // compiler options..
 /////////////////////////////////////////////////////////////
 
-export var debug       : boolean = false;
+export var include_lib_declaration  : boolean = false;
 
-export var allowRemote : boolean = true;
+export var include_node_declaration : boolean = false;
 
-export var async       : boolean = true;
+export var debug       				: boolean = false;
+
+export var allowRemote 				: boolean = true;
+
+export var async      				: boolean = true;
+
+
+
+
 
 /////////////////////////////////////////////////////////////
 // creates a new compilation unit
@@ -83,7 +91,7 @@ export function register () : void {
 		var diagnostics = [];
 		resolver.resolve([_module.filename], (units) => {
 			var compiler = new api.Compiler( logger );
-			compiler.compile( attach_declarations(units), (compilation) => {
+			compiler.compile( include_declarations(units), (compilation) => {
 				diagnostics = compilation.diagnostics;
 				if(compilation.diagnostics.length > 0) {
 					_module.exports = null;
@@ -114,7 +122,7 @@ export function compile(units:any[], callback :{ (compilation:any): void; }) : v
 	var logger = new api.NullLogger();
 	if(exports.debug) { logger = new api.ConsoleLogger(); }
 	var compiler = new api.Compiler( logger );
-	compiler.compile( attach_declarations(units), callback);
+	compiler.compile( include_declarations(units), callback);
 }
 /////////////////////////////////////////////////////////////
 // provides reflection information about a compilation.
@@ -167,11 +175,20 @@ function get_default_sandbox(): any {
 /////////////////////////////////////////////////////////////
 // attaches declarations to compilation units
 /////////////////////////////////////////////////////////////
-function attach_declarations (units:any[]):any[] {
-	var lib_decl  = exports.create('lib.d.ts',  _fs.readFileSync( _path.join(__dirname, "decl/lib.d.ts") , "utf8" ) );
-	var node_decl = exports.create('node.d.ts', _fs.readFileSync( _path.join(__dirname, "decl/node.d.ts"), "utf8" ) );
-	units.unshift(node_decl);
-	units.unshift(lib_decl);
+function include_declarations (units:any[]):any[] {
+	
+	// snap in lib.d.ts
+	if(exports.include_lib_declaration) {
+		var lib_decl  = exports.create('lib.d.ts',  _fs.readFileSync( _path.join(__dirname, "decl/lib.d.ts") , "utf8" ) );
+		units.unshift(lib_decl);
+	}	
+	
+	// snap in node.d.ts
+	if(exports.include_node_declaration) {
+		var node_decl = exports.create('node.d.ts', _fs.readFileSync( _path.join(__dirname, "decl/node.d.ts"), "utf8" ) );
+		units.unshift(node_decl);		
+	}
+	
 	return units;
 }
 
