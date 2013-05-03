@@ -18,7 +18,7 @@ TypeScript 0.9 alpha
 ### registering typescript extension
 
 The following will register the *.ts extension with require(). Compilation errors
-will be written to the console, and module will be resolve, compiled and executed
+will be written to the console, and module will be resolved, compiled and executed
 synchronously.
 
 ```javascript
