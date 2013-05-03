@@ -14,6 +14,7 @@
 //
 
 /// <reference path='decl/typescript.d.ts' />
+/// <reference path="diagnostics.ts" />
 /// <reference path='logger.ts' />
 /// <reference path='unit.ts' />
 /// <reference path='path.ts' />
@@ -42,6 +43,7 @@ module TypeScript.Api {
 		private pending     : LoadParameter       [];
 		private closed      : LoadParameter       [];	
 		private units       : SourceUnit 		  [];
+		private diagnostics : Diagnostic          [];
 	 
 		constructor( io:TypeScript.Api.IIOAsync, logger:TypeScript.ILogger ) {  
 			this.io		  	  = io;
@@ -49,6 +51,7 @@ module TypeScript.Api {
 			this.pending      = [];
 			this.closed  	  = [];
 			this.units        = [];
+			this.diagnostics  = []; // todo: implement this.....
 		}
 		
 		// resolves source files...
@@ -68,7 +71,7 @@ module TypeScript.Api {
 				this.closed.push(op);
 				this.io.readFile(op.filename, (file:ResolvedFile) => {
 					if(file.error) {
-						this.logger.log("[error] cannot load " + file.path);
+						this.logger.log("[error] cannot resolve " + file.path);
 						return;
 					}
 					var unit = new SourceUnit();

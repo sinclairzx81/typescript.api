@@ -63,7 +63,7 @@ is then sent to be run.
 
 ## reference
 
-### typescript.units.resolve (sources, callback)
+### typescript.resolve (sources, callback)
 
 Will resolve compilation units by crawling the document space. 
 
@@ -90,7 +90,7 @@ Will resolve 'program.ts' and print all referenced source files.
 	
 ```
 
-### typescript.units.create  ( filename, code )
+### typescript.create ( filename, code )
 
 Will create a unit from the supplied filename and source code.
 

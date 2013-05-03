@@ -19,6 +19,9 @@
 /// <reference path='resolver.ts' />
 /// <reference path='emitter.ts' />
 
+
+/// <reference path='reflect.ts' />
+
 module TypeScript.Api {
 	
 	///////////////////////////////////////////////////////////////////////

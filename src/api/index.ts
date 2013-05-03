@@ -43,33 +43,33 @@ export var allowRemote : boolean = true;
 export var async       : boolean = true;
 
 /////////////////////////////////////////////////////////////
-// resolves all source for a compilation..
+// creates a new compilation unit
 /////////////////////////////////////////////////////////////
-
-export class units {
-	
-	public static create (filename:string, source:string): any {
-		var api 	 = load_typescript_api();
-		var unit 	 = new api.SourceUnit();
-		unit.content = source;
-		unit.path    = filename;
-		unit.remote  = false;
-		unit.error   = '';
-		unit.load_references();
-		return unit;
-	}
-	
-	public static resolve (sources:string[], callback :{ (units:any[]): void; }) : void {
-		var api      = load_typescript_api();
-		var io       = new api.IOAsyncHost();
-		var logger   = new api.NullLogger();
-		if(exports.allowRemote) { io = new api.IOAsyncRemoteHost(); }
-		if(!exports.async)      { io = new api.IOSync(); }
-		if(exports.debug)       { logger = new api.ConsoleLogger(); }
-		var resolver = new api.CodeResolver( io, logger );
-		resolver.resolve(sources, callback);		
-	}
+export function create (filename:string, source:string): any {
+	var api 	 = load_typescript_api();
+	var unit 	 = new api.SourceUnit();
+	unit.content = source;
+	unit.path    = filename;
+	unit.remote  = false;
+	unit.error   = '';
+	unit.load_references();
+	return unit;
 }
+
+/////////////////////////////////////////////////////////////
+// resolves units.
+/////////////////////////////////////////////////////////////	
+export function resolve (sources:string[], callback :{ (units:any[]): void; }) : void {
+	var api      = load_typescript_api();
+	var io       = new api.IOAsyncHost();
+	var logger   = new api.NullLogger();
+	if(exports.allowRemote) { io = new api.IOAsyncRemoteHost(); }
+	if(!exports.async)      { io = new api.IOSync(); }
+	if(exports.debug)       { logger = new api.ConsoleLogger(); }
+	var resolver = new api.CodeResolver( io, logger );
+	resolver.resolve(sources, callback);		
+}
+ 
 
 /////////////////////////////////////////////////////////////
 // registers the .ts extension so typescript can be with require.
@@ -78,13 +78,15 @@ export class units {
 
 export function register () : void {
 	require.extensions['.ts'] = function(_module) {
-		var api      = load_typescript_api();
-		var io       = new api.IOSyncHost();
-		var logger   = new api.ConsoleLogger();
-		var resolver = new api.CodeResolver( io, logger );
+		var api         = load_typescript_api();
+		var io          = new api.IOSyncHost();
+		var logger      = new api.BufferedLogger();
+		var resolver    = new api.CodeResolver( io, logger );
+		var diagnostics = [];
 		resolver.resolve([_module.filename], (units) => {
 			var compiler = new api.Compiler( logger );
-			compiler.compile( attach_declarations(units), (compilation) =>{
+			compiler.compile( attach_declarations(units), (compilation) => {
+				diagnostics = compilation.diagnostics;
 				if(compilation.diagnostics.length > 0) {
 					_module.exports = null;
 				} else {
@@ -92,8 +94,15 @@ export function register () : void {
 						_module.exports = context;
 					});
 				}			
-			});			
+			});	
 		});
+		
+		if(diagnostics.length > 0) {
+			console.log('[TYPESCRIPT ERROR]');
+			console.log(logger.ToString());
+			throw new Error("[TYPESCRIPT ERROR]");
+			
+		}
 	}
 }
 
@@ -102,12 +111,21 @@ export function register () : void {
 /////////////////////////////////////////////////////////////
 
 export function compile(units:any[], callback :{ (compilation:any): void; }) : void {
-	var api 	   = load_typescript_api();
+	var api = load_typescript_api();
 	var typescript = load_typescript();
 	var logger = new api.NullLogger();
 	if(exports.debug) { logger = new api.ConsoleLogger(); }
 	var compiler = new api.Compiler( logger );
 	compiler.compile( attach_declarations(units), callback);
+}
+/////////////////////////////////////////////////////////////
+// provides reflection information about a compilation.
+/////////////////////////////////////////////////////////////
+
+export function reflect(compilation:any, callback :{ (reflection:any): void; }) : void {
+	var api = load_typescript_api();
+ 	var reflector = new api.Reflector(compilation);
+	callback( reflector.reflect() );
 }
 
 /////////////////////////////////////////////////////////////
@@ -152,8 +170,8 @@ function get_default_sandbox(): any {
 // attaches declarations to compilation units
 /////////////////////////////////////////////////////////////
 function attach_declarations (units:any[]):any[] {
-	var lib_decl  = exports.units.create('lib.d.ts',  _fs.readFileSync( _path.join(__dirname, "decl/lib.d.ts") , "utf8" ) );
-	var node_decl = exports.units.create('node.d.ts', _fs.readFileSync( _path.join(__dirname, "decl/node.d.ts"), "utf8" ) );
+	var lib_decl  = exports.create('lib.d.ts',  _fs.readFileSync( _path.join(__dirname, "decl/lib.d.ts") , "utf8" ) );
+	var node_decl = exports.create('node.d.ts', _fs.readFileSync( _path.join(__dirname, "decl/node.d.ts"), "utf8" ) );
 	units.unshift(node_decl);
 	units.unshift(lib_decl);
 	return units;
@@ -182,13 +200,13 @@ var typescript_filename     = _path.join(__dirname, "typescript.js");
 var typescript_api_filename = _path.join(__dirname, "typescript.api.js");
 
 // namespace cache...
-var __typescript__namespace = null;
-var __typescript__api__namespace = null;
+var cache_typescript_namespace = null;
+var _cache_typescript_api_namespace = null;
 
 function load_typescript_api() : any {
 	
-	if(__typescript__api__namespace) {
-		return __typescript__api__namespace;
+	if(_cache_typescript_api_namespace) {
+		return _cache_typescript_api_namespace;
 	}
 	
 	var sandbox = {
@@ -201,23 +219,21 @@ function load_typescript_api() : any {
 		console     : console,
 		exports     : null
 	};
-	__typescript__api__namespace = load_module(typescript_api_filename, sandbox, ["TypeScript"]).Api;
+	_cache_typescript_api_namespace = load_module(typescript_api_filename, sandbox, ["TypeScript"]).Api;
 	
-	return __typescript__api__namespace;
+	return _cache_typescript_api_namespace;
 }
 
 // loads typescript..
 function load_typescript() : any {
-	
-	if(__typescript__namespace) {
-		return __typescript__namespace;
+	if(cache_typescript_namespace) {
+		return cache_typescript_namespace;
 	}	
-	
 	var sandbox:any = { exports : null, 
 		//console : console // for debugging..
 	};
-	__typescript__namespace = load_module (typescript_filename, sandbox, ["TypeScript"]);
-	return __typescript__namespace;
+	cache_typescript_namespace = load_module (typescript_filename, sandbox, ["TypeScript"]);
+	return cache_typescript_namespace;
 }
 
 // loads a module..

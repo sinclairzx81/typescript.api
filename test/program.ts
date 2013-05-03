@@ -1,9 +1,21 @@
-/// <reference path="collections.ts" />
 
-export module application {
-	export class program {
-		public static main(args:string[]) : void  {
-			console.log('inside the main method.');
+
+module application {
+
+
+	export class Program {
+	
+		
+		public static Method(a:number, b:number) : number {
+			return a + b;
 		}
+		
+		public static Main(args:string[]) : void {
+			
+		
+		}
+		
 	}
-} 
+
+}
+
