@@ -45,6 +45,29 @@ module TypeScript.Api {
 	}
 	
 	///////////////////////////////////////////////////////////////////////
+	// IOSync: Syncronous IO (used primarily for nodejs require()
+	///////////////////////////////////////////////////////////////////////	
+	
+	export class IOSyncHost implements IIOAsync {
+		public readFile (filename:string, callback:{(file:ResolvedFile) : void; }): void {
+			try {
+				var data 	 = _fs.readFileSync(filename);
+				var file     = new ResolvedFile();
+				file.path    = filename;
+				file.content = processBuffer(data);
+				file.remote  = false;
+				callback( file );  
+			} catch(e) {
+				var file     = new ResolvedFile();
+				file.path    = filename;
+				file.error   = e;
+				file.remote  = false;
+				callback( file ); 
+			}
+		}		
+	}	
+	 
+	///////////////////////////////////////////////////////////////////////
 	// IOAsyncHost: Provides local file read services.
 	///////////////////////////////////////////////////////////////////////
 	export class IOAsyncHost implements IIOAsync {

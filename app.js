@@ -1,16 +1,8 @@
-﻿var typescript = require("./bin/index.js");
+﻿require("./bin/index.js").register();
 
-var unit = typescript.units.create("temp.ts", "export var value:number = 123;");
+var m = require('./test/program.ts');
 
-typescript.compile([unit], function(compilation) {
-	typescript.run(compilation, null, function(context) { 
-		console.log(context);
-	});
-});
- 
-
-
-
+console.log(m);
 
 
 

@@ -16,11 +16,6 @@ module application.collections {
 				}
 			}
 		}
-		
-		public foo() : number{
-			return 123;
-		}
-		
 		public each(callback:{(value:T): void;}): void{
 			for(var n in this.values) {
 				callback(this.values[n]);

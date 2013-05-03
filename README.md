@@ -15,6 +15,24 @@ TypeScript 0.9 alpha
 
 ## quick start
 
+### registering typescript extension
+
+The following will register the *.ts extension with require(). Compilation errors
+will be written to the console, and module will be resolve, compiled and executed
+synchronously.
+
+```javascript
+
+	var typescript = require("typescript.api");
+
+	typescript.register();
+
+	var mymodule = require("./program.ts");
+
+```
+
+### manual compilation
+
 The following is an example of using the api to compile the source file 'program.ts'. 
 
 The process will first resolve 'program.ts' and all its reference sources. The resolved 
@@ -22,24 +40,25 @@ sources (units) are then passed to the compiler for compilation. The compilation
 is then sent to be run.
 
 ```javascript
-var typescript = require("typescript.api");
 
-var sources = ["test/program.ts"];
+	var typescript = require("typescript.api");
 
-function has_errors(compilation) {
-	// errors can be listed on the compilation.diagnostics array.
-	return compilation.diagnostics.length > 0; 
-}
+	var sources = ["./program.ts"];
 
-typescript.units.resolve(sources, function(units) {
-	typescript.compile(units, function(compilation) {
-		if(!has_errors (compilation) ) {
-			typescript.run(compilation, null, function(context) {
-				 // exported members available on the context...
-			});
-		}
+	function has_errors(compilation) {
+		// errors can be listed on the compilation.diagnostics array.
+		return compilation.diagnostics.length > 0; 
+	}
+	typescript.units.resolve(sources, function(units) {
+		typescript.compile(units, function(compilation) {
+			if(!has_errors (compilation) ) {
+				typescript.run(compilation, null, function(context) {
+					 // exported members available on the context...
+				});
+			}
+		});
 	});
-});
+
 ```
 
 ## reference
@@ -57,16 +76,18 @@ __Example__
 
 Will resolve 'program.ts' and print all referenced source files.
 
-```js
-typescript.units.resolve(["program.ts"], function(units) { 
-	for(var n in units) {
-		console.log( units[n].path );
-		console.log( units[n].content );
-		for(var m in units[n].references) {
-			console.log( units[n].references[m] )
+```javascript
+
+	typescript.units.resolve(["program.ts"], function(units) { 
+		for(var n in units) {
+			console.log( units[n].path );
+			console.log( units[n].content );
+			for(var m in units[n].references) {
+				console.log( units[n].references[m] )
+			}
 		}
-	}
-});
+	});
+	
 ```
 
 ### typescript.units.create  ( filename, code )
@@ -82,12 +103,14 @@ __Example__
 
 The following will create a unit. and send to the compiler for compilation.
 
-```js
-var unit = typescript.units.create("temp.ts", "console.log('hello world');");
+```javascript
 
-typescript.compile([unit], function(compilation) {
-	typescript.run(compilation, null, function(context) { });
-});
+	var unit = typescript.units.create("temp.ts", "console.log('hello world');");
+
+	typescript.compile([unit], function(compilation) {
+		typescript.run(compilation, null, function(context) { });
+	});
+
 ```
 
 ### typescript.compile ( units, callback )
@@ -104,14 +127,16 @@ __Example__
 The following will first create and compile a unit, and compiled source is
 written to the console.
 
-```js
-var unit = typescript.units.create("temp.ts", "var value:number = 123;");
+```javascript
 
-typescript.compile([unit], function(compilation) {
-	for(var n in compilation.scripts){
-		console.log(compilation.scripts[n]);
-	}
-});
+	var unit = typescript.units.create("temp.ts", "var value:number = 123;");
+
+	typescript.compile([unit], function(compilation) {
+		for(var n in compilation.scripts){
+			console.log(compilation.scripts[n]);
+		}
+	});
+	
 ```
 
 ### typescript.run ( compilation, sandbox, callback )
@@ -130,12 +155,14 @@ __Example__
 The following will first create and compile a unit, then send it off
 for compilation.
 
-```js
-var unit = typescript.units.create("temp.ts", "export var value:number = 123;");
+```javascript
+	
+	var unit = typescript.units.create("temp.ts", "export var value:number = 123;");
 
-typescript.compile([unit], function(compilation) {
-	typescript.run(compilation, null, function(context) { 
-		console.log(context.value);
+	typescript.compile([unit], function(compilation) {
+		typescript.run(compilation, null, function(context) { 
+			console.log(context.value);
+		});
 	});
-});
+	
 ```

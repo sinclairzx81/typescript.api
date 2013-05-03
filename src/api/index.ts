@@ -23,7 +23,7 @@ declare var 	 process    : any;
 declare var 	 global     : any;
 declare var 	 exports    : any;
 declare var      console    : any;
-declare function require (mod:string):any;
+declare var      require    : any;
 
 /////////////////////////////////////////////////////////////
 // node modules.
@@ -32,7 +32,6 @@ var _vm   = require("vm");
 var _fs   = require("fs");
 var _path = require("path");
 
-
 /////////////////////////////////////////////////////////////
 // compiler options..
 /////////////////////////////////////////////////////////////
@@ -40,6 +39,8 @@ var _path = require("path");
 export var debug       : boolean = false;
 
 export var allowRemote : boolean = true;
+
+export var async       : boolean = true;
 
 /////////////////////////////////////////////////////////////
 // resolves all source for a compilation..
@@ -59,13 +60,42 @@ export class units {
 	}
 	
 	public static resolve (sources:string[], callback :{ (units:any[]): void; }) : void {
-		var api = load_typescript_api();
-		var async_io = new api.IOAsyncHost();
+		var api      = load_typescript_api();
+		var io       = new api.IOAsyncHost();
 		var logger   = new api.NullLogger();
-		if(exports.allowRemote) { async_io = new api.IOAsyncRemoteHost(); }
-		if(exports.debug) { logger = new api.ConsoleLogger(); }
-		var resolver = new api.CodeResolver( async_io, logger );
+		if(exports.allowRemote) { io = new api.IOAsyncRemoteHost(); }
+		if(!exports.async)      { io = new api.IOSync(); }
+		if(exports.debug)       { logger = new api.ConsoleLogger(); }
+		var resolver = new api.CodeResolver( io, logger );
 		resolver.resolve(sources, callback);		
+	}
+}
+
+/////////////////////////////////////////////////////////////
+// registers the .ts extension so typescript can be with require.
+// note, using the IOSyncHost to load.
+/////////////////////////////////////////////////////////////
+
+export function register () : void {
+	require.extensions['.ts'] = function(_module) {
+		var api      = load_typescript_api();
+		var io       = new api.IOSyncHost();
+		var logger   = new api.NullLogger();
+		var resolver = new api.CodeResolver( io, logger );
+		resolver.resolve([_module.filename], (units) => {
+			exports.compile( attach_declarations(units), (compilation) =>{
+				if(compilation.diagnostics.length > 0) {
+					for(var n in compilation.diagnostics) {
+						console.log(compilation.diagnostics[n].message);
+					}
+					_module.exports = null;
+				} else {
+					exports.run(compilation, null, function(context) {
+						_module.exports = context;
+					});
+				}			
+			});			
+		});
 	}
 }
 
@@ -76,16 +106,10 @@ export class units {
 export function compile(units:any[], callback :{ (compilation:any): void; }) : void {
 	var api 	   = load_typescript_api();
 	var typescript = load_typescript();
-	var a = exports.units.create('lib.d.ts',  _fs.readFileSync( _path.join(__dirname, "decl/lib.d.ts") , "utf8" ) );
-	var b = exports.units.create('node.d.ts', _fs.readFileSync( _path.join(__dirname, "decl/node.d.ts") , "utf8" ) );
-	
-	units.unshift(b);
-	units.unshift(a);
-	
 	var logger = new api.NullLogger();
 	if(exports.debug) { logger = new api.ConsoleLogger(); }
 	var compiler = new api.Compiler( logger );
-	compiler.compile(units, callback);
+	compiler.compile( attach_declarations(units), callback);
 }
 
 /////////////////////////////////////////////////////////////
@@ -124,6 +148,17 @@ function get_default_sandbox(): any {
 	sandbox.global   = global;
 	sandbox.exports  = {};
 	return sandbox;
+}
+
+/////////////////////////////////////////////////////////////
+// attaches declarations to compilation units
+/////////////////////////////////////////////////////////////
+function attach_declarations (units:any[]):any[] {
+	var lib_decl  = exports.units.create('lib.d.ts',  _fs.readFileSync( _path.join(__dirname, "decl/lib.d.ts") , "utf8" ) );
+	var node_decl = exports.units.create('node.d.ts', _fs.readFileSync( _path.join(__dirname, "decl/node.d.ts"), "utf8" ) );
+	units.unshift(node_decl);
+	units.unshift(lib_decl);
+	return units;
 }
 
 /////////////////////////////////////////////////////////////
