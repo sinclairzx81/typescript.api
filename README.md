@@ -1,7 +1,6 @@
 # typescript.api
 
-The typescript.api is a lightweight api that enables nodejs developers to compile 
-and run typescript source code. 
+A typescript compilation api that enables nodejs developers to resolve, compile and execute typescript 0.9 source files. 
 
 ## install
 
