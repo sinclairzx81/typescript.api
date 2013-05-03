@@ -80,14 +80,12 @@ export function register () : void {
 	require.extensions['.ts'] = function(_module) {
 		var api      = load_typescript_api();
 		var io       = new api.IOSyncHost();
-		var logger   = new api.NullLogger();
+		var logger   = new api.ConsoleLogger();
 		var resolver = new api.CodeResolver( io, logger );
 		resolver.resolve([_module.filename], (units) => {
-			exports.compile( attach_declarations(units), (compilation) =>{
+			var compiler = new api.Compiler( logger );
+			compiler.compile( attach_declarations(units), (compilation) =>{
 				if(compilation.diagnostics.length > 0) {
-					for(var n in compilation.diagnostics) {
-						console.log(compilation.diagnostics[n].message);
-					}
 					_module.exports = null;
 				} else {
 					exports.run(compilation, null, function(context) {

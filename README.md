@@ -26,8 +26,8 @@ synchronously.
 	var typescript = require("typescript.api");
 
 	typescript.register();
-
-	var mymodule = require("./program.ts");
+	
+	var program = require("./program.ts");
 
 ```
 

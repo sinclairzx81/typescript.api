@@ -1,8 +1,8 @@
 ﻿require("./bin/index.js").register();
 
-var m = require('./test/program.ts');
+var program = require('app');
 
-console.log(m);
+program.application.program.main();
 
 
 

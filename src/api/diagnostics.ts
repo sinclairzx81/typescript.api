@@ -63,5 +63,13 @@ module TypeScript.Api {
 			result.lineinfo  = LineInfo.create(unit, diagnostic);
 			return result;
 		}
+		
+		public toString() : string {
+			
+			return this.filename + " [" + (this.lineinfo.line_index + 1).toString() 
+								 + ":" +  (this.lineinfo.char_index + 1).toString() + "] " 
+								 + this.message;
+			
+		}
 	}
 }

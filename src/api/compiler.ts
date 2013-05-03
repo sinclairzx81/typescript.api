@@ -63,8 +63,8 @@ module TypeScript.Api {
 			settings.disallowBool                   = true;
 			
 			// the compiler...
-			this.compiler = new TypeScript.TypeScriptCompiler(this.logger, settings, TypeScript.diagnosticMessages);
-			this.compiler.logger = logger; 
+			this.compiler = new TypeScript.TypeScriptCompiler(new TypeScript.Api.NullLogger(), settings, TypeScript.diagnosticMessages);
+			this.compiler.logger = new TypeScript.Api.NullLogger(); 
 		} 
 		
 		public compile(units:SourceUnit [], callback: { (compilation:Compilation) : void;} ) : void {  
@@ -78,6 +78,8 @@ module TypeScript.Api {
 				var references = TypeScript.getReferencedFiles(unit.path, snapshot);
 				var document   = this.compiler.addSourceUnit(unit.path, snapshot, 0, false, references);		
 			}
+			
+			
 			// syntax check
 			for(var n in units) {
 				var unit = units[n];
@@ -97,6 +99,12 @@ module TypeScript.Api {
 					compilation.diagnostics.push( Diagnostic.create("typecheck", unit, diagnostics[m]) );
 				}
 			}
+			
+			 // output any errors.
+			for(var n in compilation.diagnostics) {
+				this.logger.log('[compiler] ' + compilation.diagnostics[n].toString());
+			}
+			 
 			
 			// emit the source code...
 			var emitter = new TypeScript.Api.Emitter();
