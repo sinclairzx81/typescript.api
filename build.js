@@ -8,7 +8,7 @@
 
 var path  = require('path');
 
-var tools = require('./build/tools.js');
+var tools = require('./tools/tools.js');
 
 // variables
 var src_dir                    = path.join( path.dirname( global.process.mainModule.filename ), "/src/");
