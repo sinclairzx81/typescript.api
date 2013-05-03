@@ -46,13 +46,25 @@ is then sent to be run.
 	var sources = ["./program.ts"];
 
 	function has_errors(compilation) {
+	
 		// errors can be listed on the compilation.diagnostics array.
+		
 		return compilation.diagnostics.length > 0; 
+		
 	}
-	typescript.units.resolve(sources, function(units) {
+	
+	// resolve units...
+	typescript.resolve(sources, function(units) {
+		
+		// compile units...
 		typescript.compile(units, function(compilation) {
+			
+			// check for errors...
 			if(!has_errors (compilation) ) {
+				
+				// run the compilation...
 				typescript.run(compilation, null, function(context) {
+				
 					 // exported members available on the context...
 				});
 			}
@@ -65,7 +77,10 @@ is then sent to be run.
 
 ### typescript.resolve (sources, callback)
 
-Will resolve compilation units by crawling the document space. 
+Will resolve compilation units by iteratively walking the source files by way of their
+<reference path='#'> elements. 
+
+Will return a list of source units needed for compilation.
 
 __Arguments__
 
@@ -78,12 +93,18 @@ Will resolve 'program.ts' and print all referenced source files.
 
 ```javascript
 
-	typescript.units.resolve(["program.ts"], function(units) { 
+	typescript.resolve(["program.ts"], function(units) { 
+	
 		for(var n in units) {
+		
 			console.log( units[n].path );
+			
 			console.log( units[n].content );
+			
 			for(var m in units[n].references) {
+			
 				console.log( units[n].references[m] )
+				
 			}
 		}
 	});
@@ -105,10 +126,14 @@ The following will create a unit. and send to the compiler for compilation.
 
 ```javascript
 
-	var unit = typescript.units.create("temp.ts", "console.log('hello world');");
+	var typescript = require("typescript.api");
+
+	var unit = typescript.create("temp.ts", "console.log('hello world');");
 
 	typescript.compile([unit], function(compilation) {
+	
 		typescript.run(compilation, null, function(context) { });
+		
 	});
 
 ```
@@ -129,10 +154,14 @@ written to the console.
 
 ```javascript
 
-	var unit = typescript.units.create("temp.ts", "var value:number = 123;");
+	var typescript = require("typescript.api");
 
+	var unit = typescript.units.create("temp.ts", "var value:number = 123;");
+	
 	typescript.compile([unit], function(compilation) {
+	
 		for(var n in compilation.scripts){
+		
 			console.log(compilation.scripts[n]);
 		}
 	});
@@ -157,11 +186,16 @@ for compilation.
 
 ```javascript
 	
-	var unit = typescript.units.create("temp.ts", "export var value:number = 123;");
+	var typescript = require("typescript.api");	
+	
+	var unit = typescript.create("temp.ts", "export var value:number = 123;");
 
 	typescript.compile([unit], function(compilation) {
+	
 		typescript.run(compilation, null, function(context) { 
+		
 			console.log(context.value);
+			
 		});
 	});
 	
