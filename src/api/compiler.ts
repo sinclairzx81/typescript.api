@@ -119,7 +119,7 @@ module TypeScript.Api {
 				unit.filename = filename;
 				unit.content  = emitter.files[filename].ToString();
 				compilation.units.push( unit );
-				idx++; // bit loose...
+				idx++; // bit loose...can probably do better...
 			}
 			
 			// return..

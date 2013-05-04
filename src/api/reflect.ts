@@ -125,20 +125,30 @@ module TypeScript.Api {
 	export class Class {
 		public methods    : Method     [];
 		public variables  : Variable   [];
+		public parameters : string     [];
+		public extends    : string     [];
+		public implements : string     [];
 		public name       : string;
-		public extends    : string [];
-		public implements : string [];
 		constructor() {
 			this.methods    = [];
 			this.variables  = [];
 			this.extends    = [];
 			this.implements = [];
+			this.parameters = [];
 		}
-
 		public static create(ast:TypeScript.ClassDeclaration): Class { 
 			console.log('Class');
 			var result = new Class();
 			result.name = ast.name.text;
+			
+			if(ast.typeParameters){
+				if (ast.typeParameters.members) {
+					for(var n in ast.typeParameters.members) { 
+						result.parameters.push(ast.typeParameters.members[n].name.text);
+					}
+				}
+			}
+			
 			if (ast.implementsList) {
 				if (ast.implementsList.members) {
 					for(var n in ast.implementsList.members) { 
@@ -147,6 +157,7 @@ module TypeScript.Api {
 					}
 				}
 			}
+			
 			if (ast.extendsList) {
 				if (ast.extendsList.members) {
 					for(var n in ast.extendsList.members) { 
@@ -155,6 +166,7 @@ module TypeScript.Api {
 					}
 				}
 			}
+			
 			return result;
 		}
 	}
@@ -162,21 +174,33 @@ module TypeScript.Api {
 	// Interface:
 	//////////////////////////////////////////////////////////////////
 	export class Interface {
-		public methods    : Method    [];
-		public variables  : Variable  [];
-		public name       : string;
-		public extends    : string    [];
-
+		public methods        : Method    [];
+		public variables      : Variable  [];
+		public parameters     : string    [];
+		public extends    	  : string    [];
+		public name       	  : string;
+		
 		constructor () {
 			this.methods    = [];
 			this.variables  = [];
 			this.extends    = [];
+			this.parameters = [];
 		}
 		
 		public static create(ast:TypeScript.InterfaceDeclaration): Interface {
 			console.log('Interface');
+			//console.log(ast.typeParameters.members[0]);
 			var result  = new Interface();
 			result.name = ast.name.text;
+			
+			if(ast.typeParameters){
+				if (ast.typeParameters.members) {
+					for(var n in ast.typeParameters.members) { 
+						result.parameters.push(ast.typeParameters.members[n].name.text);
+					}
+				}
+			}
+			
 			if (ast.extendsList) {
 				if (ast.extendsList.members) {
 					for(var n in ast.extendsList.members) { 
@@ -350,6 +374,7 @@ module TypeScript.Api {
 							
 						case TypeScript.NodeType.Script:
 							var _script = Script.create(<TypeScript.Script>ast);
+							_script.filename = compilation.units[n].filename;
 							parent.scripts.push(_script);
 							walker.userdata.push(_script);
 							break;						
