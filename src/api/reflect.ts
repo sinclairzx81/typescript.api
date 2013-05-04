@@ -268,81 +268,94 @@ module TypeScript.Api {
 	// Reflection:
 	//////////////////////////////////////////////////////////////////
 	export class Reflection {
-		public scripts : Script[];
+		
+		public scripts     : Script[];
+		
 		constructor() {
 			this.scripts = [];
 		}
 		
-		public static create(ast:TypeScript.AST) : Reflection {
+		
+		public static create(compilation:TypeScript.Api.Compilation) : Reflection {
 			var reflection     = new Reflection();
 			var walker         = new ASTWalker();
 			walker.userdata    = [];
 			walker.userdata.push(reflection);
-			walker.walk(ast, (walker, ast) => {	
-				if(walker.stack.length < walker.userdata.length - 1) {
-					do    { walker.userdata.pop(); } 
-					while (walker.stack.length < walker.userdata.length - 1);
-				}
-
-				var parent = walker.userdata[walker.userdata.length - 1];
 			
-				switch (ast.nodeType) {
+			// foreach compilation unit..
+			for(var n in compilation.units) {
+				
+				// walk the units ast..
+				walker.walk(compilation.units[n].ast, (walker, ast) => {
 					
-					case TypeScript.NodeType.VariableDeclarator:
-						var variable = Variable.create(<TypeScript.VariableDeclarator>ast);
-						parent.variables.push(variable);
-						walker.userdata.push(variable);
-						break;
+					// catch here....
+					if(walker.stack.length < walker.userdata.length - 1) {
+						do    { walker.userdata.pop(); } 
+						while (walker.stack.length < walker.userdata.length - 1);
+					}
 					
-					//case TypeScript.NodeType.VariableStatement:
-						//var variable = Variable.create( <TypeScript.VariableStatement> ast);
-						//parent.variables.push(variable);
-						//walker.userdata.push(variable);
-						//break;						
+					// set the parent node...
+					var parent = walker.userdata[walker.userdata.length - 1];
+					
+					// what node did we get?
+					switch (ast.nodeType) {
+						
+						case TypeScript.NodeType.VariableDeclarator:
+							var variable = Variable.create(<TypeScript.VariableDeclarator>ast);
+							parent.variables.push(variable);
+							walker.userdata.push(variable);
+							break;
+						
+						//case TypeScript.NodeType.VariableStatement:
+							//var variable = Variable.create( <TypeScript.VariableStatement> ast);
+							//parent.variables.push(variable);
+							//walker.userdata.push(variable);
+							//break;						
 
-					case TypeScript.NodeType.Parameter:
-						var parameter = Parameter.create(<TypeScript.Parameter>ast);
-						parent.parameters.push(parameter);
-						walker.userdata.push(parameter);
-						break;
-						
-					case TypeScript.NodeType.FunctionDeclaration:
-						var method = Method.create(<TypeScript.FunctionDeclaration>ast);
-						parent.methods.push(method);
-						walker.userdata.push(method);
-						break;
-						
-					case TypeScript.NodeType.ClassDeclaration:
-						var _class = Class.create(<TypeScript.ClassDeclaration>ast);
-						parent.classes.push(_class);
-						walker.userdata.push(_class);
-						break;
+						case TypeScript.NodeType.Parameter:
+							var parameter = Parameter.create(<TypeScript.Parameter>ast);
+							parent.parameters.push(parameter);
+							walker.userdata.push(parameter);
+							break;
+							
+						case TypeScript.NodeType.FunctionDeclaration:
+							var method = Method.create(<TypeScript.FunctionDeclaration>ast);
+							parent.methods.push(method);
+							walker.userdata.push(method);
+							break;
+							
+						case TypeScript.NodeType.ClassDeclaration:
+							var _class = Class.create(<TypeScript.ClassDeclaration>ast);
+							parent.classes.push(_class);
+							walker.userdata.push(_class);
+							break;
 
-					case TypeScript.NodeType.InterfaceDeclaration:
-						var _interface = Interface.create(<TypeScript.InterfaceDeclaration>ast);
-						parent.interfaces.push(_interface);
-						walker.userdata.push(_interface);
-						break;
+						case TypeScript.NodeType.InterfaceDeclaration:
+							var _interface = Interface.create(<TypeScript.InterfaceDeclaration>ast);
+							parent.interfaces.push(_interface);
+							walker.userdata.push(_interface);
+							break;
 
-					case TypeScript.NodeType.ImportDeclaration:
-						var _import = Import.create(<TypeScript.ImportDeclaration>ast);
-						parent.imports.push(_import);
-						walker.userdata.push(_import);
-						break;
-						
-					case TypeScript.NodeType.ModuleDeclaration:
-						var _module = Module.create(<TypeScript.ModuleDeclaration>ast);
-						parent.modules.push(_module);
-						walker.userdata.push(_module);
-						break;	
-						
-					case TypeScript.NodeType.Script:
-						var _script = Script.create(<TypeScript.Script>ast);
-						parent.scripts.push(_script);
-						walker.userdata.push(_script);
-						break;						
-				}
-			});
+						case TypeScript.NodeType.ImportDeclaration:
+							var _import = Import.create(<TypeScript.ImportDeclaration>ast);
+							parent.imports.push(_import);
+							walker.userdata.push(_import);
+							break;
+							
+						case TypeScript.NodeType.ModuleDeclaration:
+							var _module = Module.create(<TypeScript.ModuleDeclaration>ast);
+							parent.modules.push(_module);
+							walker.userdata.push(_module);
+							break;	
+							
+						case TypeScript.NodeType.Script:
+							var _script = Script.create(<TypeScript.Script>ast);
+							parent.scripts.push(_script);
+							walker.userdata.push(_script);
+							break;						
+					}
+				});
+			}
 			
 			return reflection;
 		
@@ -357,17 +370,9 @@ module TypeScript.Api {
 			
 		}
 		
-		public reflect(compilation:TypeScript.Api.Compilation) : Reflection[] {
+		public reflect(compilation:TypeScript.Api.Compilation) : Reflection {
 			
-			var reflections:Reflection[] = [];
-			
-			for(var n in compilation.units) { // change to ast_array
-				
-				var reflection = TypeScript.Api.Reflection.create(compilation.units[n].ast);
-				
-				reflections.push(reflection);
-			}
-			return reflections;
+			return TypeScript.Api.Reflection.create(compilation);
 		}
 		
 	}

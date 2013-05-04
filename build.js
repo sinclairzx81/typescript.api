@@ -11,8 +11,8 @@ var path  = require('path');
 var tools = require('./tools/tools.js');
 
 // variables
-var src_dir                    = path.join( path.dirname( global.process.mainModule.filename ), "/src/");
-var bin_dir           		   = path.join( path.dirname( global.process.mainModule.filename ), "/bin");
+var src_dir					   = path.join( path.dirname( global.process.mainModule.filename ), "/src/");
+var bin_dir					   = path.join( path.dirname( global.process.mainModule.filename ), "/bin");
 var compiler_input_filename    = path.join(src_dir, 'api/compiler.ts' );
 var compiler_output_filename   = path.join(bin_dir, 'typescript.api.js');
 var index_input_filename       = path.join(src_dir, 'api/index.ts' );
@@ -38,28 +38,28 @@ function build () {
 	tools.builder.prepare_directory(bin_dir);
 	tools.builder.prepare_directory(bin_dir + '/decl');
 	
-	console.log('compiling typescript api');
+	console.log('compiling typescript api....');
 	tools.builder.build_single([compiler_input_filename], compiler_output_filename , function() {
 		  
-		  console.log('compiling index');
+		  console.log('compiling index....');
 		  tools.builder.build_modular([index_input_filename], index_output_directory, function() {
 			  
-			  console.log('copying typescript.js');
+			  console.log('copying typescript.js....');
 			  tools.builder.copyfile(typescript_input_filename, typescript_output_filename, function(){
 				  
-				  console.log('copying lib.d.ts');
+				  console.log('copying lib.d.ts....');
 				  tools.builder.copyfile(lib_decl_input_filename, lib_decl_output_filename, function(){	
 				  
-					  console.log('copying node.d.ts');
+					  console.log('copying node.d.ts....');
 					  tools.builder.copyfile(node_decl_input_filename, node_decl_output_filename, function(){	
 					  
-						  console.log('copying package.json');
+						  console.log('copying package.json....');
 						  tools.builder.copyfile(package_input_filename, package_output_filename, function(){	
 						  
-							  console.log('copying README.md');
+							  console.log('copying README.md....');
 							  tools.builder.copyfile(readme_input_filename, readme_output_filename, function(){	
 							  
-								  console.log('running post build ');
+								  console.log('running post build....');
 								  tools.nodestart.start( post_build_filename );	
 							  });
 						  });
