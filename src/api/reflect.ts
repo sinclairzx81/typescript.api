@@ -259,6 +259,7 @@ module TypeScript.Api {
 		public static create(ast:TypeScript.Script): Script {
 			console.log('Script');
 			var result = new Script();
+			// nothing to do here...
 			return result;
 		}
 	}
@@ -267,7 +268,6 @@ module TypeScript.Api {
 	// Reflection:
 	//////////////////////////////////////////////////////////////////
 	export class Reflection {
-		
 		public scripts : Script[];
 		constructor() {
 			this.scripts = [];
@@ -278,7 +278,8 @@ module TypeScript.Api {
 			var walker         = new ASTWalker();
 			walker.userdata    = [];
 			walker.userdata.push(reflection);
-			walker.walk(ast, (walker, ast) => {				
+			walker.walk(ast, (walker, ast) => {	
+						
 				if(walker.stack.length < walker.userdata.length - 1) {
 					do    { walker.userdata.pop(); } 
 					while (walker.stack.length < walker.userdata.length - 1);
@@ -287,12 +288,6 @@ module TypeScript.Api {
 				var parent = walker.userdata[walker.userdata.length - 1];
 			
 				switch (ast.nodeType) {
-
-					case TypeScript.NodeType.FunctionDeclaration:
-						var method = Method.create(<TypeScript.FunctionDeclaration>ast);
-						parent.methods.push(method);
-						walker.userdata.push(method);
-						break;
 					
 					case TypeScript.NodeType.VariableDeclarator:
 						var variable = Variable.create(<TypeScript.VariableDeclarator>ast);
@@ -311,7 +306,13 @@ module TypeScript.Api {
 						parent.parameters.push(parameter);
 						walker.userdata.push(parameter);
 						break;
-
+						
+					case TypeScript.NodeType.FunctionDeclaration:
+						var method = Method.create(<TypeScript.FunctionDeclaration>ast);
+						parent.methods.push(method);
+						walker.userdata.push(method);
+						break;
+						
 					case TypeScript.NodeType.ClassDeclaration:
 						var _class = Class.create(<TypeScript.ClassDeclaration>ast);
 						parent.classes.push(_class);
@@ -324,23 +325,23 @@ module TypeScript.Api {
 						walker.userdata.push(_interface);
 						break;
 
-					case TypeScript.NodeType.ModuleDeclaration:
-						var _module = Module.create(<TypeScript.ModuleDeclaration>ast);
-						parent.modules.push(_module);
-						walker.userdata.push(_module);
-						break;
-
-					case TypeScript.NodeType.Script:
-						var _script = Script.create(<TypeScript.Script>ast);
-						parent.scripts.push(_script);
-						walker.userdata.push(_script);
-						break;
-
 					case TypeScript.NodeType.ImportDeclaration:
 						var _import = Import.create(<TypeScript.ImportDeclaration>ast);
 						parent.imports.push(_import);
 						walker.userdata.push(_import);
 						break;
+						
+					case TypeScript.NodeType.ModuleDeclaration:
+						var _module = Module.create(<TypeScript.ModuleDeclaration>ast);
+						parent.modules.push(_module);
+						walker.userdata.push(_module);
+						break;	
+						
+					case TypeScript.NodeType.Script:
+						var _script = Script.create(<TypeScript.Script>ast);
+						parent.scripts.push(_script);
+						walker.userdata.push(_script);
+						break;						
 				}
 			});
 			
@@ -362,8 +363,8 @@ module TypeScript.Api {
 			var reflections:Reflection[] = [];
 			
 			for(var n in compilation.ast_array) { // change to ast_array
-			
-				var reflection = TypeScript.Api.Reflection.create(compilation.ast_array[0]);
+				
+				var reflection = TypeScript.Api.Reflection.create(compilation.ast_array[n]);
 				
 				reflections.push(reflection);
 			}
