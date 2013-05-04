@@ -65,6 +65,22 @@ module TypeScript.Api {
 		constructor(){
 			this.arguments = [];
 		}
+		
+		public static create(ast:TypeScript.TypeReference) : Type {
+			console.log("Type");
+			//console.log(ast);
+			
+			var result = new Type();
+			result.name = ASTUtil.ResolveQualifiedTypeName(ast.term);
+			
+			// can shuffle this off to the type handler
+			//var typeExpr = <TypeScript.TypeReference>ast.typeExpr; 
+			
+			//if(typeExpr) {
+			//	result.type.name = ASTUtil.ResolveQualifiedTypeName(typeExpr.term); 
+			//} 			
+			return result;
+		}
 	}
 	
 	export class Variable {
@@ -79,11 +95,12 @@ module TypeScript.Api {
 			//console.log(ast.init);
 			var result   = new Variable();
 			result.name  = ast.id.text;
-			var typeExpr = <TypeScript.TypeReference>ast.typeExpr;
-			if(typeExpr){
-				console.log(typeExpr.term);
-				result.type.name = ASTUtil.ResolveQualifiedTypeName(typeExpr.term); 
-			} 
+			// can shuffle this off to the type handler
+			//var typeExpr = <TypeScript.TypeReference>ast.typeExpr; 
+			
+			//if(typeExpr) {
+			//	result.type.name = ASTUtil.ResolveQualifiedTypeName(typeExpr.term); 
+			//} 
 			return result;
 		}  
 	}
@@ -107,8 +124,6 @@ module TypeScript.Api {
 			
 			if(typeExpr){
 				result.type = ASTUtil.ResolveQualifiedTypeName(typeExpr.term); 
-			} else {
-				result.type = "any";
 			}
 			return result;
 		}   
@@ -132,12 +147,10 @@ module TypeScript.Api {
 			console.log('Method');
 			
 			var result  = new Method();
-			result.name = ast.getNameText(); // maybe run this through the Qualification proc?
+			result.name = ast.getNameText();
 			var returnTypeAnnotation = <TypeScript.TypeReference>ast.returnTypeAnnotation;
 			if(returnTypeAnnotation){
 				result.returns = ASTUtil.ResolveQualifiedTypeName(returnTypeAnnotation.term); 
-			} else {
-				result.returns = "any";
 			}
 			return result;
 		}
@@ -160,6 +173,7 @@ module TypeScript.Api {
 			this.parameters = [];
 		}
 		public static create(ast:TypeScript.ClassDeclaration): Class { 
+			
 			console.log('Class');
 			var result = new Class();
 			result.name = ast.name.text;
@@ -314,12 +328,11 @@ module TypeScript.Api {
 	//////////////////////////////////////////////////////////////////
 	export class Reflection {
 		
-		public scripts     : Script[];
+		public scripts : Script[];
 		
 		constructor() {
 			this.scripts = [];
 		}
-		
 		
 		public static create(compilation:TypeScript.Api.Compilation) : Reflection {
 			var reflection     = new Reflection();
@@ -356,7 +369,12 @@ module TypeScript.Api {
 							//parent.variables.push(variable);
 							//walker.userdata.push(variable);
 							//break;						
-
+						
+						case TypeScript.NodeType.TypeRef:
+							parent.type = Type.create(<TypeScript.TypeReference>ast);
+							walker.userdata.push(parent.type);
+							break;
+							
 						case TypeScript.NodeType.Parameter:
 							var parameter = Parameter.create(<TypeScript.Parameter>ast);
 							parent.parameters.push(parameter);

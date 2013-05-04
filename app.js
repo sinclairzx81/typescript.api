@@ -10,7 +10,7 @@ typescript.resolve(['test/program.ts'], function(units){
 		
 			var output = JSON.stringify(reflection, null, ' ');
 			
-			console.log(output);
+			//console.log(output);
 		
 		});
 	
