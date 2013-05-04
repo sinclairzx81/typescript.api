@@ -26,8 +26,19 @@ module TypeScript.Api {
 			this.userdata = null;
 			this.callback = (sender, ast) => {};
 		}
+		private walk_object_literal(ast:TypeScript.LiteralExpression) : void {
+			console.log('object literal..');
+		}
+		
 		private walk_varstatement(ast:TypeScript.VariableStatement) : void {
-			this.callback(this, ast);
+			if(ast.declaration){
+				if(ast.declaration.declarators) {
+					this.callback(this, ast);
+					this.stack.push(ast);
+					this.walk_ast_array(ast.declaration.declarators.members);
+					this.stack.pop();
+				}
+			}
 		}
 		private walk_parameter   (ast: TypeScript.Parameter): void {
 			this.callback(this, ast);
@@ -76,17 +87,17 @@ module TypeScript.Api {
 		public walk_ast       (ast: TypeScript.AST): void {
 			console.log(ast.nodeType);
 			switch (ast.nodeType) {
-				case TypeScript.NodeType.List:                 this.walk_astlist      (<TypeScript.ASTList>ast); break;
-				case TypeScript.NodeType.Script:               this.walk_script       (<TypeScript.Script>ast); break;
-				case TypeScript.NodeType.ModuleDeclaration:    this.walk_module       (<TypeScript.ModuleDeclaration>ast); break;
-				case TypeScript.NodeType.InterfaceDeclaration: this.walk_interface    (<TypeScript.InterfaceDeclaration>ast); break;
-				case TypeScript.NodeType.VariableDeclarator:   this.walk_vardecl      (<TypeScript.VariableDeclaration>ast); break;
-				case TypeScript.NodeType.VariableStatement:    this.walk_varstatement (<TypeScript.VariableStatement>ast); break;
-				case TypeScript.NodeType.ClassDeclaration:     this.walk_classdecl    (<TypeScript.ClassDeclaration>ast); break;
-				case TypeScript.NodeType.FunctionDeclaration:  this.walk_funcdecl     (<TypeScript.FunctionDeclaration>ast); break;
-				case TypeScript.NodeType.Parameter:            this.walk_parameter    (<TypeScript.Parameter>ast); break;
-				case TypeScript.NodeType.ImportDeclaration:    this.walk_import       (<TypeScript.ImportDeclaration>ast); break;
-				
+				case TypeScript.NodeType.List:                    this.walk_astlist        (<TypeScript.ASTList>ast); break;
+				case TypeScript.NodeType.Script:                  this.walk_script         (<TypeScript.Script>ast); break;
+				case TypeScript.NodeType.ModuleDeclaration:       this.walk_module         (<TypeScript.ModuleDeclaration>ast); break;
+				case TypeScript.NodeType.InterfaceDeclaration:    this.walk_interface      (<TypeScript.InterfaceDeclaration>ast); break;
+				case TypeScript.NodeType.VariableDeclarator:      this.walk_vardecl        (<TypeScript.VariableDeclaration>ast); break;
+				case TypeScript.NodeType.VariableStatement:       this.walk_varstatement   (<TypeScript.VariableStatement>ast); break;
+				case TypeScript.NodeType.ClassDeclaration:        this.walk_classdecl      (<TypeScript.ClassDeclaration>ast); break;
+				case TypeScript.NodeType.FunctionDeclaration:     this.walk_funcdecl       (<TypeScript.FunctionDeclaration>ast); break;
+				case TypeScript.NodeType.Parameter:               this.walk_parameter      (<TypeScript.Parameter>ast); break;
+				case TypeScript.NodeType.ImportDeclaration:       this.walk_import         (<TypeScript.ImportDeclaration>ast); break;
+				case TypeScript.NodeType.ObjectLiteralExpression: this.walk_object_literal (<TypeScript.LiteralExpression>ast); break;
 			}
 		}
 		

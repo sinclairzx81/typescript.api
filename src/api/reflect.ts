@@ -40,7 +40,7 @@ module TypeScript.Api {
 			return result.join('.');
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////
 	// Variable:
 	//////////////////////////////////////////////////////////////////
@@ -53,15 +53,16 @@ module TypeScript.Api {
 		
 		}
 
-		public static create(ast:TypeScript.VariableDeclaration): Variable {
-			
+		public static create(ast:TypeScript.VariableDeclarator): Variable {
+			console.log('Variable');
 			var result = new Variable();
-			//result.name      = ast.sym ? ast.sym.name : '';
-			//result.fullname  = ast.sym ? ast.sym.fullName() : '';
-			//result.type      = ast.sym ? ast.sym.getType().symbol.fullName() : '';
-			// format...
-			//result.fullname  = result.fullname.replace(Patterns.Quotes, "");
-			//result.type      = result.type.replace(Patterns.Quotes, "");
+			result.name = ast.id.text;
+			var typeExpr = <TypeScript.TypeReference>ast.typeExpr;
+			if(typeExpr){
+				result.type = ASTUtil.QualifyAST(typeExpr.term); 
+			} else {
+				result.type = "any";
+			}
 			return result;
 		}  
 	}
@@ -80,14 +81,12 @@ module TypeScript.Api {
 			var result   = new Parameter();
 			result.name  = ast.id.text;
 			var typeExpr = <TypeScript.TypeReference>ast.typeExpr;
-			result.type  = ASTUtil.QualifyAST(typeExpr.term); 
 			
-			
-			//console.log(ast);
-			//result.name = ast.sym ? ast.sym.name : '';
-			//result.type = ast.sym ? ast.sym.getType().symbol.fullName() : '';
-			// format..
-			//result.type = result.type.replace(Patterns.Quotes, "");
+			if(typeExpr){
+				result.type = ASTUtil.QualifyAST(typeExpr.term); 
+			} else {
+				result.type = "any";
+			}
 			return result;
 		}   
 	}
@@ -109,36 +108,14 @@ module TypeScript.Api {
 			
 			console.log('Method');
 			
-			var result = new Method();
-			
+			var result  = new Method();
 			result.name = ast.getNameText(); // maybe run this through the Qualification proc?
-			
 			var returnTypeAnnotation = <TypeScript.TypeReference>ast.returnTypeAnnotation;
-			
-			result.returns = ASTUtil.QualifyAST(returnTypeAnnotation.term); 
-
-			//console.log(term);
-			
-			//if(returnTypeAnnotation.term.text) {
-				//result.returns = returnTypeAnnotation.term.text;
-			//}
-			
-			//console.log(ast);
-			/*
-			result.name      = ast.name ? ast.name.text : '';
-			result.fullname  = ast.name ? ast.name.sym.fullName() : '';
-			if(ast.returnTypeAnnotation) {
-				if (ast.returnTypeAnnotation.type) {
-					result.returns = ast.returnTypeAnnotation.type.symbol.fullName();
-				} else {
-					result.returns = "constructor";
-				}
-			} 
-
-			// format..
-			result.fullname  = result.fullname.replace(Patterns.Quotes, "");
-			result.returns   = result.returns.replace(Patterns.Quotes, "");
-			*/
+			if(returnTypeAnnotation){
+				result.returns = ASTUtil.QualifyAST(returnTypeAnnotation.term); 
+			} else {
+				result.returns = "any";
+			}
 			return result;
 		}
 	}
@@ -146,8 +123,8 @@ module TypeScript.Api {
 	// Class:
 	//////////////////////////////////////////////////////////////////	 
 	export class Class {
-		public methods    : Method    [];
-		public variables  : Variable  [];
+		public methods    : Method     [];
+		public variables  : Variable   [];
 		public name       : string;
 		public extends    : string [];
 		public implements : string [];
@@ -177,39 +154,7 @@ module TypeScript.Api {
 						result.extends.push( named_decl.text );
 					}
 				}
-			}			
-			
-			/*
-			result.name      = ast.name ? ast.name.text : '';
-			result.fullname  = ast.name ? ast.name.sym.fullName() : '';
-			if (ast.extendsList) {
-				if (ast.extendsList.members) {
-					for(var n in ast.extendsList.members) { 
-						var ref = <TypeScript.NamedDeclaration>ast.extendsList.members[n];
-						result.extends.push(ref.type.symbol.fullName() );
-					}
-				}
 			}
-
-			if (ast.implementsList) {
-				if (ast.implementsList.members) {
-					for(var n in ast.implementsList.members) { 
-						var ref = <TypeScript.NamedDeclaration>ast.implementsList.members[n];
-						result.implements.push(ref.type.symbol.fullName() );
-					}
-				}
-			}
-
-			// format.. 
-			result.fullname  = result.fullname.replace(Patterns.Quotes, "");
-			for(var n in result.extends) {
-				result.extends[n] = result.extends[n].replace(Patterns.Quotes, "")
-			}
-
-			for(var n in result.implements) {
-				result.implements[n] = result.implements[n].replace(Patterns.Quotes, "")
-			}
-			*/
 			return result;
 		}
 	}
@@ -220,7 +165,7 @@ module TypeScript.Api {
 		public methods    : Method    [];
 		public variables  : Variable  [];
 		public name       : string;
-		public extends    : string [];
+		public extends    : string    [];
 
 		constructor () {
 			this.methods    = [];
@@ -239,28 +184,7 @@ module TypeScript.Api {
 						result.extends.push( named_decl.text );
 					}
 				}
-			}				
-			
-			//console.log(ast);
-			/*
-			result.name      = ast.name ? ast.name.text : '';
-			result.fullname  = ast.name ? ast.name.sym.fullName() : '';
-			if (ast.extendsList) {
-				if (ast.extendsList.members) {
-					for(var n in ast.extendsList.members) { 
-						var ref = <TypeScript.NamedDeclaration>ast.extendsList.members[n];
-						result.extends.push(ref.type.symbol.fullName() );
-					}
-				}
 			}
-			// format...
-			result.fullname  = result.fullname.replace(Patterns.Quotes, "");
-			for(var n in result.extends) {
-			
-				result.extends[n] = result.extends[n].replace(Patterns.Quotes, "")
-			}
-			*/
-
 			return result;
 		}
 	}
@@ -280,16 +204,6 @@ module TypeScript.Api {
 			var result      = new Import();
 			result.name  = ast.id.text;
 			result.alias = ast.getAliasName(ast);
-			//console.log(ast);
-			/*
-			result.name      = ast.id.actualText;
-			result.fullname  = ast.id.sym.fullName();
-			result.alias     = ast.getAliasName();
-
-			// format...
-			result.alias     = result.alias.replace(Patterns.Quotes, "");
-			result.fullname  = result.fullname.replace (Patterns.Quotes, "");
-			*/
 			return result;
 		}
 
@@ -319,19 +233,7 @@ module TypeScript.Api {
 		public static create (ast:TypeScript.ModuleDeclaration) : Module {
 			console.log('Module');
 			var result = new Module();
-			result.name = ast.prettyName;
-			//console.log(ast);
-			/*
-			result.name     = ast.name ? ast.name.text : '';
-			result.fullname = ast.name ? ast.name.sym.fullName() : '';
-			// format...
-			result.name      = result.name.replace(Patterns.DoubleSlash, "/");
-			result.fullname  = result.fullname.replace(Patterns.Quotes, "");
-			if(result.name.indexOf('/') !== -1) {
-				result.name = result.fullname;
-			}
-			*/
-			
+			result.name = ast.prettyName;			
 			return result;
 		}
 	}
@@ -357,13 +259,6 @@ module TypeScript.Api {
 		public static create(ast:TypeScript.Script): Script {
 			console.log('Script');
 			var result = new Script();
-			//console.log(ast);
-			//if(ast.topLevelMod) {
-				//result.name     = ast.topLevelMod.prettyName; // ModuleDeclaration
-				//result.filename = ast.topLevelMod.name.text + '.ts'; // might remove this...				
-			//}
-			//console.log(ast.topLevelMod);
-			
 			return result;
 		}
 	}
@@ -398,13 +293,18 @@ module TypeScript.Api {
 						parent.methods.push(method);
 						walker.userdata.push(method);
 						break;
-
-
-					case TypeScript.NodeType.VariableDeclaration:
-						var variable = Variable.create(<TypeScript.VariableDeclaration>ast);
+					
+					case TypeScript.NodeType.VariableDeclarator:
+						var variable = Variable.create(<TypeScript.VariableDeclarator>ast);
 						parent.variables.push(variable);
 						walker.userdata.push(variable);
 						break;
+					
+					//case TypeScript.NodeType.VariableStatement:
+						//var variable = Variable.create( <TypeScript.VariableStatement> ast);
+						//parent.variables.push(variable);
+						//walker.userdata.push(variable);
+						//break;						
 
 					case TypeScript.NodeType.Parameter:
 						var parameter = Parameter.create(<TypeScript.Parameter>ast);
