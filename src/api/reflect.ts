@@ -279,7 +279,6 @@ module TypeScript.Api {
 			walker.userdata    = [];
 			walker.userdata.push(reflection);
 			walker.walk(ast, (walker, ast) => {	
-						
 				if(walker.stack.length < walker.userdata.length - 1) {
 					do    { walker.userdata.pop(); } 
 					while (walker.stack.length < walker.userdata.length - 1);
@@ -362,9 +361,9 @@ module TypeScript.Api {
 			
 			var reflections:Reflection[] = [];
 			
-			for(var n in compilation.ast_array) { // change to ast_array
+			for(var n in compilation.units) { // change to ast_array
 				
-				var reflection = TypeScript.Api.Reflection.create(compilation.ast_array[n]);
+				var reflection = TypeScript.Api.Reflection.create(compilation.units[n].ast);
 				
 				reflections.push(reflection);
 			}

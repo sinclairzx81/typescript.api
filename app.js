@@ -4,13 +4,21 @@ typescript.resolve(['test/program.ts'], function(units){
 
 	typescript.compile(units, function(compilation) {
 		
-		typescript.reflect(compilation, function(reflection) {
+		console.log(compilation);
 		
-			var output = JSON.stringify(reflection, null, ' ');
+		//typescript.run(compilation, null, function(context) {
+			
+			
+			
+		//});
 		
-			console.log(output);
+		//typescript.reflect(compilation, function(reflection) {
 		
-		});
+			//var output = JSON.stringify(reflection, null, ' ');
+		
+			//console.log(output);
+		
+		//});
 	
 	});
 

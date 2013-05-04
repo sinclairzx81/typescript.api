@@ -26,20 +26,17 @@ module TypeScript.Api {
 	// Compilation : What a compiler outputs.
 	///////////////////////////////////////////////////////////////////////	
 	
-	export class CompiledSourceUnit {
+	export class CompilationUnit {
 		public ast      : TypeScript.AST;
 		public filename : string;
 		public content  : string;
-		
 	}
 	
 	export class Compilation {
-		public ast_array   : TypeScript.AST[];
+		public units       : CompilationUnit[];
 		public diagnostics : TypeScript.Api.Diagnostic[];
-		public scripts     : string[];
 		constructor() {
-			this.ast_array   = [];
-			this.scripts     = [];
+			this.units 	     = [];
 			this.diagnostics = [];
 		}
 	}
@@ -114,9 +111,15 @@ module TypeScript.Api {
 			});
 			
 			// push ast and scripts on compilation..
-			compilation.ast_array = this.compiler.getScripts();
-			for(var n in emitter.files) {
-				compilation.scripts.push(emitter.files[n].ToString());
+			var scripts:TypeScript[] = this.compiler.getScripts();
+			var idx = 0;
+			for(var filename in emitter.files) {
+				var unit      = new CompilationUnit();
+				unit.ast      = scripts[idx];
+				unit.filename = filename;
+				unit.content  = emitter.files[filename].ToString();
+				compilation.units.push( unit );
+				idx++; // bit loose...
 			}
 			
 			// return..

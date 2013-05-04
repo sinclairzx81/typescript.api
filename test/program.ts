@@ -1,5 +1,13 @@
 /// <reference path="other.ts" />
 
-function a () : app.Cat{
+module app{
+	
+	export class Cat<T> {
+		
+	}
+}
+function a () : app.Cat<number>{
 	return null;
 }
+
+console.log('aa');

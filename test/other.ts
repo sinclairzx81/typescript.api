@@ -1,6 +1,1 @@
-module app{
-	
-	export class Cat {
-		
-	}
-}
+console.log('other');

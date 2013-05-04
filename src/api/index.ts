@@ -136,8 +136,11 @@ export function reflect(compilation:any, callback :{ (reflection:any): void; }) 
 export function run (compilation:any, sandbox:any, callback :{ (context:any): void; }) : void {
 	try {
 		if(!sandbox) { sandbox = get_default_sandbox(); }
-		var source = compilation.scripts.join('');
-		var script = _vm.createScript( source, "compilation.js" );
+		var sources = [];
+		for(var n in compilation.units) {
+			sources.push(compilation.units[n].content);
+		}
+		var script = _vm.createScript( sources.join('') , "compilation.js" );
 		script.runInNewContext( sandbox );
 		callback( sandbox.exports );
 	} catch(e) {
