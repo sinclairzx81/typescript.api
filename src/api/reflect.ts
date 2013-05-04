@@ -55,8 +55,9 @@ module TypeScript.Api {
 
 		public static create(ast:TypeScript.VariableDeclarator): Variable {
 			console.log('Variable');
+			console.log(ast.init);
 			var result = new Variable();
-			result.name = ast.id.text;
+			result.name  = ast.id.text;
 			var typeExpr = <TypeScript.TypeReference>ast.typeExpr;
 			if(typeExpr){
 				result.type = ASTUtil.QualifyAST(typeExpr.term); 
@@ -66,9 +67,11 @@ module TypeScript.Api {
 			return result;
 		}  
 	}
+	
 	//////////////////////////////////////////////////////////////////
 	// Parameter:
 	//////////////////////////////////////////////////////////////////
+	
 	export class Parameter {
 		public name: string;
 		public type: string;
@@ -78,7 +81,7 @@ module TypeScript.Api {
 			console.log('Parameter');
 			
 			//ast.getVarFlags(); what does this do?
-			var result   = new Parameter();
+			var result  = new Parameter();
 			result.name  = ast.id.text;
 			var typeExpr = <TypeScript.TypeReference>ast.typeExpr;
 			
@@ -374,7 +377,7 @@ module TypeScript.Api {
 							
 						case TypeScript.NodeType.Script:
 							var _script = Script.create(<TypeScript.Script>ast);
-							_script.filename = compilation.units[n].filename;
+							_script.filename = compilation.units[n].filename; // snap on the filename...
 							parent.scripts.push(_script);
 							walker.userdata.push(_script);
 							break;						
