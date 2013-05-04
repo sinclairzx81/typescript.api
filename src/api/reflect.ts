@@ -18,12 +18,35 @@
 module TypeScript.Api {	
 	
 	//////////////////////////////////////////////////////////////////
+	// ASTUtil: helpful methods for working with TS AST.
+	//////////////////////////////////////////////////////////////////	
+	class ASTUtil {
+		
+		public static QualifyAST (ast:TypeScript.AST) : string { // NodeType = 32
+			var result = [];
+			var scan = (ast:TypeScript.AST) => {
+				if(ast.nodeType == TypeScript.NodeType.MemberAccessExpression) {
+					var expression = <TypeScript.BinaryExpression>ast;
+					scan(expression.operand1);
+					scan(expression.operand2);
+				}
+				
+				if(ast.nodeType == TypeScript.NodeType.Name) {
+					var name = <TypeScript.Identifier>ast;
+					result.push(name.text);
+				}
+			};
+			scan(ast);
+			return result.join('.');
+		}
+	}
+	
+	//////////////////////////////////////////////////////////////////
 	// Variable:
 	//////////////////////////////////////////////////////////////////
 	
 	export class Variable {
 		public name     : string;
-		public fullname : string;
 		public type     : string;
 
 		constructor(){
@@ -52,7 +75,15 @@ module TypeScript.Api {
 
 		public static create(ast:TypeScript.Parameter): Parameter {
 			console.log('Parameter');
-			var result = new Parameter();
+			
+			//ast.getVarFlags(); what does this do?
+			var result   = new Parameter();
+			result.name  = ast.id.text;
+			var typeExpr = <TypeScript.TypeReference>ast.typeExpr;
+			result.type  = ASTUtil.QualifyAST(typeExpr.term); 
+			
+			
+			//console.log(ast);
 			//result.name = ast.sym ? ast.sym.name : '';
 			//result.type = ast.sym ? ast.sym.getType().symbol.fullName() : '';
 			// format..
@@ -60,13 +91,14 @@ module TypeScript.Api {
 			return result;
 		}   
 	}
+	
 	//////////////////////////////////////////////////////////////////
 	// Method:
 	//////////////////////////////////////////////////////////////////	
 	export class Method {
+	
 		public parameters : Parameter[];
 		public name       : string;
-		public fullname   : string;
 		public returns    : string;
 
 		constructor () {
@@ -74,8 +106,24 @@ module TypeScript.Api {
 		}
 
 		public static create(ast:TypeScript.FunctionDeclaration): Method  {
+			
 			console.log('Method');
+			
 			var result = new Method();
+			
+			result.name = ast.getNameText(); // maybe run this through the Qualification proc?
+			
+			var returnTypeAnnotation = <TypeScript.TypeReference>ast.returnTypeAnnotation;
+			
+			result.returns = ASTUtil.QualifyAST(returnTypeAnnotation.term); 
+
+			//console.log(term);
+			
+			//if(returnTypeAnnotation.term.text) {
+				//result.returns = returnTypeAnnotation.term.text;
+			//}
+			
+			//console.log(ast);
 			/*
 			result.name      = ast.name ? ast.name.text : '';
 			result.fullname  = ast.name ? ast.name.sym.fullName() : '';
@@ -101,7 +149,6 @@ module TypeScript.Api {
 		public methods    : Method    [];
 		public variables  : Variable  [];
 		public name       : string;
-		public fullname   : string;
 		public extends    : string [];
 		public implements : string [];
 		constructor() {
@@ -111,11 +158,27 @@ module TypeScript.Api {
 			this.implements = [];
 		}
 
-		public static create(ast:TypeScript.ClassDeclaration): Class {
-			
+		public static create(ast:TypeScript.ClassDeclaration): Class { 
 			console.log('Class');
-			
 			var result = new Class();
+			result.name = ast.name.text;
+			if (ast.implementsList) {
+				if (ast.implementsList.members) {
+					for(var n in ast.implementsList.members) { 
+						var named_decl = <TypeScript.NamedDeclaration>ast.implementsList.members[n];
+						result.implements.push( named_decl.text );
+					}
+				}
+			}
+			if (ast.extendsList) {
+				if (ast.extendsList.members) {
+					for(var n in ast.extendsList.members) { 
+						var named_decl = <TypeScript.NamedDeclaration>ast.extendsList.members[n];
+						result.extends.push( named_decl.text );
+					}
+				}
+			}			
+			
 			/*
 			result.name      = ast.name ? ast.name.text : '';
 			result.fullname  = ast.name ? ast.name.sym.fullName() : '';
@@ -157,7 +220,6 @@ module TypeScript.Api {
 		public methods    : Method    [];
 		public variables  : Variable  [];
 		public name       : string;
-		public fullname   : string;
 		public extends    : string [];
 
 		constructor () {
@@ -165,10 +227,21 @@ module TypeScript.Api {
 			this.variables  = [];
 			this.extends    = [];
 		}
-
+		
 		public static create(ast:TypeScript.InterfaceDeclaration): Interface {
 			console.log('Interface');
-			var result       = new Interface();
+			var result  = new Interface();
+			result.name = ast.name.text;
+			if (ast.extendsList) {
+				if (ast.extendsList.members) {
+					for(var n in ast.extendsList.members) { 
+						var named_decl = <TypeScript.NamedDeclaration>ast.extendsList.members[n];
+						result.extends.push( named_decl.text );
+					}
+				}
+			}				
+			
+			//console.log(ast);
 			/*
 			result.name      = ast.name ? ast.name.text : '';
 			result.fullname  = ast.name ? ast.name.sym.fullName() : '';
@@ -180,7 +253,6 @@ module TypeScript.Api {
 					}
 				}
 			}
-			
 			// format...
 			result.fullname  = result.fullname.replace(Patterns.Quotes, "");
 			for(var n in result.extends) {
@@ -197,7 +269,6 @@ module TypeScript.Api {
 	//////////////////////////////////////////////////////////////////
 	export class Import {
 		public name     : string;
-		public fullname : string;
 		public alias    : string;
 
 		constructor() {
@@ -207,6 +278,9 @@ module TypeScript.Api {
 		public static create(ast:TypeScript.ImportDeclaration): Import {
 			console.log('Import');
 			var result      = new Import();
+			result.name  = ast.id.text;
+			result.alias = ast.getAliasName(ast);
+			//console.log(ast);
 			/*
 			result.name      = ast.id.actualText;
 			result.fullname  = ast.id.sym.fullName();
@@ -232,7 +306,6 @@ module TypeScript.Api {
 		public methods    : Method    [];
 		public variables  : Variable  [];
 		public name       : string;
-		public fullname   : string;
 
 		constructor () {
 			this.imports    = [];
@@ -243,9 +316,11 @@ module TypeScript.Api {
 			this.variables  = [];
 		}
 
-		public static create(ast:TypeScript.ModuleDeclaration): Module {
+		public static create (ast:TypeScript.ModuleDeclaration) : Module {
 			console.log('Module');
 			var result = new Module();
+			result.name = ast.prettyName;
+			//console.log(ast);
 			/*
 			result.name     = ast.name ? ast.name.text : '';
 			result.fullname = ast.name ? ast.name.sym.fullName() : '';
@@ -282,9 +357,13 @@ module TypeScript.Api {
 		public static create(ast:TypeScript.Script): Script {
 			console.log('Script');
 			var result = new Script();
-			//result.filename = ast.locationInfo.filename;
-			// format ..
-			//result.filename = result.filename.replace(Patterns.DoubleSlash, "/");
+			//console.log(ast);
+			//if(ast.topLevelMod) {
+				//result.name     = ast.topLevelMod.prettyName; // ModuleDeclaration
+				//result.filename = ast.topLevelMod.name.text + '.ts'; // might remove this...				
+			//}
+			//console.log(ast.topLevelMod);
+			
 			return result;
 		}
 	}
@@ -297,15 +376,13 @@ module TypeScript.Api {
 		public scripts : Script[];
 		constructor() {
 			this.scripts = [];
-
 		}
+		
 		public static create(ast:TypeScript.AST) : Reflection {
 			var reflection     = new Reflection();
 			var walker         = new ASTWalker();
 			walker.userdata    = [];
 			walker.userdata.push(reflection);
-			
-			console.log('before reflection.create.walker.walk(..)');
 			walker.walk(ast, (walker, ast) => {				
 				if(walker.stack.length < walker.userdata.length - 1) {
 					do    { walker.userdata.pop(); } 
@@ -376,22 +453,21 @@ module TypeScript.Api {
 	//////////////////////////////////////////////////////////////////	
 	export class Reflector {
 		
-		public compilation:TypeScript.Api.Compilation;
-		
-		constructor(compilation:TypeScript.Api.Compilation) {
-			this.compilation = compilation;
+		constructor() {
+			
 		}
 		
-		public reflect() {
+		public reflect(compilation:TypeScript.Api.Compilation) : Reflection[] {
 			
-			for(var n in this.compilation.astlist) {
+			var reflections:Reflection[] = [];
+			
+			for(var n in compilation.ast_array) { // change to ast_array
+			
+				var reflection = TypeScript.Api.Reflection.create(compilation.ast_array[0]);
 				
-				var reflection = TypeScript.Api.Reflection.create(this.compilation.astlist[n]);
-				
-				
+				reflections.push(reflection);
 			}
-		
-			return {};
+			return reflections;
 		}
 		
 	}

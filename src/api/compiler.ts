@@ -34,11 +34,11 @@ module TypeScript.Api {
 	}
 	
 	export class Compilation {
-		public astlist	   : TypeScript.AST[];
+		public ast_array   : TypeScript.AST[];
 		public diagnostics : TypeScript.Api.Diagnostic[];
 		public scripts     : string[];
 		constructor() {
-			this.astlist     = [];
+			this.ast_array   = [];
 			this.scripts     = [];
 			this.diagnostics = [];
 		}
@@ -114,7 +114,7 @@ module TypeScript.Api {
 			});
 			
 			// push ast and scripts on compilation..
-			compilation.astlist = this.compiler.getScripts();
+			compilation.ast_array = this.compiler.getScripts();
 			for(var n in emitter.files) {
 				compilation.scripts.push(emitter.files[n].ToString());
 			}

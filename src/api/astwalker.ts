@@ -26,71 +26,67 @@ module TypeScript.Api {
 			this.userdata = null;
 			this.callback = (sender, ast) => {};
 		}
-		
-		private walk_script    (ast: TypeScript.Script): void {
+		private walk_varstatement(ast:TypeScript.VariableStatement) : void {
 			this.callback(this, ast);
-			this.stack.push(ast);
-			this.walk_ast_array(ast.moduleElements.members);
-			this.stack.pop();
 		}
-
-		private walk_module    (ast: TypeScript.ModuleDeclaration): void {
+		private walk_parameter   (ast: TypeScript.Parameter): void {
 			this.callback(this, ast);
-			this.stack.push(ast);              
-			this.walk_astlist(ast.members); 
-			this.stack.pop();
 		}
-
-		private walk_import    (ast: TypeScript.ImportDeclaration): void {
-			this.callback(this, ast); 
-		}
-
-		private walk_classdecl (ast: TypeScript.ClassDeclaration): void {
-			this.callback(this, ast);
-			this.stack.push(ast);
-			this.walk_ast(ast.members);
-			this.stack.pop();
-		}
-
-		private walk_interface (ast: TypeScript.InterfaceDeclaration): void {
-			this.callback(this, ast);
-			this.stack.push(ast);
-			this.walk_ast(ast.members);
-			this.stack.pop();
-		}
-
-		private walk_vardecl   (ast: TypeScript.VariableDeclaration): void { 
-			this.callback(this, ast);
-		}   
-
 		private walk_funcdecl  (ast: TypeScript.FunctionDeclaration): void {
 			this.callback(this, ast);
 			this.stack.push(ast);
 			this.walk_astlist(ast.arguments);
 			this.stack.pop();
 		}
-
-		private walk_parameter   (ast: TypeScript.Parameter): void {
+		private walk_vardecl   (ast: TypeScript.VariableDeclaration): void { 
 			this.callback(this, ast);
+		}		
+		private walk_classdecl (ast: TypeScript.ClassDeclaration): void {
+			this.callback(this, ast);
+			this.stack.push(ast);
+			this.walk_ast(ast.members);
+			this.stack.pop();
+		}		
+		private walk_interface (ast: TypeScript.InterfaceDeclaration): void {
+			this.callback(this, ast);
+			this.stack.push(ast);
+			this.walk_ast(ast.members);
+			this.stack.pop();
+		}		
+		private walk_module (ast: TypeScript.ModuleDeclaration): void {
+			this.callback(this, ast);
+			this.stack.push(ast);              
+			this.walk_astlist(ast.members); 
+			this.stack.pop();
 		}
-				
-		public walk_ast       (ast: TypeScript.AST): void {
-			switch (ast.nodeType) {
-				case TypeScript.NodeType.List:                 this.walk_astlist    (<TypeScript.ASTList>ast); break;
-				case TypeScript.NodeType.Script:               this.walk_script     (<TypeScript.Script>ast); break;
-				case TypeScript.NodeType.ModuleDeclaration:    this.walk_module     (<TypeScript.ModuleDeclaration>ast); break;
-				case TypeScript.NodeType.InterfaceDeclaration: this.walk_interface  (<TypeScript.InterfaceDeclaration>ast); break;
-				case TypeScript.NodeType.VariableDeclaration:  this.walk_vardecl    (<TypeScript.VariableDeclaration>ast); break;
-				case TypeScript.NodeType.ClassDeclaration:     this.walk_classdecl  (<TypeScript.ClassDeclaration>ast); break;
-				case TypeScript.NodeType.FunctionDeclaration:  this.walk_funcdecl   (<TypeScript.FunctionDeclaration>ast); break;
-				case TypeScript.NodeType.Parameter:            this.walk_parameter  (<TypeScript.Parameter>ast); break;
-				case TypeScript.NodeType.ImportDeclaration:    this.walk_import     (<TypeScript.ImportDeclaration>ast); break;
-			}
+		private walk_import    (ast: TypeScript.ImportDeclaration): void {
+			this.callback(this, ast); 
+		}		
+		private walk_script (ast: TypeScript.Script): void {
+			this.callback(this, ast);
+			this.stack.push(ast);
+			this.walk_ast_array(ast.moduleElements.members);
+			this.stack.pop();
 		}
-		
-		private walk_astlist   (ast: TypeScript.ASTList): void {
+		private walk_astlist (ast: TypeScript.ASTList): void {
 			for(var n in ast.members) {
 				this.walk_ast(ast.members[n]);
+			}
+		}		
+		public walk_ast       (ast: TypeScript.AST): void {
+			console.log(ast.nodeType);
+			switch (ast.nodeType) {
+				case TypeScript.NodeType.List:                 this.walk_astlist      (<TypeScript.ASTList>ast); break;
+				case TypeScript.NodeType.Script:               this.walk_script       (<TypeScript.Script>ast); break;
+				case TypeScript.NodeType.ModuleDeclaration:    this.walk_module       (<TypeScript.ModuleDeclaration>ast); break;
+				case TypeScript.NodeType.InterfaceDeclaration: this.walk_interface    (<TypeScript.InterfaceDeclaration>ast); break;
+				case TypeScript.NodeType.VariableDeclarator:   this.walk_vardecl      (<TypeScript.VariableDeclaration>ast); break;
+				case TypeScript.NodeType.VariableStatement:    this.walk_varstatement (<TypeScript.VariableStatement>ast); break;
+				case TypeScript.NodeType.ClassDeclaration:     this.walk_classdecl    (<TypeScript.ClassDeclaration>ast); break;
+				case TypeScript.NodeType.FunctionDeclaration:  this.walk_funcdecl     (<TypeScript.FunctionDeclaration>ast); break;
+				case TypeScript.NodeType.Parameter:            this.walk_parameter    (<TypeScript.Parameter>ast); break;
+				case TypeScript.NodeType.ImportDeclaration:    this.walk_import       (<TypeScript.ImportDeclaration>ast); break;
+				
 			}
 		}
 		

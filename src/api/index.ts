@@ -44,10 +44,6 @@ export var allowRemote 				: boolean = true;
 
 export var async      				: boolean = true;
 
-
-
-
-
 /////////////////////////////////////////////////////////////
 // creates a new compilation unit
 /////////////////////////////////////////////////////////////
@@ -107,7 +103,6 @@ export function register () : void {
 			console.log('[TYPESCRIPT ERROR]');
 			console.log(logger.ToString());
 			throw new Error("[TYPESCRIPT ERROR]");
-			
 		}
 	}
 }
@@ -130,8 +125,8 @@ export function compile(units:any[], callback :{ (compilation:any): void; }) : v
 
 export function reflect(compilation:any, callback :{ (reflection:any): void; }) : void {
 	var api = load_typescript_api();
- 	var reflector = new api.Reflector(compilation);
-	callback( reflector.reflect() );
+ 	var reflector = new api.Reflector(); // todo: add logger here...
+	callback( reflector.reflect(compilation) );
 }
 
 /////////////////////////////////////////////////////////////
@@ -215,14 +210,14 @@ var typescript_filename     = _path.join(__dirname, "typescript.js");
 var typescript_api_filename = _path.join(__dirname, "typescript.api.js");
 
 // namespace cache...
-var cache_typescript_namespace = null;
+var _cache_typescript_namespace 	= null;
 var _cache_typescript_api_namespace = null;
 
 function load_typescript_api() : any {
 	
-	if(_cache_typescript_api_namespace) {
+	if(_cache_typescript_api_namespace)  
 		return _cache_typescript_api_namespace;
-	}
+	 
 	
 	var sandbox = {
 		TypeScript  : load_typescript(),
@@ -241,14 +236,15 @@ function load_typescript_api() : any {
 
 // loads typescript..
 function load_typescript() : any {
-	if(cache_typescript_namespace) {
-		return cache_typescript_namespace;
-	}	
-	var sandbox:any = { exports : null, 
-		//console : console // for debugging..
+	if(_cache_typescript_namespace)  
+		return _cache_typescript_namespace;
+	 	
+	var sandbox:any = { 
+		exports : null
+		//, console : console // for debugging..
 	};
-	cache_typescript_namespace = load_module (typescript_filename, sandbox, ["TypeScript"]);
-	return cache_typescript_namespace;
+	_cache_typescript_namespace = load_module (typescript_filename, sandbox, ["TypeScript"]);
+	return _cache_typescript_namespace;
 }
 
 // loads a module..

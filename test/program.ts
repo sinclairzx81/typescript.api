@@ -1,19 +1,12 @@
-
-
-module application {
+var a = 10;
+/*
+module testing {
 	
 	export class Program {
 		
-		public static Method(a:number, b:number) : number { 
-			
-			return a + b;
-		}
-		
-		public static Main(args:string[]) : void {
-			
-		}
-		
+		public name:string;
+		public age:number;
 	}
+}*/
 
-}
 
