@@ -155,7 +155,7 @@ written to the console.
 
 	var typescript = require("typescript.api");
 
-	var unit = typescript.units.create("temp.ts", "var value:number = 123;");
+	var unit = typescript.create("temp.ts", "var value:number = 123;");
 	
 	typescript.compile([unit], function(compilation) {
 	

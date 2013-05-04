@@ -22,21 +22,31 @@ module TypeScript.Api {
 	//////////////////////////////////////////////////////////////////	
 	class ASTUtil {
 		
-		public static QualifyAST (ast:TypeScript.AST) : string { // NodeType = 32
+		public static ResolveQualifiedTypeName (ast:TypeScript.AST) : string { // NodeType = 32
 			var result = [];
-			var scan = (ast:TypeScript.AST) => {
-				if(ast.nodeType == TypeScript.NodeType.MemberAccessExpression) {
+			var walk = (ast:TypeScript.AST) => {
+				if(ast.nodeType == TypeScript.NodeType.MemberAccessExpression) { // 32
 					var expression = <TypeScript.BinaryExpression>ast;
-					scan(expression.operand1);
-					scan(expression.operand2);
+					walk(expression.operand1);
+					walk(expression.operand2);
 				}
-				
-				if(ast.nodeType == TypeScript.NodeType.Name) {
+				if(ast.nodeType == TypeScript.NodeType.GenericType) { // 10
+					var generic_type = <TypeScript.GenericType>ast;
+					var expression = <TypeScript.BinaryExpression>generic_type.name;
+					if(expression.nodeType == TypeScript.NodeType.Name) {
+						walk(expression);
+					}
+					if(expression.nodeType == TypeScript.NodeType.MemberAccessExpression) {
+						walk(expression.operand1);
+						walk(expression.operand2);				
+					}
+				}				
+				if(ast.nodeType == TypeScript.NodeType.Name) { // 20
 					var name = <TypeScript.Identifier>ast;
 					result.push(name.text);
 				}
 			};
-			scan(ast);
+			walk(ast);
 			return result.join('.');
 		}
 	}
@@ -45,25 +55,35 @@ module TypeScript.Api {
 	// Variable:
 	//////////////////////////////////////////////////////////////////
 	
+	export class TypeArgument{
+		
+	}
+	
+	export class Type {
+		public name:string;
+		public arguments:TypeArgument[];
+		constructor(){
+			this.arguments = [];
+		}
+	}
+	
 	export class Variable {
 		public name     : string;
-		public type     : string;
-
+		public type     : Type;
 		constructor(){
-		
+			this.type = new TypeScript.Api.Type();
 		}
 
 		public static create(ast:TypeScript.VariableDeclarator): Variable {
 			console.log('Variable');
-			console.log(ast.init);
-			var result = new Variable();
+			//console.log(ast.init);
+			var result   = new Variable();
 			result.name  = ast.id.text;
 			var typeExpr = <TypeScript.TypeReference>ast.typeExpr;
 			if(typeExpr){
-				result.type = ASTUtil.QualifyAST(typeExpr.term); 
-			} else {
-				result.type = "any";
-			}
+				console.log(typeExpr.term);
+				result.type.name = ASTUtil.ResolveQualifiedTypeName(typeExpr.term); 
+			} 
 			return result;
 		}  
 	}
@@ -86,7 +106,7 @@ module TypeScript.Api {
 			var typeExpr = <TypeScript.TypeReference>ast.typeExpr;
 			
 			if(typeExpr){
-				result.type = ASTUtil.QualifyAST(typeExpr.term); 
+				result.type = ASTUtil.ResolveQualifiedTypeName(typeExpr.term); 
 			} else {
 				result.type = "any";
 			}
@@ -115,7 +135,7 @@ module TypeScript.Api {
 			result.name = ast.getNameText(); // maybe run this through the Qualification proc?
 			var returnTypeAnnotation = <TypeScript.TypeReference>ast.returnTypeAnnotation;
 			if(returnTypeAnnotation){
-				result.returns = ASTUtil.QualifyAST(returnTypeAnnotation.term); 
+				result.returns = ASTUtil.ResolveQualifiedTypeName(returnTypeAnnotation.term); 
 			} else {
 				result.returns = "any";
 			}
@@ -192,10 +212,8 @@ module TypeScript.Api {
 		
 		public static create(ast:TypeScript.InterfaceDeclaration): Interface {
 			console.log('Interface');
-			//console.log(ast.typeParameters.members[0]);
 			var result  = new Interface();
 			result.name = ast.name.text;
-			
 			if(ast.typeParameters){
 				if (ast.typeParameters.members) {
 					for(var n in ast.typeParameters.members) { 
