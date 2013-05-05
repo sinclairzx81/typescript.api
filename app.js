@@ -30,29 +30,11 @@ typescript.resolve(['test/program.ts'], function(units){
 		
 		typescript.reflect(compilation, function(reflection) {
 			
-			console.log('-------------------------------------------------------');
+			var json = JSON.stringify(reflection, null, ' ');
 			
-			each(reflection.scripts, function(script) {
-				
-				console.log('GOT SCRIPT');
-				
-				each(script.variables, function(variable) {
-						
-					console.log(variable.name + ':');
-					
-					print_type(variable.type);
-				
-				});
-			
-			});
-			
-			//var output = JSON.stringify(reflection, null, ' ');
-			//console.log(output);
-		
+			console.log(json);
 		});
-	
 	});
-
 });
 
 

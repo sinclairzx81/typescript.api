@@ -1,5 +1,3 @@
-// Acid Frameworks.  All rights reserved.
-// 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,11 +16,16 @@
 module TypeScript.Api {	
 	
 	//////////////////////////////////////////////////////////////////
-	// ASTUtil: helpful methods for working with TS AST.
-	//////////////////////////////////////////////////////////////////	
-	class ASTUtil {
+	// Type:
+	////////////////////////////////////////////////////////////////// 
+	export class Type  {
+		public name 	 : string;
+		public arguments : Type[];
 		
-		public static ResolveQualifiedTypeName (ast:TypeScript.AST) : string { // NodeType = 32
+		constructor() {
+			this.arguments = [];
+		}
+		public static qualify(ast:TypeScript.AST) : string {
 			var result = [];
 			var walk = (ast:TypeScript.AST) => {
 				if(ast.nodeType == TypeScript.NodeType.MemberAccessExpression) { // 32
@@ -47,25 +50,13 @@ module TypeScript.Api {
 				}
 			};
 			walk(ast);
-			return result.join('.');
+			return result.join('.');		
 		}
-	}
-	
-	//////////////////////////////////////////////////////////////////
-	// Type:
-	////////////////////////////////////////////////////////////////// 
-	export class Type  {
-		public name 	 : string;
-		public arguments : Type[];
 		
-		constructor() {
-			this.arguments = [];
-		}	
-		public static create(ast:TypeScript.TypeReference) : Type {
-			//console.log("Type");
+		public static create (ast:TypeScript.TypeReference) : Type {
 			var create_type = (ast:TypeScript.TypeReference) : Type => {
-				var type  = new Type();
-				type.name = ASTUtil.ResolveQualifiedTypeName (ast.term);
+				var type = new Type();
+				type.name = Type.qualify (ast.term);
 				switch(ast.term.nodeType){ 
 					case TypeScript.NodeType.GenericType:
 						var generic_type = <TypeScript.GenericType>ast.term;
@@ -77,12 +68,9 @@ module TypeScript.Api {
 				}
 				return type;
 			};
-			
 			return create_type(ast);
 		}
 	}
-	
-	
 	
 	//////////////////////////////////////////////////////////////////
 	// Variable:
@@ -99,7 +87,7 @@ module TypeScript.Api {
 			var result   = new Variable();
 			result.name  = ast.id.text;
 			
-			if(!ast.typeExpr) { // expressions picked up in typeref.
+			if(!ast.typeExpr) { // no typeExpr, default to any.
 				result.type  = new Type();
 				result.type.name = "any";
 			}  
@@ -115,17 +103,22 @@ module TypeScript.Api {
 	export class Parameter {
 		public id 		  : string;
 		public name		  : string;
-		public type		  : string;
+		public type		  : Type;
 		constructor(){ }
 
 		public static create(ast:TypeScript.Parameter): Parameter {
 			var result  = new Parameter();
 			result.name  = ast.id.text;
-			var typeExpr = <TypeScript.TypeReference>ast.typeExpr;
+
+			if(!ast.typeExpr) { // no typeExpr, default to any.
+				result.type  = new Type();
+				result.type.name = "any";
+			} 
 			
-			if(typeExpr){
-				result.type = ASTUtil.ResolveQualifiedTypeName(typeExpr.term); 
-			}
+			//var typeExpr = <TypeScript.TypeReference>ast.typeExpr;
+			//if(typeExpr) {
+			//	result.type = Type.create(typeExpr);
+			//}
 			return result;
 		}   
 	}
@@ -137,20 +130,18 @@ module TypeScript.Api {
 		public id 		  : string;
 		public parameters : Parameter[];
 		public name       : string;
-		public returns    : string;
+		public returns    : Type;
 
 		constructor () {
 			this.parameters = [];
 		}
 
 		public static create(ast:TypeScript.FunctionDeclaration): Method  {
-			//console.log('Method');
-			var result   = new Method();
-			result.name  = ast.getNameText();
-			var returnTypeAnnotation = <TypeScript.TypeReference>ast.returnTypeAnnotation;
-			if(returnTypeAnnotation){
-				result.returns = ASTUtil.ResolveQualifiedTypeName(returnTypeAnnotation.term); 
-			}
+			var result = new Method();
+			result.name = ast.getNameText();
+			if(ast.returnTypeAnnotation) {
+				result.returns = Type.create(<TypeScript.TypeReference>ast.returnTypeAnnotation);		
+			}			
 			return result;
 		}
 	}
@@ -172,11 +163,8 @@ module TypeScript.Api {
 			this.parameters = [];
 		}
 		public static create(ast:TypeScript.ClassDeclaration): Class { 
-			
-			//console.log('Class');
 			var result = new Class();
 			result.name = ast.name.text;
-			
 			if(ast.typeParameters){
 				if (ast.typeParameters.members) {
 					for(var n in ast.typeParameters.members) { 
@@ -184,7 +172,6 @@ module TypeScript.Api {
 					}
 				}
 			}
-			
 			if (ast.implementsList) {
 				if (ast.implementsList.members) {
 					for(var n in ast.implementsList.members) { 
@@ -193,7 +180,6 @@ module TypeScript.Api {
 					}
 				}
 			}
-			
 			if (ast.extendsList) {
 				if (ast.extendsList.members) {
 					for(var n in ast.extendsList.members) { 
@@ -202,7 +188,6 @@ module TypeScript.Api {
 					}
 				}
 			}
-			
 			return result;
 		}
 	}
@@ -224,7 +209,6 @@ module TypeScript.Api {
 		}
 		
 		public static create(ast:TypeScript.InterfaceDeclaration): Interface {
-			//console.log('Interface');
 			var result  = new Interface();
 			result.name = ast.name.text;
 			if(ast.typeParameters){
@@ -234,7 +218,6 @@ module TypeScript.Api {
 					}
 				}
 			}
-			
 			if (ast.extendsList) {
 				if (ast.extendsList.members) {
 					for(var n in ast.extendsList.members) { 
@@ -258,7 +241,6 @@ module TypeScript.Api {
 		}
 
 		public static create(ast:TypeScript.ImportDeclaration): Import {
-			//console.log('Import');
 			var result   = new Import();
 			result.name  = ast.id.text;
 			result.alias = ast.getAliasName(ast);
@@ -288,7 +270,6 @@ module TypeScript.Api {
 		}
 
 		public static create (ast:TypeScript.ModuleDeclaration) : Module {
-			//console.log('Module');
 			var result   = new Module();
 			result.name  = ast.prettyName;			
 			return result;
@@ -312,9 +293,7 @@ module TypeScript.Api {
 			this.methods    = [];
 			this.variables  = [];
 		}
-
-		public static create(ast:TypeScript.Script): Script {
-			//console.log('Script');
+		public static create(filename:string, ast:TypeScript.Script): Script {
 			var result = new Script();
 			// nothing to do here...
 			return result;
@@ -405,8 +384,7 @@ module TypeScript.Api {
 							break;	
 							
 						case TypeScript.NodeType.Script:
-							var _script = Script.create(<TypeScript.Script>ast);
-							_script.filename = compilation.units[n].filename; // snap on the filename...
+							var _script = Script.create(compilation.units[n].filename, <TypeScript.Script>ast);
 							parent.scripts.push(_script);
 							walker.userdata.push(_script);
 							break;						

@@ -1,7 +1,20 @@
-/// <reference path='other.ts' />
+// <reference path='other.ts' />
 
 
-var a = 10;
+//class Cat<T> {public v:Cat<number, Action<string>>;}
+
+//module cat.foo { export class Cat {} }
+
+
+//function method() : Action<cat.foo.Cat> { return null; }
+
+
+class Test {
+
+	v:Action<string>;
+
+}
+
 //module app.some {
 //	class Animal<T,S> { 
 		
