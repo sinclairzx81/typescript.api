@@ -173,9 +173,8 @@ typescript.compile([unit], function(compilation) {
 
 ### typescript.reflect ( compilation, callback )
 
-Reads compilation ast, and produces meta data about the modules, classes, methods contained within the compilation. 
-
-note: reflected metadata currently excludes declaration files.  
+Reflects compilation AST and produces meta data about the modules, classes, 
+methods and variables contained within the compilation. 
 
 __Arguments__
 
