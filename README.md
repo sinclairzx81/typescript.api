@@ -1,6 +1,6 @@
 # typescript.api
 
-A typescript compilation api that enables nodejs developers to resolve, compile and execute typescript 0.9 source files. 
+A typescript compilation api that enables nodejs developers to resolve, compile, reflect and execute typescript 0.9 source files. 
 
 ## install
 

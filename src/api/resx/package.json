@@ -1,7 +1,7 @@
 {
   "name": "typescript.api",
-  "version": "0.9.0",
-  "description": "A typescript compilation api that enables nodejs developers to resolve, compile and execute typescript 0.9 source files.",
+  "version": "0.2.0",
+  "description": "A typescript compilation api that enables nodejs developers to resolve, compile, reflect and execute typescript 0.9 source files. ",
   "main": "index.js",
   "directories": {
      
