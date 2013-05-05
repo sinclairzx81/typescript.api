@@ -1,7 +1,7 @@
 {
   "name": "typescript.api",
   "version": "0.2.0",
-  "description": "A typescript compilation api that enables nodejs developers to resolve, compile, reflect and execute typescript 0.9 source files. ",
+  "description": "A compiler as a service api enabling nodejs developers to resolve, compile, reflect and run typescript 0.9 source files.",
   "main": "index.js",
   "directories": {
      
@@ -16,7 +16,7 @@
     "url": "https://github.com/sinclairzx81/typescript.api.git"
   },
   "keywords": [
-    "typescript compiler"
+    "typescript", "compiler", "require"
   ],
   "author": "sinclair",
   "license": "Apache License, Version 2.0",

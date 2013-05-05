@@ -1,13 +1,11 @@
 # typescript.api
 
-A typescript compilation api that enables nodejs developers to resolve, compile, reflect and execute typescript 0.9 source files. 
+A compiler as a service api enabling nodejs developers to resolve, compile, reflect and run typescript 0.9 source files.
 
 ## install
 
 ```javascript
-
 npm install typescript.api
-
 ```
 
 ## compiler version
@@ -23,13 +21,11 @@ will be written to the console, and module will be resolved, compiled and execut
 synchronously.
 
 ```javascript
-
 var typescript = require("typescript.api");
 
 typescript.register();
 
 var program = require("./program.ts");
-
 ```
 
 ### manual compilation
@@ -41,7 +37,6 @@ sources (units) are then passed to the compiler for compilation. The compilation
 is then sent to be run.
 
 ```javascript
-
 var typescript = require("typescript.api");
 
 var sources = ["./program.ts"];
@@ -71,7 +66,6 @@ typescript.resolve(sources, function(units) {
 		}
 	});
 });
-
 ```
 
 ## reference
@@ -93,7 +87,6 @@ __Example__
 Will resolve 'program.ts' and print all referenced source files.
 
 ```javascript
-
 var typescript = require("typescript.api");
 
 typescript.resolve(["program.ts"], function(units) { 
@@ -111,7 +104,6 @@ typescript.resolve(["program.ts"], function(units) {
 		}
 	}
 });
-	
 ```
 
 ### typescript.create ( filename, code )
@@ -128,7 +120,6 @@ __Example__
 The following will create a unit. and send to the compiler for compilation.
 
 ```javascript
-
 var typescript = require("typescript.api");
 
 var unit = typescript.create("temp.ts", "console.log('hello world');");
@@ -138,7 +129,6 @@ typescript.compile([unit], function(compilation) {
 	typescript.run(compilation, null, function(context) { });
 	
 });
-
 ```
 
 ### typescript.compile ( units, callback )
@@ -156,7 +146,6 @@ The following will first create and compile a unit, and compiled source is
 written to the console.
 
 ```javascript
-
 var typescript = require("typescript.api");
 
 var unit = typescript.create("temp.ts", "var value:number = 123;");
@@ -168,7 +157,6 @@ typescript.compile([unit], function(compilation) {
 		console.log(compilation.scripts[n]);
 	}
 });
-	
 ```
 
 ### typescript.reflect ( compilation, callback )
@@ -187,7 +175,6 @@ The following will load the program.ts source file, compile it, then reflect. Th
 metadata is written to the console as a JSON string.
 
 ```javascript
-
 var typescript = require("typescript.api");
 
 typescript.resolve(['program.ts'], function(units){
@@ -202,7 +189,6 @@ typescript.resolve(['program.ts'], function(units){
 		});
 	});
 });
-	
 ```
 
 ### typescript.run ( compilation, sandbox, callback )
@@ -214,15 +200,13 @@ __Arguments__
 * compilation - The compilation to be executed.
 * sandbox - A sandbox. pass null to inherit the current sandbox.
 * callback - A callback that passes a content containing exported 
-		     members of the executed code. 
 
 __Example__
 
 The following will first create and compile a unit, then send it off
 for compilation.
 
-```javascript
-	
+```javascript	
 var typescript = require("typescript.api");	
 
 var unit = typescript.create("temp.ts", "export var value:number = 123;");
@@ -235,5 +219,4 @@ typescript.compile([unit], function(compilation) {
 		
 	});
 });
-	
 ```
