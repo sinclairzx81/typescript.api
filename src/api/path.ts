@@ -50,6 +50,13 @@ module TypeScript.Api {
 			return false;				
 		}
 		
+		// converts the path to forward slashes
+		public static toForwardSlashes(path:string) : string {
+		
+			return path.replace(/\\/gi, "/");
+			
+		}
+		
 		// magical function to turn a relative path into a absolute by way
 		// of its abaolute parent. if already a absolute path, just return.
 		public static relativeToAbsolute (absolute_parent_path:string, relative_path:string) : string {

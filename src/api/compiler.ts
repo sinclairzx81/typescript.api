@@ -17,9 +17,6 @@
 /// <reference path='resolver.ts' />
 /// <reference path='emitter.ts' />
 
-
-/// <reference path='reflect.ts' />
-
 module TypeScript.Api {
 	
 	///////////////////////////////////////////////////////////////////////
@@ -102,24 +99,22 @@ module TypeScript.Api {
 			for(var n in compilation.diagnostics) {
 				this.logger.log('[compiler] ' + compilation.diagnostics[n].toString());
 			}
-			 
 			
-			// emit the source code...
+			// emit the source code...store a map of the input and output.
+			var emitter_io_map = [];
 			var emitter = new TypeScript.Api.Emitter();
 			this.compiler.emitAll(emitter, (inputFile: string, outputFile: string) : void => {
-				this.logger.log('[emitting] ' + outputFile);
+				emitter_io_map[outputFile] = inputFile;
 			});
 			
 			// push ast and scripts on compilation..
-			var scripts:TypeScript[] = this.compiler.getScripts();
-			var idx = 0;
 			for(var filename in emitter.files) {
 				var unit      = new CompilationUnit();
-				unit.ast      = scripts[idx];
+				var document  = this.compiler.getDocument(emitter_io_map[filename]);
+				unit.ast 	  = document.script;
 				unit.filename = filename;
 				unit.content  = emitter.files[filename].ToString();
 				compilation.units.push( unit );
-				idx++; // bit loose...can probably do better...
 			}
 			
 			// return..

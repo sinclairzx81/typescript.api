@@ -1,4 +1,4 @@
 console.log('other');
 
 
-var a = 10;
+var a:Action<string>;

@@ -50,57 +50,60 @@ module TypeScript.Api {
 			return result.join('.');
 		}
 	}
-
+	
+	//////////////////////////////////////////////////////////////////
+	// Type:
+	////////////////////////////////////////////////////////////////// 
+	export class Type  {
+		public name 	 : string;
+		public arguments : Type[];
+		
+		constructor() {
+			this.arguments = [];
+		}	
+		public static create(ast:TypeScript.TypeReference) : Type {
+			//console.log("Type");
+			var create_type = (ast:TypeScript.TypeReference) : Type => {
+				var type  = new Type();
+				type.name = ASTUtil.ResolveQualifiedTypeName (ast.term);
+				switch(ast.term.nodeType){ 
+					case TypeScript.NodeType.GenericType:
+						var generic_type = <TypeScript.GenericType>ast.term;
+						for(var n in generic_type.typeArguments.members) {
+							var argument = create_type(generic_type.typeArguments.members[n]);
+							type.arguments.push(argument);
+						}
+						break;
+				}
+				return type;
+			};
+			
+			return create_type(ast);
+		}
+	}
+	
+	
+	
 	//////////////////////////////////////////////////////////////////
 	// Variable:
-	//////////////////////////////////////////////////////////////////
-	
-	export class TypeArgument{
-		
-	}
-	
-	export class Type {
-		public name:string;
-		public arguments:TypeArgument[];
-		constructor(){
-			this.arguments = [];
-		}
-		
-		public static create(ast:TypeScript.TypeReference) : Type {
-			console.log("Type");
-			//console.log(ast);
-			
-			var result = new Type();
-			result.name = ASTUtil.ResolveQualifiedTypeName(ast.term);
-			
-			// can shuffle this off to the type handler
-			//var typeExpr = <TypeScript.TypeReference>ast.typeExpr; 
-			
-			//if(typeExpr) {
-			//	result.type.name = ASTUtil.ResolveQualifiedTypeName(typeExpr.term); 
-			//} 			
-			return result;
-		}
-	}
-	
+	//////////////////////////////////////////////////////////////////	
 	export class Variable {
-		public name     : string;
-		public type     : Type;
-		constructor(){
-			this.type = new TypeScript.Api.Type();
+		public name       : string;
+		public type       : Type;
+		constructor() {
+			
 		}
-
+		
 		public static create(ast:TypeScript.VariableDeclarator): Variable {
-			console.log('Variable');
-			//console.log(ast.init);
+			//console.log('Variable');
 			var result   = new Variable();
 			result.name  = ast.id.text;
-			// can shuffle this off to the type handler
-			//var typeExpr = <TypeScript.TypeReference>ast.typeExpr; 
 			
-			//if(typeExpr) {
-			//	result.type.name = ASTUtil.ResolveQualifiedTypeName(typeExpr.term); 
-			//} 
+			if(!ast.typeExpr) { // expressions picked up in typeref.
+				result.type  = new Type();
+				result.type.name = "any";
+			}  
+			
 			return result;
 		}  
 	}
@@ -110,14 +113,12 @@ module TypeScript.Api {
 	//////////////////////////////////////////////////////////////////
 	
 	export class Parameter {
-		public name: string;
-		public type: string;
+		public id 		  : string;
+		public name		  : string;
+		public type		  : string;
 		constructor(){ }
 
 		public static create(ast:TypeScript.Parameter): Parameter {
-			console.log('Parameter');
-			
-			//ast.getVarFlags(); what does this do?
 			var result  = new Parameter();
 			result.name  = ast.id.text;
 			var typeExpr = <TypeScript.TypeReference>ast.typeExpr;
@@ -133,7 +134,7 @@ module TypeScript.Api {
 	// Method:
 	//////////////////////////////////////////////////////////////////	
 	export class Method {
-	
+		public id 		  : string;
 		public parameters : Parameter[];
 		public name       : string;
 		public returns    : string;
@@ -143,11 +144,9 @@ module TypeScript.Api {
 		}
 
 		public static create(ast:TypeScript.FunctionDeclaration): Method  {
-			
-			console.log('Method');
-			
-			var result  = new Method();
-			result.name = ast.getNameText();
+			//console.log('Method');
+			var result   = new Method();
+			result.name  = ast.getNameText();
 			var returnTypeAnnotation = <TypeScript.TypeReference>ast.returnTypeAnnotation;
 			if(returnTypeAnnotation){
 				result.returns = ASTUtil.ResolveQualifiedTypeName(returnTypeAnnotation.term); 
@@ -174,7 +173,7 @@ module TypeScript.Api {
 		}
 		public static create(ast:TypeScript.ClassDeclaration): Class { 
 			
-			console.log('Class');
+			//console.log('Class');
 			var result = new Class();
 			result.name = ast.name.text;
 			
@@ -211,11 +210,11 @@ module TypeScript.Api {
 	// Interface:
 	//////////////////////////////////////////////////////////////////
 	export class Interface {
-		public methods        : Method    [];
-		public variables      : Variable  [];
-		public parameters     : string    [];
-		public extends    	  : string    [];
-		public name       	  : string;
+		public methods    : Method    [];
+		public variables  : Variable  [];
+		public parameters : string    [];
+		public extends    : string    [];
+		public name       : string;
 		
 		constructor () {
 			this.methods    = [];
@@ -225,7 +224,7 @@ module TypeScript.Api {
 		}
 		
 		public static create(ast:TypeScript.InterfaceDeclaration): Interface {
-			console.log('Interface');
+			//console.log('Interface');
 			var result  = new Interface();
 			result.name = ast.name.text;
 			if(ast.typeParameters){
@@ -251,16 +250,16 @@ module TypeScript.Api {
 	// Import:
 	//////////////////////////////////////////////////////////////////
 	export class Import {
-		public name     : string;
-		public alias    : string;
+		public name       : string;
+		public alias      : string;
 
 		constructor() {
 		
 		}
 
 		public static create(ast:TypeScript.ImportDeclaration): Import {
-			console.log('Import');
-			var result      = new Import();
+			//console.log('Import');
+			var result   = new Import();
 			result.name  = ast.id.text;
 			result.alias = ast.getAliasName(ast);
 			return result;
@@ -271,7 +270,6 @@ module TypeScript.Api {
 	// Module:
 	//////////////////////////////////////////////////////////////////
 	export class Module {
-
 		public imports    : Import    [];
 		public modules    : Module    [];
 		public interfaces : Interface [];
@@ -290,9 +288,9 @@ module TypeScript.Api {
 		}
 
 		public static create (ast:TypeScript.ModuleDeclaration) : Module {
-			console.log('Module');
-			var result = new Module();
-			result.name = ast.prettyName;			
+			//console.log('Module');
+			var result   = new Module();
+			result.name  = ast.prettyName;			
 			return result;
 		}
 	}
@@ -316,7 +314,7 @@ module TypeScript.Api {
 		}
 
 		public static create(ast:TypeScript.Script): Script {
-			console.log('Script');
+			//console.log('Script');
 			var result = new Script();
 			// nothing to do here...
 			return result;
@@ -339,7 +337,7 @@ module TypeScript.Api {
 			var walker         = new ASTWalker();
 			walker.userdata    = [];
 			walker.userdata.push(reflection);
-			
+		
 			// foreach compilation unit..
 			for(var n in compilation.units) {
 				
@@ -364,15 +362,10 @@ module TypeScript.Api {
 							walker.userdata.push(variable);
 							break;
 						
-						//case TypeScript.NodeType.VariableStatement:
-							//var variable = Variable.create( <TypeScript.VariableStatement> ast);
-							//parent.variables.push(variable);
-							//walker.userdata.push(variable);
-							//break;						
-						
-						case TypeScript.NodeType.TypeRef:
-							parent.type = Type.create(<TypeScript.TypeReference>ast);
-							walker.userdata.push(parent.type);
+						case TypeScript.NodeType.TypeRef: 
+							var type = Type.create(<TypeScript.TypeReference>ast);
+							parent.type = type;
+							walker.userdata.push(type);							
 							break;
 							
 						case TypeScript.NodeType.Parameter:

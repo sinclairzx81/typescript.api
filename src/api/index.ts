@@ -34,9 +34,9 @@ var _path = require("path");
 // compiler options..
 /////////////////////////////////////////////////////////////
 
-export var include_lib_declaration  : boolean = false;
+export var include_lib_declaration  : boolean = true;
 
-export var include_node_declaration : boolean = false;
+export var include_node_declaration : boolean = true;
 
 export var debug       				: boolean = false;
 

@@ -13,6 +13,9 @@
 
 module TypeScript.Api {
 
+	
+
+
 	////////////////////////////////////////////////////////////////////
 	// ASTWalker: API specific API Walker..
 	////////////////////////////////////////////////////////////////////
@@ -111,7 +114,8 @@ module TypeScript.Api {
 		}
 		
 		public walk_ast       (ast: TypeScript.AST): void {
-			console.log(ast.nodeType);
+			
+			//console.log(TypeScript.NodeType._map[ast.nodeType]);
 			switch (ast.nodeType) {
 				case TypeScript.NodeType.List:                    this.walk_astlist        (<TypeScript.ASTList>ast); break;
 				case TypeScript.NodeType.Script:                  this.walk_script         (<TypeScript.Script>ast); break;
