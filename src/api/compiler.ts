@@ -14,6 +14,7 @@
 /// <reference path='diagnostics.ts' />
 /// <reference path='resolver.ts' />
 /// <reference path='emitter.ts' />
+/// <reference path='path.ts' />
 
 module TypeScript.Api {
 	

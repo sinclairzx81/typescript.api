@@ -26,8 +26,6 @@ typescript.resolve(['test/program.ts'], function(units){
 
 	typescript.compile(units, function(compilation) {
 		
-		console.log(compilation.units.length);
-		
 		typescript.reflect(compilation, function(reflection) {
 			
 			var json = JSON.stringify(reflection, null, ' ');

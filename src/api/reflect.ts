@@ -12,6 +12,7 @@
 /// <reference path="decl/typescript.d.ts" />
 /// <reference path="astwalker.ts" />
 /// <reference path="compiler.ts" />
+/// <reference path="path.ts" />
 
 module TypeScript.Api {	
 	
@@ -295,7 +296,7 @@ module TypeScript.Api {
 		}
 		public static create(filename:string, ast:TypeScript.Script): Script {
 			var result = new Script();
-			// nothing to do here...
+			result.filename = filename;
 			return result;
 		}
 	}

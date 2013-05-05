@@ -5,7 +5,9 @@ A typescript compilation api that enables nodejs developers to resolve, compile 
 ## install
 
 ```javascript
+
 npm install typescript.api
+
 ```
 
 ## compiler version
@@ -22,11 +24,11 @@ synchronously.
 
 ```javascript
 
-	var typescript = require("typescript.api");
+var typescript = require("typescript.api");
 
-	typescript.register();
-	
-	var program = require("./program.ts");
+typescript.register();
+
+var program = require("./program.ts");
 
 ```
 
@@ -40,35 +42,35 @@ is then sent to be run.
 
 ```javascript
 
-	var typescript = require("typescript.api");
+var typescript = require("typescript.api");
 
-	var sources = ["./program.ts"];
+var sources = ["./program.ts"];
 
-	function has_errors(compilation) {
+function has_errors(compilation) {
+
+	// errors can be listed on the compilation.diagnostics array.
 	
-		// errors can be listed on the compilation.diagnostics array.
-		
-		return compilation.diagnostics.length > 0; 
-		
-	}
+	return compilation.diagnostics.length > 0; 
 	
-	// resolve units...
-	typescript.resolve(sources, function(units) {
+}
+
+// resolve units...
+typescript.resolve(sources, function(units) {
+	
+	// compile units...
+	typescript.compile(units, function(compilation) {
 		
-		// compile units...
-		typescript.compile(units, function(compilation) {
+		// check for errors...
+		if(!has_errors (compilation) ) {
 			
-			// check for errors...
-			if(!has_errors (compilation) ) {
-				
-				// run the compilation...
-				typescript.run(compilation, null, function(context) {
-				
-					 // exported members available on the context...
-				});
-			}
-		});
+			// run the compilation...
+			typescript.run(compilation, null, function(context) {
+			
+				 // exported members available on the context...
+			});
+		}
 	});
+});
 
 ```
 
@@ -92,21 +94,23 @@ Will resolve 'program.ts' and print all referenced source files.
 
 ```javascript
 
-	typescript.resolve(["program.ts"], function(units) { 
+var typescript = require("typescript.api");
+
+typescript.resolve(["program.ts"], function(units) { 
+
+	for(var n in units) {
 	
-		for(var n in units) {
+		console.log( units[n].path );
 		
-			console.log( units[n].path );
+		console.log( units[n].content );
+		
+		for(var m in units[n].references) {
+		
+			console.log( units[n].references[m] )
 			
-			console.log( units[n].content );
-			
-			for(var m in units[n].references) {
-			
-				console.log( units[n].references[m] )
-				
-			}
 		}
-	});
+	}
+});
 	
 ```
 
@@ -125,15 +129,15 @@ The following will create a unit. and send to the compiler for compilation.
 
 ```javascript
 
-	var typescript = require("typescript.api");
+var typescript = require("typescript.api");
 
-	var unit = typescript.create("temp.ts", "console.log('hello world');");
+var unit = typescript.create("temp.ts", "console.log('hello world');");
 
-	typescript.compile([unit], function(compilation) {
+typescript.compile([unit], function(compilation) {
+
+	typescript.run(compilation, null, function(context) { });
 	
-		typescript.run(compilation, null, function(context) { });
-		
-	});
+});
 
 ```
 
@@ -153,17 +157,52 @@ written to the console.
 
 ```javascript
 
-	var typescript = require("typescript.api");
+var typescript = require("typescript.api");
 
-	var unit = typescript.create("temp.ts", "var value:number = 123;");
+var unit = typescript.create("temp.ts", "var value:number = 123;");
+
+typescript.compile([unit], function(compilation) {
+
+	for(var n in compilation.scripts){
 	
-	typescript.compile([unit], function(compilation) {
+		console.log(compilation.scripts[n]);
+	}
+});
 	
-		for(var n in compilation.scripts){
+```
+
+### typescript.reflect ( compilation, callback )
+
+Reads compilation ast, and produces meta data about the modules, classes, methods contained within the compilation. 
+
+note: reflected metadata currently excludes declaration files.  
+
+__Arguments__
+
+* units - The compilation to be reflected. 
+* callback - A callback that passes the reflected metadata.
+
+__Example__
+
+The following will load the program.ts source file, compile it, then reflect. The reflected
+metadata is written to the console as a JSON string.
+
+```javascript
+
+var typescript = require("typescript.api");
+
+typescript.resolve(['program.ts'], function(units){
+
+	typescript.compile(units, function(compilation) {
 		
-			console.log(compilation.scripts[n]);
-		}
+		typescript.reflect(compilation, function(reflection) {
+			
+			var json = JSON.stringify(reflection, null, ' ');
+			
+			console.log(json);
+		});
 	});
+});
 	
 ```
 
@@ -185,17 +224,17 @@ for compilation.
 
 ```javascript
 	
-	var typescript = require("typescript.api");	
-	
-	var unit = typescript.create("temp.ts", "export var value:number = 123;");
+var typescript = require("typescript.api");	
 
-	typescript.compile([unit], function(compilation) {
+var unit = typescript.create("temp.ts", "export var value:number = 123;");
+
+typescript.compile([unit], function(compilation) {
+
+	typescript.run(compilation, null, function(context) { 
 	
-		typescript.run(compilation, null, function(context) { 
+		console.log(context.value);
 		
-			console.log(context.value);
-			
-		});
 	});
+});
 	
 ```
