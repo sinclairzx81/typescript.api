@@ -28,29 +28,35 @@ module TypeScript.Api {
 	// Emitter: Compiler uses this to emit files.
 	///////////////////////////////////////////////////////////////////////		
 	
-	export class Emitter {
+	export class Emitter implements IEmitter {
 		
 		public files : ITextWriter[];
 		
 		constructor() {
+			
 			this.files = [];
 		}
 		
 		public createFile(path: string, useUTF8?: boolean): ITextWriter {
+		
 			this.files[path] = new TypeScript.Api.TextWriter();
+			
 			return this.files[path];
 			
 		}
 		
 		public directoryExists(path: string): boolean {
+		
 			return true;
 		}
 		
 		public fileExists(path: string): boolean {
+		
 			return true;
 		}
 		
 		public resolvePath(path: string): string {
+		
 			return '/';
 		}
 

@@ -10,6 +10,7 @@
 // limitations under the License.
 
 /// <reference path="decl/node.d.ts" />
+/// <reference path="unit.ts" />
 
 module TypeScript.Api {
 	
@@ -25,40 +26,28 @@ module TypeScript.Api {
 	
 	export interface IIOAsync {
 	
-		readFile(filename:string, callback:{( file:ResolvedFile) : void; }): void;
+		readFile(filename:string, callback:{( unit:SourceUnit) : void; }): void;
 		
 	}	
-	
-	///////////////////////////////////////////////////////////////////////
-	// ResolvedFile: Response object for IIOAsync
-	///////////////////////////////////////////////////////////////////////	
-	
-	export class ResolvedFile implements IResolvedFile {
-		public content    : string;
-		public path       : string;
-		public remote     : boolean;
-		public error      : string;
-	}
 	
 	///////////////////////////////////////////////////////////////////////
 	// IOSync: Syncronous IO (used primarily for nodejs require()
 	///////////////////////////////////////////////////////////////////////	
 	
 	export class IOSyncHost implements IIOAsync {
-		public readFile (filename:string, callback:{(file:ResolvedFile) : void; }): void {
+	
+		public readFile (filename:string, callback:{(unit:SourceUnit) : void; }): void {
+		
 			try {
-				var data 	 = _fs.readFileSync(filename);
-				var file     = new ResolvedFile();
-				file.path    = filename;
-				file.content = processBuffer(data);
-				file.remote  = false;
-				callback( file );  
-			} catch(e) {
-				var file     = new ResolvedFile();
-				file.path    = filename;
-				file.error   = e;
-				file.remote  = false;
-				callback( file ); 
+			
+				var data = _fs.readFileSync(filename);
+				
+				callback( new SourceUnit(filename, processBuffer(data), false, null) );  
+				
+			} catch(exception) {
+			
+				callback( new SourceUnit(filename, null, false, exception) );  
+			
 			}
 		}		
 	}	
@@ -66,24 +55,22 @@ module TypeScript.Api {
 	///////////////////////////////////////////////////////////////////////
 	// IOAsyncHost: Provides local file read services.
 	///////////////////////////////////////////////////////////////////////
+	
 	export class IOAsyncHost implements IIOAsync {
 		
-		public readFile (filename:string, callback:{(file:ResolvedFile) : void; }): void {
+		public readFile (filename:string, callback: { (unit:SourceUnit) : void; } ): void {
 			
-			_fs.readFile(filename, (err, data) => {
-			  if (!err) {
-				var file     = new ResolvedFile();
-				file.path    = filename;
-				file.content = processBuffer(data);
-				file.remote  = false;
-				callback( file );  
-			  } else {
-				var file     = new ResolvedFile();
-				file.path    = filename;
-				file.error   = err;
-				file.remote  = false;
-				callback( file ); 
-			  }
+			_fs.readFile(filename, (error, data) => {
+			
+				  if (!error) {
+				  
+					callback( new SourceUnit(filename, processBuffer(data), false, null) ); 
+					
+				  } else {
+					
+					callback( new SourceUnit(filename, null, false, error) );  
+				  }
+			  
 			});			
 		}	
 	}
@@ -91,82 +78,89 @@ module TypeScript.Api {
 	///////////////////////////////////////////////////////////////////////
 	// IOAsyncRemoteHost: Provides local and remote file read services.
 	///////////////////////////////////////////////////////////////////////
+	
 	export class IOAsyncRemoteHost implements IIOAsync  {
 		
-		public readFile(filename:string, callback:{ (file:ResolvedFile) : void; }): void {
+		public readFile(filename:string, callback:{ ( unit:SourceUnit ) : void; }): void {
+		
 			if(this.isUrl(filename)) {
+			
 				this.readFileFromHttp(filename, callback);
+				
 				return;
 			}
+			
 			this.readFileFromDisk(filename, callback);
 		}
 		
-		private readFileFromDisk(filename:string, callback:{( file:ResolvedFile ) : void; }): void {
+		private readFileFromDisk(filename:string, callback:{( unit:SourceUnit ) : void; }): void {
 		
-			_fs.readFile(filename, (err, data) => {
-			  if (!err) {
-				var file     = new ResolvedFile();
-				file.path    = filename;
-				file.content = processBuffer(data);
-				file.remote  = false;
-				callback ( file );  
-			  } else {
-				var file     = new ResolvedFile();
-				file.path    = filename;
-				file.error   = err;
-				file.remote  = false;
-				callback ( file ); 
-			  }
+			_fs.readFile(filename, (error, data) => {
+			
+				  if (!error) {
+				  
+					callback( new SourceUnit(filename, processBuffer(data), false, null) ); 
+					
+				  } else {
+					
+					callback( new SourceUnit(filename, null, false, error) );  
+				  }
+			  
 			});			
 		}
 		
-		private readFileFromHttp(filename:string, callback:{( file:ResolvedFile ) : void; }): void {
+		private readFileFromHttp(filename:string, callback:{( unit:SourceUnit ) : void; }): void {
 		
 			var url      = _url.parse(filename);
+			
 			var protocol = _http;
-			var options = {
-				host   : url.host,
-				port   : url.port,
-				path   : url.path,
-				method : 'GET',
-				headers: { }
-			};
+			
+			var options  = { host : url.host, port : url.port, path : url.path, method : 'GET' };
 			
 			if(this.isHTTPS(filename)) {
+			
+				protocol 	 = _https;
+				
 				options.port = 443;
-				protocol = _https;
 			}
 			
 			var request = protocol.request(options, (response) => {
+			
 				var data = [];
+				
 				response.on('data', (chunk) => { data.push(chunk); });
+				
 				response.on('end',  ()      => { 
-					var file = new ResolvedFile();
-					file.path    = filename;
-					file.remote  = true;
-					file.content = data.join('');
-					callback ( file );  
+
+					callback( new SourceUnit(filename, processBuffer( data.join('') ), true, null) );  
+					
 				});
 			});
-			request.on('error', (err) => {
-				 var file     = new ResolvedFile();
-				 file.path    = filename;
-				 file.error   = err;
-				 file.remote  = true;
-				 callback ( file );  
+			
+			request.on('error', (error) => {
+			
+				callback( new SourceUnit(filename, null, false, error) ); 
+				
 			});
+			
 			request.end();  
 		}
 		
 		private isHTTPS (path:string) : boolean {
+		
 			if(path.indexOf('https://') == 0) {
+			
 				return true;
+				
 			}
+			
 			return false;
 		}
 		
 		private isUrl (path:string) : boolean {
+		
 			var regex = new RegExp("^(http[s]?:\\/\\/(www\\.)?|ftp[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_\+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?");
+			
 			return regex.test(path);
 		}		
 	}

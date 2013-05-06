@@ -12,7 +12,6 @@
 /// <reference path='decl/typescript.d.ts' />
 /// <reference path='textwriter.ts' />
 /// <reference path='diagnostics.ts' />
-/// <reference path='resolver.ts' />
 /// <reference path='emitter.ts' />
 /// <reference path='path.ts' />
 
@@ -60,6 +59,7 @@ module TypeScript.Api {
 			this.compiler = new TypeScript.TypeScriptCompiler(new TypeScript.Api.NullLogger(), settings, TypeScript.diagnosticMessages);
 			this.compiler.logger = new TypeScript.Api.NullLogger(); 
 		} 
+		
 		
 		public compile(units:SourceUnit [], callback: { (compilation:Compilation) : void;} ) : void {  
 			
@@ -112,7 +112,7 @@ module TypeScript.Api {
 				var document  = this.compiler.getDocument(emitter_io_map[filename]);
 				unit.ast 	  = document.script;
 				unit.filename = filename;
-				unit.content  = emitter.files[filename].ToString();
+				unit.content  = emitter.files[filename].toString();
 				compilation.units.push( unit );
 			}
 			

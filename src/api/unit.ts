@@ -15,27 +15,56 @@ module TypeScript.Api {
 	
 	///////////////////////////////////////////////////////////////////////
 	// SourceUnit : Return object for the CodeResolver.
-	///////////////////////////////////////////////////////////////////////		
-	export class SourceUnit implements IResolvedFile {
+	///////////////////////////////////////////////////////////////////////	
+	
+	export class SourceUnit {
+	
 		public content    : string;
-		public path       : string;
-		public remote     : boolean;
-		public error      : string;
-		public references : string[];
 		
-		public load_references() : void {
-			this.references = [];
-			var lines :string[] = this.content.split('\r\n');
-			if (lines.length === 1) {
-				lines = this.content.split('\n');
-			}
-			for(var n in lines) {
-				var reference_pattern = /^(\/\/\/\s*<reference\s+path=)('|")(.+?)\2\s*(static=('|")(.+?)\2\s*)*\/>/gim;
-				var match = reference_pattern.exec(lines[n]);
-				if(match) {
-					this.references.unshift( match[3] );
+		public path       : string;
+		
+		public remote     : boolean;
+		
+		public error      : string;
+		
+		constructor(path:string, content:string, remote:boolean, error:string) {
+		
+			this.path    	= path;
+			
+			this.content	= content;
+			
+			this.remote  	= remote;
+			
+			this.error   	= error;
+		}
+		
+		public references() : string [] {
+		
+			var result : string[] = [];
+			
+			if(this.content) {
+			
+				var lines  : string[] = this.content.split('\r\n');
+				
+				if (lines.length === 1) {
+				
+					lines = this.content.split('\n');
+					
+				}
+				for(var n in lines) {
+				
+					var reference_pattern = /^(\/\/\/\s*<reference\s+path=)('|")(.+?)\2\s*(static=('|")(.+?)\2\s*)*\/>/gim;
+					
+					var match = reference_pattern.exec(lines[n]);
+					
+					if(match) {
+					
+						result.unshift( match[3] );
+					}
 				}
 			}
+			
+			return result;
 		}
 	}
 }

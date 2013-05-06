@@ -24,6 +24,7 @@ declare var      require    : any;
 /////////////////////////////////////////////////////////////
 // node modules.
 /////////////////////////////////////////////////////////////
+
 var _vm   = require("vm");
 var _fs   = require("fs");
 var _path = require("path");
@@ -46,27 +47,42 @@ export var async      				: boolean = true;
 // creates a new compilation unit
 /////////////////////////////////////////////////////////////
 export function create (filename:string, source:string): any {
+
 	var api 	 = load_typescript_api();
+	
 	var unit 	 = new api.SourceUnit();
+	
 	unit.content = source;
+	
 	unit.path    = filename;
+	
 	unit.remote  = false;
+	
 	unit.error   = '';
-	unit.load_references();
+	
 	return unit;
 }
 
 /////////////////////////////////////////////////////////////
 // resolves units.
-/////////////////////////////////////////////////////////////	
+/////////////////////////////////////////////////////////////
+
 export function resolve (sources:string[], callback :{ (units:any[]): void; }) : void {
+
 	var api      = load_typescript_api();
+	
 	var io       = new api.IOAsyncHost();
+	
 	var logger   = new api.NullLogger();
+	
 	if(exports.allowRemote) { io = new api.IOAsyncRemoteHost(); }
+	
 	if(!exports.async)      { io = new api.IOSync(); }
+	
 	if(exports.debug)       { logger = new api.ConsoleLogger(); }
+	
 	var resolver = new api.CodeResolver( io, logger );
+	
 	resolver.resolve(sources, callback);		
 }
  
@@ -77,29 +93,48 @@ export function resolve (sources:string[], callback :{ (units:any[]): void; }) :
 /////////////////////////////////////////////////////////////
 
 export function register () : void {
+
 	require.extensions['.ts'] = function(_module) {
+	
 		var api         = load_typescript_api();
+		
 		var io          = new api.IOSyncHost();
+		
 		var logger      = new api.BufferedLogger();
+		
 		var resolver    = new api.CodeResolver( io, logger );
+		
 		var diagnostics = [];
+		
 		resolver.resolve([_module.filename], (units) => {
+		
 			var compiler = new api.Compiler( logger );
+			
 			compiler.compile( include_declarations(units), (compilation) => {
+			
 				diagnostics = compilation.diagnostics;
+				
 				if(compilation.diagnostics.length > 0) {
+				
 					_module.exports = null;
+					
 				} else {
+				
 					exports.run(compilation, null, function(context) {
+					
 						_module.exports = context;
+						
 					});
 				}			
 			});	
 		});
 		
 		if(diagnostics.length > 0) {
+		
 			console.log('[TYPESCRIPT ERROR]');
-			console.log(logger.ToString());
+			
+			console.log(logger.toString());
+			
 			throw new Error("[TYPESCRIPT ERROR]");
 		}
 	}
@@ -110,11 +145,17 @@ export function register () : void {
 /////////////////////////////////////////////////////////////
 
 export function compile(units:any[], callback :{ (compilation:any): void; }) : void {
+
 	var api = load_typescript_api();
+	
 	var typescript = load_typescript();
+	
 	var logger = new api.NullLogger();
+	
 	if(exports.debug) { logger = new api.ConsoleLogger(); }
+	
 	var compiler = new api.Compiler( logger );
+	
 	compiler.compile( include_declarations(units), callback);
 }
 /////////////////////////////////////////////////////////////
@@ -122,8 +163,11 @@ export function compile(units:any[], callback :{ (compilation:any): void; }) : v
 /////////////////////////////////////////////////////////////
 
 export function reflect(compilation:any, callback :{ (reflection:any): void; }) : void {
+
 	var api = load_typescript_api();
+	
  	var reflector = new api.Reflector(); // todo: add logger here...
+	
 	callback( reflector.reflect(compilation) );
 }
 
@@ -132,18 +176,31 @@ export function reflect(compilation:any, callback :{ (reflection:any): void; }) 
 /////////////////////////////////////////////////////////////
 
 export function run (compilation:any, sandbox:any, callback :{ (context:any): void; }) : void {
+
 	try {
+	
 		if(!sandbox) { sandbox = get_default_sandbox(); }
+		
 		var sources = [];
+		
 		for(var n in compilation.units) {
+		
 			sources.push(compilation.units[n].content);
+			
 		}
+		
 		var script = _vm.createScript( sources.join('') , "compilation.js" );
+		
 		script.runInNewContext( sandbox );
+		
 		callback( sandbox.exports );
+		
 	} catch(e) {
+	
 		// can i do source mapping here?
+		
 		callback( null );
+		
 		console.log(e);
 	}
 }
@@ -152,37 +209,56 @@ export function run (compilation:any, sandbox:any, callback :{ (context:any): vo
 /////////////////////////////////////////////////////////////
 // runs a compilation
 /////////////////////////////////////////////////////////////
+
 function get_default_sandbox(): any {
+
 	var sandbox:any = {};
+	
 	if (!sandbox) {
+	
 		sandbox = {};
+		
 		for (var n in global) {
+		
 			sandbox[n] = global[n];
+			
 		}
 	}
+	
 	sandbox.require  = require;
+	
 	sandbox.process  = process;
+	
 	sandbox.console  = console;
+	
 	sandbox.global   = global;
+	
 	sandbox.exports  = {};
+	
 	return sandbox;
 }
 
 /////////////////////////////////////////////////////////////
 // attaches declarations to compilation units
 /////////////////////////////////////////////////////////////
+
 function include_declarations (units:any[]):any[] {
 	
 	// snap in lib.d.ts
 	if(exports.include_lib_declaration) {
+	
 		var lib_decl  = exports.create('lib.d.ts',  _fs.readFileSync( _path.join(__dirname, "decl/lib.d.ts") , "utf8" ) );
+		
 		units.unshift(lib_decl);
 	}	
 	
 	// snap in node.d.ts
 	if(exports.include_node_declaration) {
+	
 		var node_decl = exports.create('node.d.ts', _fs.readFileSync( _path.join(__dirname, "decl/node.d.ts"), "utf8" ) );
-		units.unshift(node_decl);		
+		
+		units.unshift(node_decl);
+		
 	}
 	
 	return units;
@@ -193,33 +269,48 @@ function include_declarations (units:any[]):any[] {
 /////////////////////////////////////////////////////////////
 
 export function api_namespace() : any {
+
 	return load_typescript_api();
 }
 /////////////////////////////////////////////////////////////
 // loads the TypeScript namespace
 /////////////////////////////////////////////////////////////
 export function typescript_namespace() : any {
+
 	return load_typescript();
 }
 
 /////////////////////////////////////////////////////////////
-// retro binding hack to load in typescript and api.
+//
+// TypeScript and TypeScript.API bindings
+//
 /////////////////////////////////////////////////////////////
 
-// js files to bind..
+/////////////////////////////////////////////////////////////
+// files
+/////////////////////////////////////////////////////////////
+
 var typescript_filename     = _path.join(__dirname, "typescript.js");
 var typescript_api_filename = _path.join(__dirname, "typescript.api.js");
 
-// namespace cache...
+/////////////////////////////////////////////////////////////
+// module caching variables..
+/////////////////////////////////////////////////////////////
+
 var _cache_typescript_namespace 	= null;
 var _cache_typescript_api_namespace = null;
 
+
+/////////////////////////////////////////////////////////////
+// Runs the TypeScript.API module
+/////////////////////////////////////////////////////////////
 function load_typescript_api() : any {
 	
-	if(_cache_typescript_api_namespace)  
-		return _cache_typescript_api_namespace;
-	 
+	if(_cache_typescript_api_namespace)  {
 	
+		return _cache_typescript_api_namespace;
+	}
+	 
 	var sandbox = {
 		TypeScript  : load_typescript(),
 		__filename  : __filename,
@@ -230,33 +321,49 @@ function load_typescript_api() : any {
 		console     : console,
 		exports     : null
 	};
+	
 	_cache_typescript_api_namespace = load_module(typescript_api_filename, sandbox, ["TypeScript"]).Api;
 	
 	return _cache_typescript_api_namespace;
 }
 
-// loads typescript..
+/////////////////////////////////////////////////////////////
+// Runs the TypeScript module
+/////////////////////////////////////////////////////////////
+
 function load_typescript() : any {
-	if(_cache_typescript_namespace)  
+
+	if(_cache_typescript_namespace)  {
+	
 		return _cache_typescript_namespace;
+		
+	}
 	 	
 	var sandbox:any = { 
 		exports : null
-		//, console : console // for debugging..
+		//, console : console 
 	};
 	_cache_typescript_namespace = load_module (typescript_filename, sandbox, ["TypeScript"]);
+	
 	return _cache_typescript_namespace;
 }
 
-// loads a module..
+/////////////////////////////////////////////////////////////
+// Runs a module
+/////////////////////////////////////////////////////////////
 function load_module(filename, sandbox, export_type_names) : any {
-	var source = _fs.readFileSync(filename, 'utf8');
-	for(var n in export_type_names) {
-		source = source.concat('\n\nexports = ' + export_type_names[n] + ';'); 
-	}
-	var script = _vm.createScript( source, "typescript.js" );
-	script.runInNewContext( sandbox );
-	return sandbox.exports;
-	 
-}
 
+	var source = _fs.readFileSync(filename, 'utf8');
+	
+	for(var n in export_type_names) {
+	
+		source = source.concat('\n\nexports = ' + export_type_names[n] + ';'); 
+		
+	}
+	
+	var script = _vm.createScript( source, "typescript.js" );
+	
+	script.runInNewContext( sandbox );
+	
+	return sandbox.exports;
+}

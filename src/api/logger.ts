@@ -13,6 +13,7 @@
 /// <reference path='textwriter.ts' />
 
 module TypeScript.Api {
+	
 	///////////////////////////////////////////////////////////////////////
 	// NullLogger: A Logger that doesn't log anything.
 	///////////////////////////////////////////////////////////////////////		
@@ -77,8 +78,8 @@ module TypeScript.Api {
 			this.writer.WriteLine(s);
 		}
 		
-		public ToString() : string {
-			return this.writer.ToString();
+		public toString() : string {
+			return this.writer.toString();
 		}
 	}
 	

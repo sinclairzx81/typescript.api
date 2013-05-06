@@ -60,6 +60,8 @@ module TypeScript.Api {
 			return result;
 		}
 		
+		 
+		
 		public toString() : string {
 			
 			return this.filename + " [" + (this.lineinfo.line_index + 1).toString() 

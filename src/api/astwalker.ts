@@ -10,12 +10,9 @@
 // limitations under the License.
 
 module TypeScript.Api {
-
 	
-
-
 	////////////////////////////////////////////////////////////////////
-	// ASTWalker: API specific API Walker..
+	// ASTWalker: TypeScript.API ASTWalker.
 	////////////////////////////////////////////////////////////////////
 	export class ASTWalker  {
 		public stack    : TypeScript.AST [];
