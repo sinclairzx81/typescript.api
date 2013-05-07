@@ -196,6 +196,6 @@ module TypeScript.Api.Ast
 			this.stack    = [];
 			
 			this.walk_ast(ast); 
-		}		
+		}
 	}
 }

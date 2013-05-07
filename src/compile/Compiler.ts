@@ -16,10 +16,10 @@
 /// <reference path="../units/CompiledUnit.ts" />
 /// <reference path="Emitter.ts" />
 
-module TypeScript.Api.Compile 
-{
-	export class Compiler 
-	{
+module TypeScript.Api.Compile {
+
+	export class Compiler  {
+
 		public compiler : TypeScript.TypeScriptCompiler;
 		
 		public logger   : TypeScript.ILogger;

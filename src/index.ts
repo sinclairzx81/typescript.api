@@ -36,11 +36,11 @@ var _path = require("path");
 // compiler options..
 /////////////////////////////////////////////////////////////
 
-export var include_lib_declaration  : boolean = true;
+export var include_lib_declaration  : boolean = false;
 
-export var include_node_declaration : boolean = true;
+export var include_node_declaration : boolean = false;
 
-export var allowRemote 				: boolean = true;
+export var allowRemote 				: boolean = false;
 
 export var debug       				: boolean = false;
 
@@ -49,10 +49,9 @@ export var debug       				: boolean = false;
 // check: checks to see if the units are ok..
 /////////////////////////////////////////////////////////////
 
-export function check (units : TypeScript.Api.Units.Unit[]) : boolean 
-{
+export function check (units : TypeScript.Api.Units.Unit[]) : boolean {
 	
-	for(var n in units)
+    for(var n in units)
 	{
 		if(units[n].hasError())
 		{
@@ -68,8 +67,8 @@ export function check (units : TypeScript.Api.Units.Unit[]) : boolean
 // with require. note, using the IOSync to load.
 /////////////////////////////////////////////////////////////
 
-function print_diagnostics(units:TypeScript.Api.Units.Unit[]): void 
-{
+function print_diagnostics(units:TypeScript.Api.Units.Unit[]): void {
+
 	for(var n in units)
 	{
 		for(var m in units[n].diagnostics)
@@ -93,23 +92,23 @@ export function register () : void
 		
 		var diagnostics = [];
 		
-		resolver.resolve([_module.filename], (sourceUnits:TypeScript.Api.Units.SourceUnit[]) => 
-		{
-			if(exports.check(sourceUnits))
-			{
+		resolver.resolve([_module.filename], (sourceUnits:TypeScript.Api.Units.SourceUnit[]) => {
+			
+            if(exports.check(sourceUnits)) {
+
 				var compiler = new api.Compile.Compiler( logger );
 				
-				compiler.compile( include_declarations( sourceUnits ), ( compiledUnits : TypeScript.Api.Units.CompiledUnit[] ) => 
-				{
-					if( exports.check(compiledUnits) )
-					{
-						exports.run(compiledUnits, null, function(context) 
-						{
+				compiler.compile( include_declarations( sourceUnits ), ( compiledUnits : TypeScript.Api.Units.CompiledUnit[] ) =>  {
+					
+                    if( exports.check(compiledUnits) ) {
+
+						exports.run(compiledUnits, null, function(context) {
+
 							_module.exports = context;
 						});
 					}
-					else
-					{
+					else {
+
 						print_diagnostics(compiledUnits);
 					}
 				});
@@ -201,7 +200,7 @@ export function run (compiledUnits:TypeScript.Api.Units.CompiledUnit[], sandbox:
 			sources.push(compiledUnits[n].content);
 		}
 		
-		var script = _vm.createScript( sources.join('') , "compilation.js" );
+		var script = _vm.createScript( sources.join('') , "typescript-compilation.js" );
 		
 		script.runInNewContext( sandbox );
 		
@@ -236,13 +235,17 @@ function get_default_sandbox(): any {
 		}
 	}
 	
-	sandbox.require  = require;
+	sandbox.require    = require;
 	
-	sandbox.process  = process;
+	sandbox.process    = process;
 	
-	sandbox.console  = console;
+	sandbox.console    = console;
 	
-	sandbox.global   = global;
+	sandbox.global     = global;
+
+    sandbox.__dirname  = _path.dirname(process.mainModule.filename);
+
+    sandbox.__filename = _path.join(sandbox.__dirname, "typescript-compilation.js");
 	
 	sandbox.exports  = {};
 	

@@ -32,10 +32,10 @@ module TypeScript.Api.Resolve
 			this.units        = [];
 		}
 		
-		public resolve(sources:string[], callback: {( units:TypeScript.Api.Units.SourceUnit[] ): void; }) : void 
-		{
-			for(var n in sources) 
-			{
+		public resolve(sources:string[], callback: {( units:TypeScript.Api.Units.SourceUnit[] ): void; }) : void {
+
+			for(var n in sources)  {
+
 				var parameter = new TypeScript.Api.Resolve.LoadParameter( process.mainModule.filename, sources[n] );
 				
 				this.pending.push(parameter);
@@ -44,20 +44,20 @@ module TypeScript.Api.Resolve
 			this.load ( callback );
 		}	
 		
-		private load (callback: {( unit : TypeScript.Api.Units.SourceUnit[]): void; }) : void 
-		{
+		private load (callback: {( unit : TypeScript.Api.Units.SourceUnit[]): void; }) : void  {
+
 			var parameter = this.pending.pop();
 			
-			if( !this.visited(parameter) ) 
-			{
+			if( !this.visited(parameter) )  {
+
 				this.closed.push(parameter);
 				
-				this.io.readFile(parameter.filename, (unit : TypeScript.Api.Units.SourceUnit) => 
-				{					
-					if(unit.diagnostics.length == 0) 
-					{
-						for(var n in unit.references() ) 
-						{
+				this.io.readFile(parameter.filename, (unit : TypeScript.Api.Units.SourceUnit) =>  {
+                    					
+					if(unit.diagnostics.length == 0)  {
+
+						for(var n in unit.references() )  {
+
 							var parameter = new TypeScript.Api.Resolve.LoadParameter( unit.path, unit.references() [n] );
 							
 							this.pending.push( parameter );
@@ -94,10 +94,10 @@ module TypeScript.Api.Resolve
 		
 		private visited (parameter : TypeScript.Api.Resolve.LoadParameter) : boolean 
 		{
-			for(var n in this.closed) 
-			{
-				if(this.closed[n].filename == parameter.filename) 
-				{
+			for(var n in this.closed) {
+
+				if(this.closed[n].filename == parameter.filename) {
+
 					return true;
 				}
 			}
