@@ -22,6 +22,22 @@ exports.copyfile = function(input_filename, output_filename, callback) {
 	callback();
 
 }
+// just copies...
+exports.cutpastefile = function(input_filename, output_filename, callback) {
+
+	// copies input to output.
+
+	var readstream = _fs.createReadStream( input_filename );
+
+	var writestream = _fs.createWriteStream( output_filename );
+
+	readstream.pipe(writestream);
+	
+	_fs.unlinkSync(input_filename);
+	
+	callback();
+
+}
 
 // compiles source into single output.
 exports.build_single = function(sources, output_filename, callback) {
