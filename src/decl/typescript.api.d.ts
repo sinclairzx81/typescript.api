@@ -172,8 +172,8 @@ declare module TypeScript.Api.Ast {
         public userdata: any;
         constructor();
         private walk_varstatement(ast);
-        private walk_parameter(ast);
         private walk_type_ref(ast);
+        private walk_parameter(ast);
         private walk_vardecl(ast);
         private walk_funcdecl(ast);
         private walk_classdecl(ast);
@@ -195,28 +195,38 @@ declare module TypeScript.Api.Reflect {
     }
 }
 declare module TypeScript.Api.Reflect {
-    class Parameter {
-        public id: string;
-        public name: string;
-        public type: Type;
-        static create(ast: Parameter): Parameter;
-    }
-}
-declare module TypeScript.Api.Reflect {
     class Type {
         public name: string;
         public arguments: Type[];
+        public arrayCount: number;
         constructor();
         static qualify(ast: AST): string;
         static create(ast: TypeReference): Type;
     }
 }
 declare module TypeScript.Api.Reflect {
-    class Method {
-        public id: string;
-        public parameters: Parameter[];
+    class Parameter {
         public name: string;
+        public type: Type;
+        static create(ast: Parameter): Parameter;
+    }
+}
+declare module TypeScript.Api.Reflect {
+    class Method {
+        public name: string;
+        public parameters: Parameter[];
         public returns: Type;
+        public isStatic: boolean;
+        public isAccessor: boolean;
+        public isSignature: boolean;
+        public isConstructor: boolean;
+        public isCallMember: boolean;
+        public isDeclaration: boolean;
+        public isExpression: boolean;
+        public isGetAccessor: boolean;
+        public isSetAccessor: boolean;
+        public isIndexer: boolean;
+        public comments: string[];
         constructor();
         static create(ast: FunctionDeclaration): Method;
     }
@@ -225,6 +235,14 @@ declare module TypeScript.Api.Reflect {
     class Variable {
         public name: string;
         public type: Type;
+        public isProperty: boolean;
+        public isStatic: boolean;
+        public isStatement: boolean;
+        public isExpression: boolean;
+        public isStatementOrExpression: boolean;
+        public isExported: boolean;
+        public comments: string[];
+        constructor();
         static create(ast: VariableDeclarator): Variable;
     }
 }

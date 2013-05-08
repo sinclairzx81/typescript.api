@@ -10,13 +10,13 @@
 // limitations under the License.
 	
 /// <reference path="../decl/typescript.d.ts" />
+/// <reference path="Type.ts" />
 
 module TypeScript.Api.Reflect 
 {
 	
 	export class Parameter 
 	{
-		public id 		  : string;
 		public name		  : string;
 		public type		  : Type;
 
@@ -28,10 +28,10 @@ module TypeScript.Api.Reflect
 
 			if(!ast.typeExpr) 
 			{ 
-				result.type  	 = new Type();
-				
-				result.type.name = "any";
+				result.type = new TypeScript.Api.Reflect.Type()
 			} 
+
+            
 			
 			return result;
 		}   

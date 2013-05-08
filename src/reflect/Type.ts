@@ -15,12 +15,15 @@ module TypeScript.Api.Reflect
 {
 	export class Type  
 	{
-		public name 	 : string;
+		public name 	  : string;
+        
+        public arguments  : Type[];
 		
-		public arguments : Type[];
-		
+        public arrayCount : number;
+
 		constructor() 
 		{
+            this.name      = "any";
 			this.arguments = [];
 		}
 		
@@ -56,7 +59,7 @@ module TypeScript.Api.Reflect
 						
 						walk(expression.operand2);				
 					}
-				}				
+				}
 				if(ast.nodeType == TypeScript.NodeType.Name) 
 				{  
 					var name = <TypeScript.Identifier>ast;
@@ -77,6 +80,8 @@ module TypeScript.Api.Reflect
 				var type = new Type();
 				
 				type.name = Type.qualify (ast.term);
+
+                type.arrayCount = ast.arrayCount;
 				
 				switch(ast.term.nodeType)
 				{ 
@@ -95,6 +100,7 @@ module TypeScript.Api.Reflect
 				
 				return type;
 			};
+
 			return create_type(ast);
 		}
 	}

@@ -55,38 +55,41 @@ function build () {
 	
 	console.log('compiling typescript api....');
 	tools.builder.build_single([api_input_filename, "--declaration"], api_output_filename , function() {
+		
+      
+
+	        console.log('moving typescript.api.d.ts to src/decl for index.ts build..');
+	        tools.builder.copyfile(api_input_decl_filename, api_output_decl_filename, function() {
 		  
-		  console.log('moving typescript.api.d.ts to src/decl for index.ts build..');
-		  tools.builder.cutpastefile(api_input_decl_filename, api_output_decl_filename, function() {
-		  
-			  console.log('compiling index....');
-			  tools.builder.build_modular([index_input_filename], index_output_directory, function() {
+	            console.log('compiling index....');
+	            tools.builder.build_modular([index_input_filename], index_output_directory, function() {
 				  
-				  console.log('copying typescript.js....');
-				  tools.builder.copyfile(typescript_input_filename, typescript_output_filename, function(){
+	                console.log('copying typescript.js....');
+	                tools.builder.copyfile(typescript_input_filename, typescript_output_filename, function(){
 					  
-					  console.log('copying lib.d.ts....');
-					  tools.builder.copyfile(lib_decl_input_filename, lib_decl_output_filename, function(){	
+	                    console.log('copying lib.d.ts....');
+	                    tools.builder.copyfile(lib_decl_input_filename, lib_decl_output_filename, function(){	
 					  
-						  console.log('copying node.d.ts....');
-						  tools.builder.copyfile(node_decl_input_filename, node_decl_output_filename, function(){	
+	                        console.log('copying node.d.ts....');
+	                        tools.builder.copyfile(node_decl_input_filename, node_decl_output_filename, function(){	
 						  
-							  console.log('copying package.json....');
-							  tools.builder.copyfile(package_input_filename, package_output_filename, function(){	
+	                            console.log('copying package.json....');
+	                            tools.builder.copyfile(package_input_filename, package_output_filename, function(){	
 							  
-								  console.log('copying README.md....');
-								  tools.builder.copyfile(readme_input_filename, readme_output_filename, function(){	
+	                                console.log('copying README.md....');
+	                                tools.builder.copyfile(readme_input_filename, readme_output_filename, function(){	
 								  
-									  console.log('running post build....');
-									  console.log('-------------------------------------------------------');
-									  tools.nodestart.start( post_build_filename );	
-								  });
-							  });
-						  });
-					  });
-				  });
-			  });	
-		  });
+	                                    console.log('running post build....');
+	                                    console.log('-------------------------------------------------------');
+	                                    tools.nodestart.start( post_build_filename );	
+	                                });
+	                            });
+	                        });
+	                    });
+	                });
+	            });	
+	        });
+        
 	});
 }
 

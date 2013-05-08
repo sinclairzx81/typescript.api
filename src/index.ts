@@ -62,26 +62,27 @@ export function check (units : TypeScript.Api.Units.Unit[]) : boolean {
 	return true;
 }
 
+
 /////////////////////////////////////////////////////////////
 // register: registers the .ts extension so typescript can be 
 // with require. note, using the IOSync to load.
 /////////////////////////////////////////////////////////////
 
-function print_diagnostics(units:TypeScript.Api.Units.Unit[]): void {
-
-	for(var n in units)
-	{
-		for(var m in units[n].diagnostics)
-		{
-			console.log(units[n].diagnostics[m].toString());
-		}
-	}
-}
-
 export function register () : void 
 {
 	require.extensions['.ts'] = function(_module) 
 	{
+        var output_diagnostics = (units:TypeScript.Api.Units.Unit[]) => {
+
+	        for(var n in units)
+	        {
+		        for(var m in units[n].diagnostics)
+		        {
+			        console.log(units[n].diagnostics[m].toString());
+		        }
+	        }        
+        };
+        
 		var api         = load_typescript_api();
 		
 		var io          = new api.IO.IOSync();
@@ -109,13 +110,13 @@ export function register () : void
 					}
 					else {
 
-						print_diagnostics(compiledUnits);
+						output_diagnostics(compiledUnits);
 					}
 				});
 			} 
 			else
 			{
-				print_diagnostics(sourceUnits);
+				output_diagnostics(sourceUnits);
 			}
 		});
 	}
@@ -136,8 +137,21 @@ export function create (path:string, content:string) : TypeScript.Api.Units.Sour
 // resolve: resolves source units.
 /////////////////////////////////////////////////////////////
 
-export function resolve (sources:string[], callback :{ (units : TypeScript.Api.Units.SourceUnit[] ) : void; }) : void 
-{
+export function resolve (sources:string[], callback :{ (units : TypeScript.Api.Units.SourceUnit[] ) : void; }) : void  {
+
+    var getType = (obj:any):string => { return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase() };
+    
+    var _sources = [];
+
+    switch( getType(sources) ) {
+        case "string":
+            _sources.push(sources);
+            break;
+        case "array":
+            _sources = sources;
+            break;
+    }
+    
 	var api      = load_typescript_api();
 	
 	var io       = new api.IO.IOAsync();
@@ -150,15 +164,15 @@ export function resolve (sources:string[], callback :{ (units : TypeScript.Api.U
 	
 	var resolver = new api.Resolve.Resolver( io, logger );
 	
-	resolver.resolve(sources, callback);
+	resolver.resolve(_sources, callback);
 }
 
 /////////////////////////////////////////////////////////////
 // compile: compiles source units. outputs a compilation.
 /////////////////////////////////////////////////////////////
 
-export function compile(sourceUnits:TypeScript.Api.Units.SourceUnit[], callback : { (compiledUnit:TypeScript.Api.Units.CompiledUnit[] ): void; } ) : void 
-{
+export function compile (sourceUnits: TypeScript.Api.Units.SourceUnit[], callback : { (compiledUnit:TypeScript.Api.Units.CompiledUnit[] ): void; } ) : void {
+
 	var api = load_typescript_api();
 
 	var logger = new api.Loggers.NullLogger();
@@ -174,8 +188,8 @@ export function compile(sourceUnits:TypeScript.Api.Units.SourceUnit[], callback 
 // reflect: reflects compilation AST.
 /////////////////////////////////////////////////////////////
 
-export function reflect(compiledUnits:TypeScript.Api.Units.CompiledUnit [], callback :{ ( reflection:TypeScript.Api.Reflect.Reflection ): void; }) : void 
-{
+export function reflect(compiledUnits:TypeScript.Api.Units.CompiledUnit [], callback :{ ( reflection:TypeScript.Api.Reflect.Reflection ): void; }) : void  {
+
 	var api = load_typescript_api();
 	
  	var reflection = api.Reflect.Reflection.create(compiledUnits);

@@ -15,29 +15,83 @@
 
 module TypeScript.Api.Reflect 
 {	
-	
 	export class Method 
 	{
-		public id 		  : string;
-		public parameters : Parameter[];
-		public name       : string;
-		public returns    : Type;
+		public name            : string;
 
+        public parameters      : Parameter[];
+
+		public returns         : Type;
+
+        public isStatic        : boolean;
+
+        public isAccessor      : boolean; 
+
+        public isSignature     : boolean;
+
+        public isConstructor   : boolean;
+
+        public isCallMember    : boolean;
+
+        public isDeclaration   : boolean;
+
+        public isExpression    : boolean;
+
+        public isGetAccessor   : boolean;
+
+        public isSetAccessor   : boolean;
+
+        public isIndexer       : boolean;
+
+        public comments        : string [];
+        
 		constructor () 
 		{
 			this.parameters = [];
+
+            this.comments   = [];
 		}
 
-		public static create(ast:TypeScript.FunctionDeclaration) : Method  
-		{
-			var result = new Method();
-			
-			result.name = ast.getNameText();
-			
-			if(ast.returnTypeAnnotation) 
-			{
-				result.returns = Type.create(<TypeScript.TypeReference>ast.returnTypeAnnotation);		
-			}		
+		public static create(ast:TypeScript.FunctionDeclaration) : Method  {
+
+			var result           = new Method();
+            
+            result.name          = ast.isConstructor ? "constructor" : ast.getNameText();
+            
+            result.isConstructor = ast.isConstructor;
+            
+            result.isStatic      = ast.isStatic();
+            
+            result.isSignature   = ast.isSignature();
+            
+            result.isCallMember  = ast.isCallMember();
+            
+            result.isDeclaration = ast.isDeclaration();
+            
+            result.isExpression  = ast.isExpression();
+            
+            result.isGetAccessor = ast.isGetAccessor();
+            
+            result.isSetAccessor = ast.isSetAccessor();
+
+            result.isIndexer     = ast.isIndexerMember();
+            
+            var comments         = ast.getDocComments();
+            
+            for(var n in comments) {
+                
+                result.comments.push(comments[n].content);
+            
+            }
+            
+			if(ast.returnTypeAnnotation) {
+
+				result.returns = TypeScript.Api.Reflect.Type.create(<TypeScript.TypeReference>ast.returnTypeAnnotation);		
+			}
+            else {
+
+                result.returns = new TypeScript.Api.Reflect.Type();
+            }	
 			
 			return result;
 		}

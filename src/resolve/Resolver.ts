@@ -24,11 +24,12 @@ module TypeScript.Api.Resolve
 		
 		private units       : TypeScript.Api.Units.SourceUnit [];
 		
-		constructor( public io 	   : TypeScript.Api.IO.IIO, 
-					 public logger : TypeScript.ILogger ) 
+		constructor( public io : TypeScript.Api.IO.IIO, public logger : TypeScript.ILogger ) 
 		{
 			this.pending      = [];
+
 			this.closed  	  = [];
+
 			this.units        = [];
 		}
 		

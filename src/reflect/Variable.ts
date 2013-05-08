@@ -16,20 +16,51 @@ module TypeScript.Api.Reflect {
 	
 	export class Variable 
 	{
-		public name       : string;
-		public type       : Type;
-		
+		public name                    : string;
+		public type                    : Type;
+        public isProperty              : boolean;
+        public isStatic                : boolean;
+        public isStatement             : boolean;
+        public isExpression            : boolean;
+        public isStatementOrExpression : boolean;
+		public isExported              : boolean;
+        public comments                : string[];
+
+        constructor() {
+            
+            this.comments = [];
+
+        }
+
 		public static create(ast:TypeScript.VariableDeclarator): Variable 
 		{
 			var result = new Variable();
-			
-			result.name = ast.id.text;
-			
+
+			result.name                    = ast.id.text;
+            
+            result.isProperty              = ast.isProperty();
+
+            result.isStatic                = ast.isStatic();
+
+			result.isStatement             = ast.isStatement();
+
+            result.isExpression            = ast.isExpression();
+
+            result.isExported              = ast.isExported();
+
+            result.isStatementOrExpression = ast.isStatementOrExpression();
+
+            var comments                   = ast.getDocComments();
+            
+            for(var n in comments) {
+                
+                result.comments.push(comments[n].content);
+            
+            }
+            
 			if(!ast.typeExpr) 
 			{ 
-				result.type  = new Type();
-				
-				result.type.name = "any";
+				result.type  = new TypeScript.Api.Reflect.Type();
 			}  
 			
 			return result;

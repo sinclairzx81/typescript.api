@@ -18,16 +18,23 @@ module TypeScript.Api.Reflect
 	export class Interface 
 	{
 		public methods    : Method    [];
+
 		public variables  : Variable  [];
+
 		public parameters : string    [];
+
 		public extends    : string    [];
+
 		public name       : string;
 		
 		constructor () 
 		{
 			this.methods    = [];
+
 			this.variables  = [];
+
 			this.extends    = [];
+
 			this.parameters = [];
 		}
 		
@@ -36,7 +43,7 @@ module TypeScript.Api.Reflect
 			var result  = new Interface();
 			
 			result.name = ast.name.text;
-			
+            
 			if(ast.typeParameters)
 			{
 				if (ast.typeParameters.members) 

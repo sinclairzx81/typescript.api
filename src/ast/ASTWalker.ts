@@ -50,15 +50,34 @@ module TypeScript.Api.Ast
 			}
 		}
 		
+        private walk_type_ref       (ast:TypeScript.TypeReference): void 
+		{
+			this.callback(this, ast);
+		}
+        		
 		private walk_parameter   (ast: TypeScript.Parameter): void 
 		{
 			this.callback(this, ast);
+
+			if(ast.typeExpr) 
+			{
+				this.stack.push(ast);
+				
+				this.walk_ast(ast.typeExpr);
+				
+				this.stack.pop();
+			} 
+			else 
+			{
+				this.stack.push(ast);
+				
+				this.walk_ast(ast.id);
+				
+				this.stack.pop();
+			}
 		}
 		
-		private walk_type_ref       (ast:TypeScript.TypeReference): void 
-		{
-			this.callback(this, ast);
-		}
+
 		
 		private walk_vardecl   (ast: TypeScript.VariableDeclarator): void 
 		{ 
@@ -152,7 +171,6 @@ module TypeScript.Api.Ast
 		
 		public walk_ast       (ast: TypeScript.AST): void {
 			
-			//console.log(TypeScript.NodeType._map[ast.nodeType]);
 			switch (ast.nodeType) 
 			{
 				case TypeScript.NodeType.List:                    this.walk_astlist        (<TypeScript.ASTList>ast); break;
