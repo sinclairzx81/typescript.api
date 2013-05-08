@@ -1,0 +1,226 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+
+        <title>typescript.api - reflection</title>
+
+        <style type="text/css">
+
+            body 
+            {
+                font-family : 'Courier New', Courier, 'Nimbus Mono L', monospace;
+
+                font-size : 0.8em;
+            }
+
+        </style>
+        
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+        
+        <script type="text/javascript" src="http://knockoutjs.com/downloads/knockout-2.2.1.js"></script>
+        
+        <script type="text/javascript" src="/script.js"></script>
+        
+        <script type="text/javascript">
+
+            var Model = function(data) 
+            {
+                this.reflection = new ReflectionModel(data);
+            }
+
+            function initialize() 
+            {
+                ajax.get('/reflect', function (data) 
+                {
+                    var model = new Model(data);
+
+                    ko.applyBindings(model);
+                });
+            }
+
+            $(document).ready(initialize);
+
+        </script>
+        
+        <!-- ----------------------------------------------------------------
+        template.variable
+        ------------------------------------------------------------------ -->
+
+        <script type="text/html" id="template.variable">
+
+            <a href="#" data-bind="text: text()" />
+
+        </script>
+
+        <!-- ----------------------------------------------------------------
+        template.method
+        ------------------------------------------------------------------ -->
+
+        <script type="text/html" id="template.method">
+
+             <a href=" " data-bind="text: text(), event:{click:toggle}" />
+
+        </script>
+
+        <!-- ----------------------------------------------------------------
+        template.interface
+        ------------------------------------------------------------------ -->
+
+        <script type="text/html" id="template.interface">
+
+            <a href="#" data-bind="text: name(), event:{click:toggle}" />
+
+            <div data-bind="if:expanded">
+
+                <ul data-bind="foreach:variables">
+
+                    <li data-bind="template: {name:'template.variable', data:$data}" />
+                </ul>
+
+                <ul data-bind="foreach:methods">
+
+                    <li data-bind="template: {name:'template.method', data:$data}" />
+
+                </ul>
+
+            </div>
+
+        </script>
+        
+        <!-- ----------------------------------------------------------------
+        template.class
+        ------------------------------------------------------------------ -->
+              
+        <script type="text/html" id="template.class">
+
+            <a href="#" data-bind="text: text(), event:{click:toggle}" />
+
+            <div data-bind="if:expanded">
+
+                <ul data-bind="foreach:variables">
+
+                    <li data-bind="template: {name:'template.variable', data:$data}" />
+
+                </ul>
+
+                <ul data-bind="foreach:methods">
+
+                    <li data-bind="template: {name:'template.method', data:$data}" />
+
+                </ul>
+
+            </div>
+
+        </script>
+        
+        <!-- ----------------------------------------------------------------
+        template.import
+        ------------------------------------------------------------------ -->
+        <script type="text/html" id="template.import">
+
+            <a data-bind="{text:'import: ' + alias()}" href="#"></a>
+
+        </script>
+
+        <!-- ----------------------------------------------------------------
+        template.module
+        ------------------------------------------------------------------ -->
+        <script type="text/html" id="template.module">
+
+            <a href="#" data-bind="text: name(), event:{click:toggle}" />
+
+            <div data-bind="if:expanded">
+
+                <ul data-bind="foreach:imports">
+
+                    <li data-bind="template:{name:'template.import', data:$data}" />
+
+                </ul>
+                <ul data-bind="foreach:modules">
+
+                    <li data-bind="template:{name:'template.module', data:$data}" />
+
+                </ul>
+                <ul data-bind="foreach:methods">
+
+                    <li data-bind="template:{name:'template.method', data:$data}" />
+
+                </ul>
+                <ul data-bind="foreach:variables">
+
+                    <li data-bind="template:{name:'template.variable', data:$data}" />
+
+                </ul>
+                <ul data-bind="foreach:interfaces">
+
+                    <li data-bind="template:{name:'template.interface', data:$data}" />
+
+                </ul>
+
+                <ul data-bind="foreach:classes">
+
+                    <li data-bind="template:{name:'template.class', data:$data}" />
+
+                </ul>
+
+            </div>
+
+        </script>
+
+        <!-- ----------------------------------------------------------------
+        template.script
+        ------------------------------------------------------------------ -->
+        <script type="text/html" id="template.script">
+
+             <a href="#" data-bind="text:'script: '+ path(), event:{click:toggle}"></a>
+
+             <div data-bind="if:expanded">
+
+                <ul data-bind="foreach:modules">
+
+                    <li data-bind="template:{name:'template.module', data:$data}" />
+
+                </ul>
+                <ul data-bind="foreach:methods">
+
+                    <li data-bind="template:{name:'template.method', data:$data}" />
+
+                </ul>
+
+                <ul data-bind="foreach:variables">
+
+                    <li data-bind="template:{name:'template.variable', data:$data}" />
+
+                </ul>
+
+                <ul data-bind="foreach:interfaces">
+
+                    <li data-bind="template:{name:'template.interface', data:$data}" />
+
+                </ul>
+
+                <ul data-bind="foreach:classes">
+
+                    <li data-bind="template:{name:'template.class', data:$data}" />
+
+                </ul>
+
+            </div>
+
+        </script>
+        
+    </head>
+
+    <body>
+        
+        <ul data-bind="foreach: reflection.scripts"> 
+
+            <li data-bind="template:{name:'template.script', data:$data}" />
+
+        </ul>  
+             
+    </body>
+
+</html>
