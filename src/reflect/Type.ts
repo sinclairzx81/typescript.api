@@ -104,13 +104,13 @@ module TypeScript.Api.Reflect
             walk(ast);
 			
             return result.join('.');		
-		}
-
+        }
+    
         // [accepts]
         // 10 : TypeScript.NodeType.GenericType 
         // 11 : TypeScript.NodeType.TypeRef		
         public static create (ast:TypeScript.AST) : Type 
-		{
+        {
             var create_type = (ast:TypeScript.AST) : Type => 
             {
                 var type = new Type();
@@ -144,7 +144,7 @@ module TypeScript.Api.Reflect
                 return type;
             };
             
-			return create_type(ast);
-		}
+            return create_type(ast);
+        }
 	}
 }
