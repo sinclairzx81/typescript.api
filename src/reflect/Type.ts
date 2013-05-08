@@ -23,49 +23,80 @@ module TypeScript.Api.Reflect
 
 		constructor() 
 		{
-            this.name      = "any";
-			this.arguments = [];
+            this.name       = "any";
+
+			this.arguments  = [];
+
+            this.arrayCount = 0;
 		}
 		
-		public static qualify(ast:TypeScript.AST) : string 
+		private static qualify(ast:TypeScript.AST) : string // [accepts]
+                                                           // 10 : TypeScript.NodeType.GenericType 
+                                                           // 11 : TypeScript.NodeType.TypeRef
+                                                           // 20 : TypeScript.NodeType.Name
 		{
 			var result = [];
 			
-			var walk = (ast:TypeScript.AST) => 
+			var walk = (ast:TypeScript.AST) =>  // [accepts]
+                                                // 10 : TypeScript.NodeType.GenericType 
+                                                // 11 : TypeScript.NodeType.TypeRef
+                                                // 20 : TypeScript.NodeType.Name
+                                                // 32 : TypeScript.NodeType.MemberAccessExpression (as per iteration)
 			{
-				if(ast.nodeType == TypeScript.NodeType.MemberAccessExpression) 
-				{ 
-					var expression = <TypeScript.BinaryExpression>ast;
+                switch(ast.nodeType)
+                {
+                    case TypeScript.NodeType.Name:
+
+					    var name = <TypeScript.Identifier>ast;
 					
-					walk(expression.operand1);
+					    result.push(name.text);
+
+                        break;
+
+                    case TypeScript.NodeType.MemberAccessExpression:
+
+					    var expression = <TypeScript.BinaryExpression>ast;
+                        
+					    walk(expression.operand1);
 					
-					walk(expression.operand2);
-				}
-				
-				if(ast.nodeType == TypeScript.NodeType.GenericType) 
-				{  
-					var generic_type = <TypeScript.GenericType>ast;
+					    walk(expression.operand2);
+
+                        break;
+
+                    case TypeScript.NodeType.TypeRef:
+
+                        var type_reference = <TypeScript.TypeReference>ast;
+
+                        walk(type_reference.term);
+
+                        break;
+
+                    case TypeScript.NodeType.GenericType:
+
+					    var generic_type = <TypeScript.GenericType>ast;
 					
-					var expression = <TypeScript.BinaryExpression>generic_type.name;
+					    var expression = <TypeScript.BinaryExpression>generic_type.name;
+					    
+					    if(expression.nodeType == TypeScript.NodeType.Name) 
+					    {
+						    walk(expression);
+					    }
 					
-					if(expression.nodeType == TypeScript.NodeType.Name) 
-					{
-						walk(expression);
-					}
-					
-					if(expression.nodeType == TypeScript.NodeType.MemberAccessExpression) 
-					{
-						walk(expression.operand1);
+					    if(expression.nodeType == TypeScript.NodeType.MemberAccessExpression) 
+					    {
+						    walk(expression.operand1);
 						
-						walk(expression.operand2);				
-					}
-				}
-				if(ast.nodeType == TypeScript.NodeType.Name) 
-				{  
-					var name = <TypeScript.Identifier>ast;
-					
-					result.push(name.text);
-				}
+						    walk(expression.operand2);				
+					    }
+
+                        break;
+                    
+                    default:
+                        
+                        result.push("any");
+
+                        break;
+                }
 			};
 			
 			walk(ast);
@@ -73,34 +104,66 @@ module TypeScript.Api.Reflect
 			return result.join('.');		
 		}
 		
-		public static create (ast:TypeScript.TypeReference) : Type 
+		public static create (ast:TypeScript.AST) : Type // [accepts]
+                                                         // 10 : TypeScript.NodeType.GenericType 
+                                                         // 11 : TypeScript.NodeType.TypeRef
 		{
-			var create_type = (ast:TypeScript.TypeReference) : Type => 
+			var create_type = (ast:TypeScript.AST) : Type => 
 			{
-				var type = new Type();
-				
-				type.name = Type.qualify (ast.term);
+                var type = new Type();
 
-                type.arrayCount = ast.arrayCount;
-				
-				switch(ast.term.nodeType)
-				{ 
-					case TypeScript.NodeType.GenericType:
-					
-						var generic_type = <TypeScript.GenericType>ast.term;
-						
+                 type.name = Type.qualify(ast);
+
+                switch(ast.nodeType)
+                {
+                    case TypeScript.NodeType.TypeRef:
+
+                        var type_reference = <TypeScript.TypeReference>ast;
+
+                        type = create_type(type_reference.term)
+
+                        break;
+
+                    case TypeScript.NodeType.GenericType:
+
+                        var generic_type = <TypeScript.GenericType>ast;
+
 						for(var n in generic_type.typeArguments.members) 
 						{
-							var argument = create_type(generic_type.typeArguments.members[n]);
-							
-							type.arguments.push(argument);
-						}
-						break;
-				}
-				
-				return type;
-			};
+                            var type_reference = <TypeScript.TypeReference>generic_type.typeArguments.members[n].term;
 
+							type.arguments.push( create_type( type_reference ) );
+						}
+
+                        break;
+                }
+
+                return type;
+                
+				//var type = new Type();
+                
+				//type.name = Type.qualify (ast.term);
+                
+                //type.arrayCount = ast.arrayCount;
+				
+				//switch(ast.term.nodeType)
+				//{ 
+				//	case TypeScript.NodeType.GenericType:
+					
+				//		var generic_type = <TypeScript.GenericType>ast.term;
+						
+				//		for(var n in generic_type.typeArguments.members) 
+				//		{
+				//			var argument = create_type(generic_type.typeArguments.members[n]);
+							
+				//			type.arguments.push(argument);
+				//		}
+				//		break;
+				//}
+				
+				//return type;
+			};
+            
 			return create_type(ast);
 		}
 	}

@@ -86,7 +86,9 @@ module TypeScript.Api.Reflect
             
 			if(ast.returnTypeAnnotation) {
 
-				result.returns = TypeScript.Api.Reflect.Type.create(<TypeScript.TypeReference>ast.returnTypeAnnotation);		
+                var type_reference = <TypeScript.TypeReference>ast.returnTypeAnnotation;
+                
+				result.returns = TypeScript.Api.Reflect.Type.create( type_reference );		
 			}
             else {
 

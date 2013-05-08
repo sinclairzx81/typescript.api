@@ -12,6 +12,7 @@
 /// <reference path="../decl/typescript.d.ts" />
 /// <reference path="Method.ts" />
 /// <reference path="Variable.ts" />
+/// <reference path="Type.ts" />
 
 module TypeScript.Api.Reflect 
 {
@@ -23,7 +24,7 @@ module TypeScript.Api.Reflect
 
 		public parameters : string    [];
 
-		public extends    : string    [];
+		public extends    : Type      [];
 
 		public name       : string;
 		
@@ -61,9 +62,9 @@ module TypeScript.Api.Reflect
 				{
 					for(var n in ast.extendsList.members) 
 					{ 
-						var named_decl = <TypeScript.NamedDeclaration>ast.extendsList.members[n];
-						
-						result.extends.push( named_decl.text );
+                        var type = TypeScript.Api.Reflect.Type.create( ast.extendsList.members[n] );
+
+						result.extends.push( type );
 					}
 				}
 			}
