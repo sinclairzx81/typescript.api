@@ -13,29 +13,29 @@
 
 module TypeScript.Api.Reflect 
 {
-	export class Type  
-	{
+    export class Type  
+    {
         public name 	  : string;
         
         public arguments  : Type[];
 		
         public arrayCount : number;
 
-		constructor() 
-		{
+        constructor() 
+        {
             this.name       = "any";
 
             this.arguments  = [];
 
             this.arrayCount = 0;
-		}
+        }
 
         // [accepts]
         // 10 : TypeScript.NodeType.GenericType 
         // 11 : TypeScript.NodeType.TypeRef
         // 20 : TypeScript.NodeType.Name		
-		private static qualify(ast:TypeScript.AST) : string
-		{
+        private static qualify(ast:TypeScript.AST) : string
+        {
             var result = [];
 
             // [accepts]
@@ -53,7 +53,7 @@ module TypeScript.Api.Reflect
 					
                         result.push(name.text);
 
-                    break;
+                        break;
 
                     case TypeScript.NodeType.MemberAccessExpression:
 
@@ -63,7 +63,7 @@ module TypeScript.Api.Reflect
 					
                         walk(expression.operand2);
 
-                    break;
+                        break;
 
                     case TypeScript.NodeType.TypeRef:
 
@@ -71,7 +71,7 @@ module TypeScript.Api.Reflect
 
                         walk(type_reference.term);
 
-                    break;
+                        break;
 
                     case TypeScript.NodeType.GenericType:
 
@@ -91,13 +91,13 @@ module TypeScript.Api.Reflect
                             walk(expression.operand2);				
                         }
 
-                    break;
+                        break;
                     
                     default:
                         
-                    result.push("any");
+                        result.push("any");
 
-                    break;
+                        break;
                 }
             };
 			
@@ -105,10 +105,11 @@ module TypeScript.Api.Reflect
 			
             return result.join('.');		
 		}
-		
-		public static create (ast:TypeScript.AST) : Type // [accepts]
-                                                         // 10 : TypeScript.NodeType.GenericType 
-                                                         // 11 : TypeScript.NodeType.TypeRef
+
+        // [accepts]
+        // 10 : TypeScript.NodeType.GenericType 
+        // 11 : TypeScript.NodeType.TypeRef		
+        public static create (ast:TypeScript.AST) : Type 
 		{
             var create_type = (ast:TypeScript.AST) : Type => 
             {
