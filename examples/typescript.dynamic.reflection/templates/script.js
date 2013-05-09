@@ -255,10 +255,10 @@ var ClassModel = function (obj) {
     
         for (var n in obj.parameters) this.parameters.push ( obj.parameters [n] );
     
-        for (var n in obj.implements) this.implements.push ( obj.implements [n] );
+        for (var n in obj.implements) this.implements.push ( new TypeModel ( obj.implements [n] ) );
     
-        for (var n in obj.extends)    this.extends.push    ( obj.extends    [n] );
-    
+        for (var n in obj.extends)    this.extends.push    ( new TypeModel ( obj.extends[n] ) ); 
+        
         this.name  (obj.name);
     }
 
@@ -292,13 +292,46 @@ var ClassModel = function (obj) {
             }
         }
 
-        if (this.parameters().length > 0) {
-
+        if (this.parameters().length > 0) 
+        {
             buffer.push('>');
-
         }
 
-        // todo: extends...
+        // extends
+        length = this.extends().length;
+
+        if(length > 0)
+        {
+            buffer.push(' extends')
+        }
+
+        for(var i = 0; i < length; i++)
+        {
+            buffer.push( ' ' + this.extends()[i].text() );
+
+            if(i != length - 1) 
+            {
+                buffer.push(', ');
+            }
+        }
+        
+        // implements
+        length = this.implements().length;
+
+        if(length > 0)
+        {
+            buffer.push(' implements')
+        }
+
+        for(var i = 0; i < length; i++)
+        {
+            buffer.push( ' ' + this.implements()[i].text() );
+
+            if(i != length - 1) 
+            {
+                buffer.push(', ');
+            }
+        }
 
         return buffer.join('');
     }
@@ -326,13 +359,13 @@ var InterfaceModel = function (obj)
 
     this.construct = function () 
     {
-        for (var n in obj.methods)    this.methods.push(new MethodModel(obj.methods[n]));
+        for (var n in obj.methods)    this.methods.push   (new MethodModel(obj.methods[n]));
 
-        for (var n in obj.variables)  this.variables.push(new VariableModel(obj.variables[n]));
+        for (var n in obj.variables)  this.variables.push (new VariableModel(obj.variables[n]));
 
         for (var n in obj.parameters) this.parameters.push(obj.parameters[n]);
 
-        for (var n in obj.extends)    this.extends.push(obj.extends[n]);
+        for (var n in obj.extends)    this.extends.push    ( new TypeModel ( obj.extends[n] ) ); 
 
         this.name(obj.name);
     }
@@ -373,7 +406,23 @@ var InterfaceModel = function (obj)
 
         }
 
-        // todo: extends...
+        // extends
+        length = this.extends().length;
+
+        if(length > 0)
+        {
+            buffer.push(' extends')
+        }
+
+        for(var i = 0; i < length; i++)
+        {
+            buffer.push( ' ' + this.extends()[i].text() );
+
+            if(i != length - 1) 
+            {
+                buffer.push(', ');
+            }
+        }
 
         return buffer.join('');
     }
@@ -402,25 +451,39 @@ var ImportModel = function (obj) {
 // ModuleModel
 /////////////////////////////////////////////////////////////////////
 var ModuleModel = function (obj) {
+    
     this.imports    = ko.observableArray([]);
+    
     this.modules    = ko.observableArray([]);
+    
     this.interfaces = ko.observableArray([]);
+    
     this.classes    = ko.observableArray([]);
+    
     this.methods    = ko.observableArray([]);
+    
     this.variables  = ko.observableArray([]);
+    
     this.name       = ko.observable();
 
     this.expanded   = ko.observable(false);
     
     for (var n in obj.imports)    this.imports.push    ( new ImportModel    ( obj.imports    [n] ) );
+    
     for (var n in obj.modules)    this.modules.push    ( new ModuleModel    ( obj.modules    [n] ) );
+    
     for (var n in obj.interfaces) this.interfaces.push ( new InterfaceModel ( obj.interfaces [n] ) );
+    
     for (var n in obj.classes)    this.classes.push    ( new ClassModel     ( obj.classes    [n] ) );
+    
     for (var n in obj.methods)    this.methods.push    ( new MethodModel    ( obj.methods    [n] ) );
+    
     for (var n in obj.variables)  this.variables.push  ( new VariableModel  ( obj.variables  [n] ) );
+    
     this.name  (obj.name);
 
-    this.toggle = function () {
+    this.toggle = function () 
+    {
         this.expanded(this.expanded() ? false : true);
     }
 }
@@ -429,19 +492,31 @@ var ModuleModel = function (obj) {
 // ScriptModel
 /////////////////////////////////////////////////////////////////////
 var ScriptModel = function (obj) {
+
     this.modules    = ko.observableArray([]);
+
     this.interfaces = ko.observableArray([]);
+
     this.classes    = ko.observableArray([]);
+
     this.methods    = ko.observableArray([]);
+
     this.variables  = ko.observableArray([]);
+
     this.path       = ko.observable();
+
     this.expanded   = ko.observable(false);
 
     for (var n in obj.modules)    this.modules.push    ( new ModuleModel    ( obj.modules    [n] ) );
+
     for (var n in obj.interfaces) this.interfaces.push ( new InterfaceModel ( obj.interfaces [n] ) );
+
     for (var n in obj.classes)    this.classes.push    ( new ClassModel     ( obj.classes    [n] ) );
+
     for (var n in obj.methods)    this.methods.push    ( new MethodModel    ( obj.methods    [n] ) );
+
     for (var n in obj.variables)  this.variables.push  ( new VariableModel  ( obj.variables  [n] ) );
+
     this.path(obj.path);
 
     this.toggle = function () {
