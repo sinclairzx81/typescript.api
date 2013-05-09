@@ -48,6 +48,7 @@ module TypeScript.Api.Compile {
 		private addSourceUnit ( sourceUnit : TypeScript.Api.Units.SourceUnit ) : void 
 		{
 			// do not compile units with errors.
+
 			if( !sourceUnit.hasError() ) 
 			{
 				var snapshot = TypeScript.ScriptSnapshot.fromString( sourceUnit.content );
@@ -172,19 +173,19 @@ module TypeScript.Api.Compile {
 				
 				for(var m in syntax_diagnostics)
 				{
-					sourceUnits[n].diagnostics.push( syntax_diagnostics );
+					sourceUnits[n].diagnostics.push( syntax_diagnostics[m] );
 				}
 			}
 			
 			// typecheck
-			for(var n in sourceUnits) 
+			for(var n in sourceUnits)
 			{
 				var typecheck_diagnostics = this.typeCheck( sourceUnits[n] );
 				
 				for(var m in typecheck_diagnostics)
 				{
-					sourceUnits[n].diagnostics.push( typecheck_diagnostics );
-				}				
+					sourceUnits[n].diagnostics.push( typecheck_diagnostics[m] );
+				}
 			}
 			
 			// emit and return...

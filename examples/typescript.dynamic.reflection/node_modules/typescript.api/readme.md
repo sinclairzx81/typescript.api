@@ -33,7 +33,7 @@ var program = require("./program.ts");
 The following is an example of using the api to compile a source file named 'program.ts'. 
 
 The process will first resolve 'program.ts' and all its referenced sources files. The resolved 
-sources (units) then checked prior to being send to the compiler for compilation. Once compiled,
+sources (units) then checked prior to being sent to the compiler for compilation. Once compiled,
 the compilation is checked again for problems prior to being run.
 
 ```javascript
@@ -83,12 +83,12 @@ typescript.resolve(['./program.ts'], function(units) {
 
 Will resolve source units by traversing each source files reference element.
 
-__Arguments__
+__arguments__
 
-* sources - An array of source filenames. 
+* sources - A filename, or a array of filenames to resolve. 
 * callback(units) - A callback with the resolved units.
 
-__Example__
+__example__
 
 The following will resolve 'program.ts' and log each referenced source file to 
 the console.
@@ -117,12 +117,12 @@ typescript.resolve(["program.ts"], function(units) {
 
 Checks source units for diagnostic errors. 
 
-__Arguments__
+__arguments__
 
 * units - units to be checked. 
 * returns - true if ok. 
 
-__Example__
+__example__
 
 The following example will check if both a resolve() and compile() is successful.
 
@@ -150,12 +150,12 @@ typescript.resolve(["program.ts"], function(units) {
 
 Will create a unit from the supplied filename and source code.
 
-__Arguments__
+__arguments__
 
 * filename - A filename that other units can reference.
 * code - The source code for this unit.
 
-__Example__
+__example__
 
 The following will create a unit. and send to the compiler for compilation. 
 The compilation is then run.
@@ -179,12 +179,12 @@ typescript.compile([unit], function(compilation) {
 
 Compiles source units. 
 
-__Arguments__
+__arguments__
 
 * units - An array of source units. 
 * callback - A callback that passes the compiled output.
 
-__Example__
+__example__
 
 The following will first create and compile a unit, and compiled source is
 written to the console.
@@ -208,12 +208,12 @@ typescript.compile([unit], function(compilation) {
 Reflects compilation AST and produces meta data about the modules, classes, 
 methods and variables contained within the compilation. 
 
-__Arguments__
+__arguments__
 
 * units - The compilation to be reflected. 
 * callback - A callback that passes the reflected metadata.
 
-__Example__
+__example__
 
 The following will resolve the source file 'program.ts', compile it, then reflect its
 meta data to the console as a JSON string.
@@ -239,13 +239,13 @@ typescript.resolve(['program.ts'], function(units){
 
 Runs a compilation. 
 
-__Arguments__
+__arguments__
 
 * compilation - The compilation to be run.
 * sandbox - A sandbox. pass null to inherit the current sandbox.
 * callback - A callback that passes a context containing any exported variables and function.
 
-__Example__
+__example__
 
 The following will first create and compile a unit, then send it off
 for compilation.

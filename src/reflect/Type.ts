@@ -39,9 +39,13 @@ module TypeScript.Api.Reflect
             var result = [];
             
             // 10 : TypeScript.NodeType.GenericType 
+
             // 11 : TypeScript.NodeType.TypeRef
+
             // 20 : TypeScript.NodeType.Name
+
             // 32 : TypeScript.NodeType.MemberAccessExpression (as per iteration)
+
             var walk = (ast:TypeScript.AST) =>  
             {
                 switch(ast.nodeType)

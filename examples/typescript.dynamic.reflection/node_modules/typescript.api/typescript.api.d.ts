@@ -191,6 +191,8 @@ declare module TypeScript.Api.Reflect {
     class Import {
         public name: string;
         public alias: string;
+        public limChar: number;
+        public minChar: number;
         static create(ast: ImportDeclaration): Import;
     }
 }
@@ -199,6 +201,8 @@ declare module TypeScript.Api.Reflect {
         public name: string;
         public arguments: Type[];
         public arrayCount: number;
+        public limChar: number;
+        public minChar: number;
         constructor();
         private static qualifyName(ast);
         static create(ast: AST): Type;
@@ -208,6 +212,8 @@ declare module TypeScript.Api.Reflect {
     class Parameter {
         public name: string;
         public type: Type;
+        public limChar: number;
+        public minChar: number;
         static create(ast: Parameter): Parameter;
     }
 }
@@ -227,6 +233,8 @@ declare module TypeScript.Api.Reflect {
         public isSetAccessor: boolean;
         public isIndexer: boolean;
         public comments: string[];
+        public limChar: number;
+        public minChar: number;
         constructor();
         static create(ast: FunctionDeclaration): Method;
     }
@@ -242,6 +250,8 @@ declare module TypeScript.Api.Reflect {
         public isStatementOrExpression: boolean;
         public isExported: boolean;
         public comments: string[];
+        public limChar: number;
+        public minChar: number;
         constructor();
         static create(ast: VariableDeclarator): Variable;
     }
@@ -253,6 +263,8 @@ declare module TypeScript.Api.Reflect {
         public parameters: string[];
         public extends: Type[];
         public name: string;
+        public limChar: number;
+        public minChar: number;
         constructor();
         static create(ast: InterfaceDeclaration): Interface;
     }
@@ -265,6 +277,8 @@ declare module TypeScript.Api.Reflect {
         public extends: Type[];
         public implements: Type[];
         public name: string;
+        public limChar: number;
+        public minChar: number;
         constructor();
         static create(ast: ClassDeclaration): Class;
     }
@@ -278,6 +292,8 @@ declare module TypeScript.Api.Reflect {
         public methods: Method[];
         public variables: Variable[];
         public name: string;
+        public limChar: number;
+        public minChar: number;
         constructor();
         static create(ast: ModuleDeclaration): Module;
     }

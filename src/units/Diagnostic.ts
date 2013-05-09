@@ -14,14 +14,19 @@ module TypeScript.Api.Units
 	export class Diagnostic
 	{
 		public line_index:number;
+
 		public char_index:number;
 		
 		constructor(public type       : string,
+
 				    public path       : string,
+
 					public text       : string,
+
 					public message    : string) 
 		{
 			this.line_index = 0;
+
 			this.char_index = 0;
   	    }		
 		
