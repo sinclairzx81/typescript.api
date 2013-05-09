@@ -19,19 +19,28 @@ module TypeScript.Api.Reflect
 	export class Class 
 	{
 		public methods    : Method     [];
+
 		public variables  : Variable   [];
-		public parameters : string     [];
-		public extends    : Type       [];
-		public implements : Type       [];
-		public name       : string;
+		
+        public parameters : string     [];
+		
+        public extends    : Type       [];
+		
+        public implements : Type       [];
+		
+        public name       : string;
 		
 		constructor() 
 		{
 			this.methods    = [];
-			this.variables  = [];
-			this.extends    = [];
-			this.implements = [];
-			this.parameters = [];
+			
+            this.variables  = [];
+			
+            this.extends    = [];
+			
+            this.implements = [];
+			
+            this.parameters = [];
 		}
 		
 		public static create(ast:TypeScript.ClassDeclaration) : Class 

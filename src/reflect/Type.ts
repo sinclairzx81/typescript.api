@@ -29,16 +29,11 @@ module TypeScript.Api.Reflect
 
             this.arrayCount = 0;
         }
-
-        // [accepts]
-        // 10 : TypeScript.NodeType.GenericType 
-        // 11 : TypeScript.NodeType.TypeRef
-        // 20 : TypeScript.NodeType.Name		
-        private static qualify(ast:TypeScript.AST) : string
+        		
+        private static qualifyName(ast:TypeScript.AST) : string
         {
             var result = [];
-
-            // [accepts]
+            
             // 10 : TypeScript.NodeType.GenericType 
             // 11 : TypeScript.NodeType.TypeRef
             // 20 : TypeScript.NodeType.Name
@@ -105,46 +100,72 @@ module TypeScript.Api.Reflect
 			
             return result.join('.');		
         }
-    
-        // [accepts]
-        // 10 : TypeScript.NodeType.GenericType 
-        // 11 : TypeScript.NodeType.TypeRef		
+        
         public static create (ast:TypeScript.AST) : Type 
         {
-            var create_type = (ast:TypeScript.AST) : Type => 
+            // invoked on variable, return, and parameter types.
+
+            var create_type = (typeRef:TypeScript.TypeReference) : Type => 
             {
-                var type = new Type();
+                var type  = new Type();
 
-                type.name = Type.qualify(ast);
+                type.name = Type.qualifyName(typeRef);
 
-                switch(ast.nodeType)
+                type.arrayCount = typeRef.arrayCount;
+                     
+                if(typeRef.term.nodeType == TypeScript.NodeType.GenericType)
                 {
-                    case TypeScript.NodeType.TypeRef:
+                    var genericType = <TypeScript.GenericType>typeRef.term;                            
 
-                        var type_reference = <TypeScript.TypeReference>ast;
+                    for(var n in genericType.typeArguments.members) 
+                    {
+                        var typeRef = <TypeScript.TypeReference>genericType.typeArguments.members[n];
 
-                        type = create_type(type_reference.term);
-
-                        break;
-
-                    case TypeScript.NodeType.GenericType:
-
-                        var generic_type = <TypeScript.GenericType>ast;
-
-                        for(var n in generic_type.typeArguments.members) 
-                        {
-                            var type_reference = <TypeScript.TypeReference>generic_type.typeArguments.members[n].term;
-
-                            type.arguments.push( create_type( type_reference ) );
-                        }
-
-                        break;
+                        type.arguments.push( create_type( typeRef ) );
+                    }
                 }
-
+                    
                 return type;
             };
             
-            return create_type(ast);
+            // note: invoked on implement and extends lists. (see Class and Interface)
+
+            var create_generic_type = (genericType:TypeScript.GenericType) : Type =>
+            {
+                var type  = new Type();
+            
+                type.name = Type.qualifyName(genericType);
+
+                for(var n in genericType.typeArguments.members) 
+                {
+                    var typeRef = <TypeScript.TypeReference>genericType.typeArguments.members[n];
+
+                    type.arguments.push( create_type( typeRef ) );
+                }
+                 
+                return type;
+            };
+
+            // check the type passed....
+
+            var type:TypeScript.Api.Reflect.Type = null;
+
+            switch(ast.nodeType)
+            {
+                case TypeScript.NodeType.GenericType:
+
+                    type = create_generic_type(<TypeScript.GenericType>ast);
+
+                    break;
+                
+                case TypeScript.NodeType.TypeRef:
+
+                    type = create_type(<TypeScript.TypeReference>ast);
+
+                    break;
+            }
+
+            return type;
         }
-	}
+    }
 }

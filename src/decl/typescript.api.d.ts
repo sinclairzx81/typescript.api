@@ -200,7 +200,7 @@ declare module TypeScript.Api.Reflect {
         public arguments: Type[];
         public arrayCount: number;
         constructor();
-        private static qualify(ast);
+        private static qualifyName(ast);
         static create(ast: AST): Type;
     }
 }
