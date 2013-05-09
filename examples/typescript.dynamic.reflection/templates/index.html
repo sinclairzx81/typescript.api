@@ -10,11 +10,14 @@
 
             body 
             {
-                font-family : 'Courier New', Courier, 'Nimbus Mono L', monospace;
+                font-family : Arial, 'DejaVu Sans', 'Liberation Sans', Freesans, sans-serif;
 
                 font-size : 0.8em;
             }
+            a, a:visited {
+                color:#000;
 
+            }
         </style>
         
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
@@ -77,6 +80,7 @@
                 <ul data-bind="foreach:variables">
 
                     <li data-bind="template: {name:'template.variable', data:$data}" />
+
                 </ul>
 
                 <ul data-bind="foreach:methods">
