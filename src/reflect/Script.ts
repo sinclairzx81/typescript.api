@@ -21,18 +21,27 @@ module TypeScript.Api.Reflect {
 	export class Script 
 	{
 		public modules    : Module    [];
-		public interfaces : Interface [];
-		public classes    : Class     [];
-		public methods    : Method    [];
-		public variables  : Variable  [];
-		public path       : string;
+		
+        public interfaces : Interface [];
+		
+        public classes    : Class     [];
+		
+        public methods    : Method    [];
+		
+        public variables  : Variable  [];
+		
+        public path       : string;
 		
 		constructor () 
 		{
 			this.modules    = [];
-			this.interfaces = [];
-			this.classes    = [];
-			this.methods    = [];
+			
+            this.interfaces = [];
+			
+            this.classes    = [];
+			
+            this.methods    = [];
+
 			this.variables  = [];
 		}
 		

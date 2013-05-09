@@ -44,6 +44,10 @@ module TypeScript.Api.Reflect
         public isIndexer       : boolean;
 
         public comments        : string [];
+
+        public limChar         : number;
+
+        public minChar         : number;
         
 		constructor () 
 		{
@@ -76,6 +80,10 @@ module TypeScript.Api.Reflect
 
             result.isIndexer     = ast.isIndexerMember();
             
+            result.limChar       = ast.limChar;
+
+            result.minChar       = ast.minChar;
+
             var comments         = ast.getDocComments();
             
             for(var n in comments) {

@@ -23,12 +23,16 @@ module TypeScript.Api.Reflect
 		public variables  : Variable   [];
 		
         public parameters : string     [];
-		
+
         public extends    : Type       [];
 		
         public implements : Type       [];
 		
         public name       : string;
+
+        public limChar    : number;
+
+        public minChar    : number;
 		
 		constructor() 
 		{
@@ -45,9 +49,13 @@ module TypeScript.Api.Reflect
 		
 		public static create(ast:TypeScript.ClassDeclaration) : Class 
 		{ 
-			var result = new Class();
+			var result     = new Class();
 			
-			result.name = ast.name.text;
+			result.name    = ast.name.text;
+
+            result.limChar = ast.limChar;
+
+            result.minChar = ast.minChar;
 			
 			if(ast.typeParameters) 
 			{

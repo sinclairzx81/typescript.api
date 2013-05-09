@@ -17,14 +17,26 @@ module TypeScript.Api.Reflect {
 	export class Variable 
 	{
 		public name                    : string;
-		public type                    : Type;
+		
+        public type                    : Type;
+        
         public isProperty              : boolean;
+        
         public isStatic                : boolean;
+        
         public isStatement             : boolean;
+        
         public isExpression            : boolean;
+        
         public isStatementOrExpression : boolean;
-		public isExported              : boolean;
+		
+        public isExported              : boolean;
+        
         public comments                : string[];
+        
+        public limChar                 : number;
+
+        public minChar                 : number;
 
         constructor() {
             
@@ -49,6 +61,10 @@ module TypeScript.Api.Reflect {
             result.isExported              = ast.isExported();
 
             result.isStatementOrExpression = ast.isStatementOrExpression();
+
+            result.limChar                 = ast.limChar;
+
+            result.minChar                 = ast.minChar;            
 
             var comments                   = ast.getDocComments();
             

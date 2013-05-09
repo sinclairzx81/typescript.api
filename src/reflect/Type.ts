@@ -21,6 +21,10 @@ module TypeScript.Api.Reflect
 		
         public arrayCount : number;
 
+        public limChar    : number;
+
+        public minChar    : number;
+
         constructor() 
         {
             this.name       = "any";
@@ -109,9 +113,13 @@ module TypeScript.Api.Reflect
             {
                 var type  = new Type();
 
-                type.name = Type.qualifyName(typeRef);
+                type.name       = Type.qualifyName(typeRef);
 
                 type.arrayCount = typeRef.arrayCount;
+
+                type.limChar    = typeRef.limChar;
+
+                type.minChar    = typeRef.minChar;
                      
                 if(typeRef.term.nodeType == TypeScript.NodeType.GenericType)
                 {
@@ -132,10 +140,16 @@ module TypeScript.Api.Reflect
 
             var create_generic_type = (genericType:TypeScript.GenericType) : Type =>
             {
-                var type  = new Type();
+                var type     = new Type();
             
-                type.name = Type.qualifyName(genericType);
+                type.name    = Type.qualifyName(genericType);
 
+                type.limChar = genericType.limChar;
+
+                type.minChar = genericType.minChar;
+
+                // note: no arrayCount as types cannot inheriate arrays. 
+                
                 for(var n in genericType.typeArguments.members) 
                 {
                     var typeRef = <TypeScript.TypeReference>genericType.typeArguments.members[n];

@@ -22,27 +22,47 @@ module TypeScript.Api.Reflect
 	export class Module 
 	{
 		public imports    : Import    [];
-		public modules    : Module    [];
-		public interfaces : Interface [];
-		public classes    : Class     [];
-		public methods    : Method    [];
-		public variables  : Variable  [];
-		public name       : string;
+		
+        public modules    : Module    [];
+		
+        public interfaces : Interface [];
+		
+        public classes    : Class     [];
+		
+        public methods    : Method    [];
+		
+        public variables  : Variable  [];
+		
+        public name       : string;
+
+        public limChar    : number;
+
+        public minChar    : number;
 
 		constructor () {
+
 			this.imports    = [];
+
 			this.modules    = [];
+
 			this.interfaces = [];
+
 			this.classes    = [];
+
 			this.methods    = [];
+
 			this.variables  = [];
 		}
 
 		public static create (ast:TypeScript.ModuleDeclaration) : Module 
 		{
-			var result   = new Module();
+			var result     = new Module();
 			
-			result.name  = ast.prettyName;	
+			result.name    = ast.prettyName;	
+
+            result.limChar = ast.limChar;
+
+            result.minChar = ast.minChar;
 			
 			return result;
 		}

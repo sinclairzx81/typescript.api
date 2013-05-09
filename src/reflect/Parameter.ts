@@ -18,13 +18,22 @@ module TypeScript.Api.Reflect
 	export class Parameter 
 	{
 		public name		  : string;
+
 		public type		  : Type;
+
+        public limChar    : number;
+
+        public minChar    : number;
 
 		public static create(ast:TypeScript.Parameter) : Parameter 
 		{
-			var result   = new Parameter();
+			var result     = new Parameter();
 			
-			result.name  = ast.id.text;
+			result.name    = ast.id.text;
+
+            result.limChar = ast.limChar;
+
+            result.minChar = ast.minChar;
 
 			if(!ast.typeExpr) 
 			{ 
