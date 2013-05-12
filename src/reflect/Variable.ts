@@ -12,86 +12,86 @@
 /// <reference path="../decl/typescript.d.ts" />
 /// <reference path="Type.ts" />
 
-module TypeScript.Api.Reflect {	
-	
+module TypeScript.Api.Reflect 
+{
 	export class Variable 
 	{
 		public name                    : string;
-		
-        public type                    : Type;
-        
-        public isProperty              : boolean;
-        
-        public isStatic                : boolean;
-        
-        public isStatement             : boolean;
-        
-        public isExpression            : boolean;
-        
-        public isStatementOrExpression : boolean;
-		
-        public isExported              : boolean;
-        
-        public comments                : string[];
-        
-        public limChar                 : number;
 
-        public minChar                 : number;
+		public type                    : Type;
 
-        constructor() {
-            
-            this.comments = [];
+		public isProperty              : boolean;
 
-        }
+		public isStatic                : boolean;
 
-        private static load_comments(result:Variable, ast:TypeScript.VariableDeclarator) : void {
-        
-            var comments                   = ast.getDocComments();
-            
-            for(var n in comments) {
-                
-                result.comments.push(comments[n].content);
-            }
-        }
+		public isStatement             : boolean;
 
-        private static load_type (result:Variable, ast:TypeScript.VariableDeclarator) : void {
-        
+		public isExpression            : boolean;
+
+		public isStatementOrExpression : boolean;
+
+		public isExported              : boolean;
+
+		public comments                : string[];
+
+		public limChar                 : number;
+
+		public minChar                 : number;
+
+		constructor() {
+
+			this.comments = [];
+
+		}
+
+		private static load_comments(result:Variable, ast:TypeScript.VariableDeclarator) : void {
+
+			var comments                   = ast.getDocComments();
+
+			for(var n in comments) 
+			{
+				result.comments.push(comments[n].content);
+			}
+		}
+
+		private static load_type (result:Variable, ast:TypeScript.VariableDeclarator) : void {
+
 			if(!ast.typeExpr) 
 			{ 
 				result.type  = new TypeScript.Api.Reflect.Type();
 
-                return;
+				return;
 			}   
 
-            result.type = TypeScript.Api.Reflect.Type.create(ast.typeExpr);        
-        }
+			result.type = TypeScript.Api.Reflect.Type.create(ast.typeExpr);
+		}
 
 		public static create(ast:TypeScript.VariableDeclarator): Variable 
 		{
 			var result = new Variable();
 
 			result.name                    = ast.id.text;
-            
-            result.isProperty              = ast.isProperty();
 
-            result.isStatic                = ast.isStatic();
+			result.isProperty              = ast.isProperty();
+
+			result.isStatic                = ast.isStatic();
 
 			result.isStatement             = ast.isStatement();
 
-            result.isExpression            = ast.isExpression();
+			result.isExpression            = ast.isExpression();
 
-            result.isExported              = ast.isExported();
+			result.isExported              = ast.isExported();
 
-            result.isStatementOrExpression = ast.isStatementOrExpression();
+			result.isStatementOrExpression = ast.isStatementOrExpression();
 
-            result.limChar                 = ast.limChar;
+			result.limChar                 = ast.limChar;
 
-            result.minChar                 = ast.minChar;            
+			result.minChar                 = ast.minChar;
 
-            Variable.load_type(result, ast);
+			Variable.load_type(result, ast);
 
-            Variable.load_comments(result, ast);
-            
+			Variable.load_comments(result, ast);
+
 			return result;
 		}  
 	}

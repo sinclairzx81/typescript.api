@@ -20,12 +20,12 @@
 /// <reference path="Variable.ts" />
 /// <reference path="Type.ts" />
 
-module TypeScript.Api.Reflect  {	
-	
+module TypeScript.Api.Reflect  
+{
 	export class Reflection
 	{
 		public scripts : Script[];
-		
+
 		constructor() 
 		{
 			this.scripts = [];

@@ -10,34 +10,32 @@
 // limitations under the License.
 
 /// <reference path="../decl/typescript.d.ts" />
-	
+
 module TypeScript.Api.Reflect 
 {
 	export class Import 
 	{
 		public name       : string;
-		
-        public alias      : string;
-        
-        public limChar    : number;
 
-        public minChar    : number;
+		public alias      : string;
+
+		public limChar    : number;
+
+		public minChar    : number;
 
 		public static create(ast:TypeScript.ImportDeclaration) : Import 
 		{
 			var result     = new Import();
-			
+
 			result.name    = ast.id.text;
-			
+
 			result.alias   = ast.getAliasName(ast);
 
-            result.limChar = ast.limChar;
+			result.limChar = ast.limChar;
 
-            result.minChar = ast.minChar;
-            
-			
+			result.minChar = ast.minChar;
+
 			return result;
 		}
 	}
 }
-	

@@ -8,7 +8,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-	
+
 /// <reference path="../decl/typescript.d.ts" />
 /// <reference path="Type.ts" />
 
@@ -20,37 +20,34 @@ module TypeScript.Api.Reflect
 
 		public type		  : Type;
 
-        public limChar    : number;
+		public limChar    : number;
 
-        public minChar    : number;
+		public minChar    : number;
 
-
-        private static load_type(result:Parameter, ast:TypeScript.Parameter) : void {
-        
+		private static load_type(result:Parameter, ast:TypeScript.Parameter) : void 
+		{
 			if(!ast.typeExpr) 
 			{ 
 				result.type = new TypeScript.Api.Reflect.Type()
-			    
-                return;
-            } 
-            
-            result.type = TypeScript.Api.Reflect.Type.create(ast.typeExpr); 
-        }
+
+				return;
+			} 
+			result.type = TypeScript.Api.Reflect.Type.create(ast.typeExpr); 
+		}
 
 		public static create(ast:TypeScript.Parameter) : Parameter 
 		{
 			var result     = new Parameter();
-			
+
 			result.name    = ast.id.text;
 
-            result.limChar = ast.limChar;
+			result.limChar = ast.limChar;
 
-            result.minChar = ast.minChar;
+			result.minChar = ast.minChar;
 
-            Parameter.load_type(result, ast);
-			
+			Parameter.load_type(result, ast);
+
 			return result;
 		}   
 	}
-	
 }

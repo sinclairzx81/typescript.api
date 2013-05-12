@@ -14,121 +14,118 @@
 /// <reference path="Type.ts" />
 
 module TypeScript.Api.Reflect 
-{	
+{
 	export class Method 
 	{
 		public name            : string;
 
-        public parameters      : Parameter[];
+		public parameters      : Parameter[];
 
 		public returns         : Type;
 
-        public isStatic        : boolean;
+		public isStatic        : boolean;
 
-        public isAccessor      : boolean; 
+		public isAccessor      : boolean; 
 
-        public isSignature     : boolean;
+		public isSignature     : boolean;
 
-        public isConstructor   : boolean;
+		public isConstructor   : boolean;
 
-        public isCallMember    : boolean;
+		public isCallMember    : boolean;
 
-        public isDeclaration   : boolean;
+		public isDeclaration   : boolean;
 
-        public isExpression    : boolean;
+		public isExpression    : boolean;
 
-        public isGetAccessor   : boolean;
+		public isGetAccessor   : boolean;
 
-        public isSetAccessor   : boolean;
+		public isSetAccessor   : boolean;
 
-        public isIndexer       : boolean;
+		public isIndexer       : boolean;
 
-        public comments        : string [];
+		public comments        : string [];
 
-        public limChar         : number;
+		public limChar         : number;
 
-        public minChar         : number;
-        
+		public minChar         : number;
+
 		constructor () 
 		{
 			this.parameters = [];
 
-            this.comments   = [];
+			this.comments   = [];
 		}
 
-        private static load_comments(result:Method, ast:TypeScript.FunctionDeclaration) : void {
+		private static load_comments(result:Method, ast:TypeScript.FunctionDeclaration) : void 
+		{
+			var comments = ast.getDocComments();
 
-            var comments = ast.getDocComments();
-            
-            for(var n in comments) {
-                
-                result.comments.push(comments[n].content);
-            
-            }        
-        }
-
-        private static load_returns(result:Method, ast:TypeScript.FunctionDeclaration) : void {
-        
-			if(ast.returnTypeAnnotation) {
-
-                var type_reference = <TypeScript.TypeReference>ast.returnTypeAnnotation;
-                
-				result.returns = TypeScript.Api.Reflect.Type.create( type_reference );		
+			for(var n in comments) 
+			{
+				result.comments.push(comments[n].content);
 			}
-            else {
+		}
 
-                result.returns = new TypeScript.Api.Reflect.Type();
-            }	            
-        }
+		private static load_returns(result:Method, ast:TypeScript.FunctionDeclaration) : void 
+		{
+			if(ast.returnTypeAnnotation) 
+			{
+				var type_reference = <TypeScript.TypeReference>ast.returnTypeAnnotation;
 
-        public static load_parameters(result:Method, ast:TypeScript.FunctionDeclaration) : void {
-        
-            for(var n in ast.arguments.members) 
+				result.returns = TypeScript.Api.Reflect.Type.create( type_reference );	
+
+				return;
+			}
+			result.returns = new TypeScript.Api.Reflect.Type();            
+		}
+
+		public static load_parameters(result:Method, ast:TypeScript.FunctionDeclaration) : void 
+		{
+			for(var n in ast.arguments.members) 
 			{
 				var argument = ast.arguments.members[n];
 
-                var parameter = TypeScript.Api.Reflect.Parameter.create(argument);
+				var parameter = TypeScript.Api.Reflect.Parameter.create(argument);
 
-                result.parameters.push(parameter);
-			}	
-        }
-        
-		public static create(ast:TypeScript.FunctionDeclaration) : Method  {
+				result.parameters.push(parameter);
+			}
+		}
 
+		public static create(ast:TypeScript.FunctionDeclaration) : Method  
+		{
 			var result           = new Method();
-            
-            result.name          = ast.isConstructor ? "constructor" : ast.getNameText();
-            
-            result.isConstructor = ast.isConstructor;
-            
-            result.isStatic      = ast.isStatic();
-            
-            result.isSignature   = ast.isSignature();
-            
-            result.isCallMember  = ast.isCallMember();
-            
-            result.isDeclaration = ast.isDeclaration();
-            
-            result.isExpression  = ast.isExpression();
-            
-            result.isGetAccessor = ast.isGetAccessor();
-            
-            result.isSetAccessor = ast.isSetAccessor();
 
-            result.isIndexer     = ast.isIndexerMember();
-            
-            result.limChar       = ast.limChar;
+			result.name          = ast.isConstructor ? "constructor" : ast.getNameText();
 
-            result.minChar       = ast.minChar;
+			result.isConstructor = ast.isConstructor;
 
-            Method.load_comments(result, ast);
+			result.isStatic      = ast.isStatic();
 
-            Method.load_returns(result, ast);
-			
-            Method.load_parameters(result, ast);
-            
+			result.isSignature   = ast.isSignature();
+
+			result.isCallMember  = ast.isCallMember();
+
+			result.isDeclaration = ast.isDeclaration();
+
+			result.isExpression  = ast.isExpression();
+
+			result.isGetAccessor = ast.isGetAccessor();
+
+			result.isSetAccessor = ast.isSetAccessor();
+
+			result.isIndexer     = ast.isIndexerMember();
+
+			result.limChar       = ast.limChar;
+
+			result.minChar       = ast.minChar;
+
+			Method.load_comments   (result, ast);
+
+			Method.load_returns    (result, ast);
+
+			Method.load_parameters (result, ast);
+
 			return result;
 		}
 	}
-	
 }
