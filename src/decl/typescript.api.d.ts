@@ -116,8 +116,6 @@ declare module TypeScript.Api.Resolve {
         public filename: string;
         constructor(parent_filename: string, filename: string);
     }
-}
-declare module TypeScript.Api.Resolve {
     class Resolver {
         public io: IO.IIO;
         public logger: ILogger;

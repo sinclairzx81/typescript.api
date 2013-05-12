@@ -75,7 +75,6 @@ module TypeScript.Api.Compile {
 			}
 
 			return result;
-		 
 		}
 		
 		private typeCheck(sourceUnit:TypeScript.Api.Units.SourceUnit) : TypeScript.Api.Units.Diagnostic [] 

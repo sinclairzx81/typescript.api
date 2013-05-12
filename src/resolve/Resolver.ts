@@ -11,19 +11,33 @@
 
 /// <reference path="../decl/typescript.d.ts" />
 /// <reference path="../units/SourceUnit.ts" />
+/// <reference path="../util/Path.ts" />
 /// <reference path="../io/IIO.ts" />
-/// <reference path="LoadParameter.ts" />
 
 module TypeScript.Api.Resolve 
 {	
+	export class LoadParameter 
+	{
+		public parent_filename  : string;
+
+		public filename         : string;
+
+		constructor(parent_filename:string, filename:string) 
+		{
+			this.parent_filename = parent_filename;
+
+			this.filename = Util.Path.relativeToAbsolute(parent_filename, filename); 
+		} 
+	} 
+
 	export class Resolver 
 	{
 		private pending     : TypeScript.Api.Resolve.LoadParameter  [];
-		
+
 		private closed      : TypeScript.Api.Resolve.LoadParameter  [];
-		
+
 		private units       : TypeScript.Api.Units.SourceUnit [];
-		
+
 		constructor( public io : TypeScript.Api.IO.IIO, public logger : TypeScript.ILogger ) 
 		{
 			this.pending      = [];
@@ -32,77 +46,74 @@ module TypeScript.Api.Resolve
 
 			this.units        = [];
 		}
-		
-		public resolve(sources:string[], callback: {( units:TypeScript.Api.Units.SourceUnit[] ): void; }) : void {
 
-			for(var n in sources)  {
-
+		public resolve(sources:string[], callback: {( units:TypeScript.Api.Units.SourceUnit[] ): void; }) : void 
+		{
+			for(var n in sources)  
+			{
 				var parameter = new TypeScript.Api.Resolve.LoadParameter( process.mainModule.filename, sources[n] );
-				
+
 				this.pending.push(parameter);
 			}
-			
+
 			this.load ( callback );
 		}	
-		
-		private load (callback: {( unit : TypeScript.Api.Units.SourceUnit[]): void; }) : void  {
 
+		private load (callback: {( unit : TypeScript.Api.Units.SourceUnit[]): void; }) : void  
+		{
 			var parameter = this.pending.pop();
-			
-			if( !this.visited(parameter) )  {
 
+			if( !this.visited(parameter) )  
+			{
 				this.closed.push(parameter);
-				
-				this.io.readFile(parameter.filename, (unit : TypeScript.Api.Units.SourceUnit) =>  {
-                    					
-					if(unit.diagnostics.length == 0)  {
 
-						for(var n in unit.references() )  {
-
+				this.io.readFile(parameter.filename, (unit : TypeScript.Api.Units.SourceUnit) =>  
+				{				
+					if(unit.diagnostics.length == 0)  
+					{
+						for(var n in unit.references() )  
+						{
 							var parameter = new TypeScript.Api.Resolve.LoadParameter( unit.path, unit.references() [n] );
-							
+
 							this.pending.push( parameter );
 						}
 					}
-					
+
 					this.units.push(unit);
-					
+
 					this.next(callback);
-					
+
 				});
-				
 			} 
 			else 
 			{
 				this.next(callback);
 			}			
 		}
-		
+
 		private next (callback) : void 
 		{ 
 			if(this.pending.length > 0) 
 			{
 				this.load ( callback );
-				
+
+				return;
 			} 
-			else 
-			{
-				this.units.reverse();
-				
-				callback( this.units );
-			}			
+
+			this.units.reverse();
+
+			callback( this.units );
 		}
-		
+
 		private visited (parameter : TypeScript.Api.Resolve.LoadParameter) : boolean 
 		{
-			for(var n in this.closed) {
-
-				if(this.closed[n].filename == parameter.filename) {
-
+			for(var n in this.closed) 
+			{
+				if(this.closed[n].filename == parameter.filename) 
+				{
 					return true;
 				}
 			}
-			
 			return false;
 		}		
 	}
