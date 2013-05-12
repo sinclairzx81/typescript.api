@@ -114,7 +114,13 @@ module TypeScript.Api.Compile {
 
 				    this.compiler.updateSourceUnit(sourceUnit.path, snapshot, 0, false, textChange);
                     
-                    oldSourceUnit = sourceUnit;
+                    for(var n in this.sourceUnits) // update the existing source unit.
+                    {
+                        if(this.sourceUnits[n].path == sourceUnit.path)
+                        {
+                            this.sourceUnits[n] = sourceUnit;
+                        }
+                    }
 
                     return;
                 }
