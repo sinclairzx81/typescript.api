@@ -77,8 +77,7 @@ module TypeScript.Api.Compile {
 			}
 			return false;
 		}
-
-
+        
 		private addSourceUnit ( sourceUnit : TypeScript.Api.Units.SourceUnit ) : void 
 		{
 			if( !sourceUnit.hasError() ) 
@@ -89,16 +88,24 @@ module TypeScript.Api.Compile {
 
 			    if( !this.isSourceUnitInCache(sourceUnit) )
 			    {
+                    sourceUnit.syntaxChecked = false;
+
+                    sourceUnit.typeChecked   = false;
+
 				    this.compiler.addSourceUnit(sourceUnit.path, snapshot, 0, false, references);
 
                     this.sourceUnits.push(sourceUnit);
-				
+				    
 				    return;
 			    }
                 
                 if(this.isSourceUnitUpdated(sourceUnit))
                 {
-                    var oldSourceUnit = null;
+                    sourceUnit.syntaxChecked = false;
+
+                    sourceUnit.typeChecked   = false;
+
+                    var oldSourceUnit        = null;
 
                     for(var n in this.sourceUnits)
                     {
@@ -193,7 +200,7 @@ module TypeScript.Api.Compile {
 				{
 					// locate corrosponding source unit.
 
-					var sourceUnit : TypeScript.Api.Units.SourceUnit;
+					var sourceUnit : TypeScript.Api.Units.SourceUnit = null;
 
 					for(var n in sourceUnits)
 					{
@@ -221,42 +228,71 @@ module TypeScript.Api.Compile {
 					}
 				}
 			}
+
 			return result;
 		}
 
 		public compile(sourceUnits:TypeScript.Api.Units.SourceUnit[], callback: { (compiledUnits : TypeScript.Api.Units.CompiledUnit [] ) : void;} ) : void 
 		{  
-			// add source units...
+            // remove non referenced source units....
+            
+            this.sourceUnits = this.sourceUnits.filter((element, index, array) => 
+            {
+                for(var n in sourceUnits)
+                {
+                    if(sourceUnits[n].path == element.path)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }); 
+
+			// add or update source units to the compiler.....
+
 			for(var n in sourceUnits)
 			{
 				this.addSourceUnit ( sourceUnits[n] );
 			}
 
-			// syntaxcheck
-			for(var n in sourceUnits) 
-			{
-				var syntax_diagnostics = this.syntaxCheck(sourceUnits[n]);
+			// syntax check....
 
-				for(var m in syntax_diagnostics)
-				{
-					sourceUnits[n].diagnostics.push( syntax_diagnostics[m] );
-				}
+			for(var n in this.sourceUnits) 
+			{
+                if(!this.sourceUnits[n].syntaxChecked)
+                {
+				    var syntax_diagnostics = this.syntaxCheck( this.sourceUnits[n] );
+
+				    for(var m in syntax_diagnostics)
+				    {
+					    this.sourceUnits[n].diagnostics.push( syntax_diagnostics[m] );
+				    }
+
+                    this.sourceUnits[n].syntaxChecked = true;
+                }
 			}
 
-			// typecheck
-			for(var n in sourceUnits)
-			{
-				var typecheck_diagnostics = this.typeCheck( sourceUnits[n] );
+			// type check....
 
-				for(var m in typecheck_diagnostics)
-				{
-					sourceUnits[n].diagnostics.push( typecheck_diagnostics[m] );
-				}
+			for(var n in this.sourceUnits)
+			{
+                if(!this.sourceUnits[n].typeChecked)
+                {
+				    var typecheck_diagnostics = this.typeCheck( this.sourceUnits[n] );
+
+				    for(var m in typecheck_diagnostics)
+				    {
+					    this.sourceUnits[n].diagnostics.push( typecheck_diagnostics[m] );
+				    }
+
+                    this.sourceUnits[n].typeChecked = true;
+                }
 			}
 
 			// emit and return...
 
-			var compiledUnits = this.emitUnits( sourceUnits );
+			var compiledUnits = this.emitUnits( this.sourceUnits );
 
 			callback(  compiledUnits );
 		}

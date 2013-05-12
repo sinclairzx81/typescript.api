@@ -23,6 +23,8 @@ declare module TypeScript.Api.Units {
 declare module TypeScript.Api.Units {
     class SourceUnit extends Unit {
         public remote: boolean;
+        public syntaxChecked: boolean;
+        public typeChecked: boolean;
         constructor(path: string, content: string, diagnostics: Diagnostic[], remote: boolean);
         public references(): string[];
     }

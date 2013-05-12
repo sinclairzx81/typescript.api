@@ -17,13 +17,21 @@ module TypeScript.Api.Units
 {
 	export class SourceUnit extends Unit
 	{	
-		public remote:boolean;
+		public remote        : boolean;   // is this a remote source file...
+
+        public syntaxChecked : boolean;   // compiler flag...
+
+        public typeChecked   : boolean;   // compiler flag...
 
 		constructor(path:string, content:string, diagnostics:Diagnostic[], remote:boolean)
 		{ 
 			super(path, content, diagnostics);
 
 			this.remote = remote;
+
+            this.syntaxChecked = false;
+
+            this.typeChecked = false;
 		}
 
 		public references() : string [] 
