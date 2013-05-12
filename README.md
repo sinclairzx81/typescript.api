@@ -51,23 +51,23 @@ function show_diagnostics (units) {
 	}
 }
 
-typescript.resolve(['./program.ts'], function(units) {
+typescript.resolve(['./program.ts'], function(resolved) {
 	
-	if(!typescript.check(units)) {
+	if(!typescript.check(resolved)) {
 	
-		show_diagnostics(units);
+		show_diagnostics(resolved);
 	}
 	else {
 		
-		typescript.compile(units, function(compilation) {
+		typescript.compile(resolved, function(compiled) {
 			
-			if(!typescript.check(compilation)) {
+			if(!typescript.check(compiled)) {
 			
-				show_diagnostics (compilation);
+				show_diagnostics (compiled);
 			}
 			else
 			{			
-				typescript.run(compilation, null, function(context) {
+				typescript.run(compiled, null, function(context) {
 				
 					 // exports are available on the context...
 				});
@@ -96,17 +96,17 @@ the console.
 ```javascript
 var typescript = require("typescript.api");
 
-typescript.resolve(["program.ts"], function(units) { 
+typescript.resolve(["program.ts"], function(resolved) { 
 
-	for(var n in units) {
+	for(var n in resolved) {
 	
-		console.log( units[n].path );
+		console.log( resolved[n].path );
 		
-		console.log( units[n].content );
+		console.log( resolved[n].content );
 		
-		for(var m in units[n].references) {
+		for(var m in resolved[n].references) {
 		
-			console.log( units[n].references[m] )
+			console.log( resolved[n].references[m] )
 			
 		}
 	}
@@ -129,15 +129,15 @@ The following example will check if both a resolve() and compile() is successful
 ```javascript
 var typescript = require("typescript.api");
 
-typescript.resolve(["program.ts"], function(units) { 
+typescript.resolve(["program.ts"], function(resolved) { 
 
-	if(typescript.check (units)) {
+	if(typescript.check (resolved)) {
 		
-		typescript.compile(units, function(compilation) {
+		typescript.compile(resolved, function(compiled) {
 		
-			if( typescript.check (compilation) ) {
+			if( typescript.check (compiled) ) {
 			
-				typescript.run(compilation, null, function(context) {
+				typescript.run(compiled, null, function(context) {
 					
 				});
 			}
@@ -163,11 +163,11 @@ The compilation is then run.
 ```javascript
 var typescript = require("typescript.api");
 
-var unit = typescript.create("temp.ts", "console.log('hello world');");
+var sourceUnit = typescript.create("temp.ts", "console.log('hello world');");
 
-typescript.compile([unit], function(compilation) {
+typescript.compile([sourceUnit], function(compiled) {
 
-	typescript.run(compilation, null, function(context) { 
+	typescript.run(compiled, null, function(context) { 
 		
 		// will output hello world..
 	});
@@ -192,13 +192,13 @@ written to the console.
 ```javascript
 var typescript = require("typescript.api");
 
-var unit = typescript.create("temp.ts", "var value:number = 123;");
+var sourceUnit = typescript.create("temp.ts", "var value:number = 123;");
 
-typescript.compile([unit], function(compilation) {
+typescript.compile([sourceUnit], function(compiled) {
 
-	for(var n in compilation){
+	for(var n in compiled) {
 	
-		console.log(compilation[n].content);
+		console.log(compiled[n].content);
 	}
 });
 ```
@@ -221,11 +221,11 @@ meta data to the console as a JSON string.
 ```javascript
 var typescript = require("typescript.api");
 
-typescript.resolve(['program.ts'], function(units){
+typescript.resolve(['program.ts'], function(resolved){
 
-	typescript.compile(units, function(compilation) {
+	typescript.compile(resolved, function(compiled) {
 		
-		typescript.reflect(compilation, function(reflection) {
+		typescript.reflect(compiled, function(reflection) {
 			
 			var json = JSON.stringify(reflection, null, ' ');
 			
@@ -253,11 +253,11 @@ for compilation.
 ```javascript	
 var typescript = require("typescript.api");	
 
-var unit = typescript.create("temp.ts", "export var value:number = 123;");
+var sourceUnit = typescript.create("temp.ts", "export var value:number = 123;");
 
-typescript.compile([unit], function(compilation) {
+typescript.compile([sourceUnit], function(compiled) {
 
-	typescript.run(compilation, null, function(context) { 
+	typescript.run(compiled, null, function(context) { 
 	
 		console.log(context.value);
 		
