@@ -44,13 +44,109 @@ module TypeScript.Api.Reflect {
 
 			this.variables  = [];
 		}
-		
+
+        private static load_modules(result:TypeScript.Api.Reflect.Script, ast:TypeScript.Script) : void {
+        
+            for(var n in ast.moduleElements.members) {
+
+                var member = ast.moduleElements.members[n];
+
+                if(member.nodeType == TypeScript.NodeType.ModuleDeclaration) {
+                    
+                    var obj = TypeScript.Api.Reflect.Module.create(<TypeScript.ModuleDeclaration>member);
+
+                    result.modules.push(obj);                
+                }
+            }
+        }
+
+        private static load_interfaces(result:TypeScript.Api.Reflect.Script, ast:TypeScript.Script) : void {
+        
+            for(var n in ast.moduleElements.members) {
+
+                var member = ast.moduleElements.members[n];
+
+                if(member.nodeType == TypeScript.NodeType.InterfaceDeclaration) {
+                    
+                    var obj = TypeScript.Api.Reflect.Interface.create(<TypeScript.InterfaceDeclaration>member);
+
+                    result.interfaces.push(obj);                
+                }
+            }
+        }
+        private static load_classes(result:TypeScript.Api.Reflect.Script, ast:TypeScript.Script) : void {
+        
+            for(var n in ast.moduleElements.members) {
+
+                var member = ast.moduleElements.members[n];
+
+                if(member.nodeType == TypeScript.NodeType.ClassDeclaration) {
+                    
+                    var obj = TypeScript.Api.Reflect.Class.create(<TypeScript.ClassDeclaration>member);
+
+                    result.classes.push(obj);                
+                }
+            }
+        }
+
+        private static load_methods(result:TypeScript.Api.Reflect.Script, ast:TypeScript.Script) : void {
+        
+            for(var n in ast.moduleElements.members) {
+
+                var member = ast.moduleElements.members[n];
+
+                if(member.nodeType == TypeScript.NodeType.FunctionDeclaration) {
+                    
+                    var obj = TypeScript.Api.Reflect.Method.create(<TypeScript.FunctionDeclaration>member);
+
+                    result.methods.push(obj);                
+                }
+            }
+        }
+
+        private static load_variables(result:TypeScript.Api.Reflect.Script, ast:TypeScript.Script) : void {
+        
+            for(var n in ast.moduleElements.members) {
+
+                var member = ast.moduleElements.members[n];
+
+                if(member.nodeType == TypeScript.NodeType.VariableStatement) {
+                    
+                    var statement = <TypeScript.VariableStatement>member;
+                        
+			        if(statement.declaration)
+			        {
+				        if(statement.declaration.declarators) 
+				        {
+                            for(var m in statement.declaration.declarators.members) {
+                                            
+                                var obj = TypeScript.Api.Reflect.Variable.create(statement.declaration.declarators.members[m])
+
+                                result.variables.push(obj);
+                                
+                            }
+				        }
+			        }              
+                }
+            }
+        }
+                   
 		public static create(path:string, ast:TypeScript.Script): Script 
 		{
 			var result = new Script();
 			
 			result.path = path;
-			
+            
+            Script.load_modules    (result, ast);
+
+            Script.load_interfaces (result, ast);
+
+            Script.load_classes    (result, ast);
+
+            Script.load_methods    (result, ast);
+
+            Script.load_variables  (result, ast);
+
 			return result;
 		}
 	}

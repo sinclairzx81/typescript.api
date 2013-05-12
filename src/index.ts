@@ -192,7 +192,15 @@ export function reflect(compiledUnits:TypeScript.Api.Units.CompiledUnit [], call
 
 	var api = load_typescript_api();
 	
- 	var reflection = api.Reflect.Reflection.create(compiledUnits);
+    var reflection = new api.Reflect.Reflection();
+
+    for(var n in compiledUnits)
+    {
+        var script = api.Reflect.Script.create(compiledUnits[n].path, compiledUnits[n].ast );
+
+        reflection.scripts.push(script);
+    
+    }
 	
 	callback( reflection );
 }

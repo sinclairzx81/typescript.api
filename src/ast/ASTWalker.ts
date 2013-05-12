@@ -170,7 +170,7 @@ module TypeScript.Api.Ast
 		}
 		
 		public walk_ast       (ast: TypeScript.AST): void {
-			
+
 			switch (ast.nodeType) 
 			{
 				case TypeScript.NodeType.List:                    this.walk_astlist        (<TypeScript.ASTList>ast); break;

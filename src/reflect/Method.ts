@@ -56,6 +56,43 @@ module TypeScript.Api.Reflect
             this.comments   = [];
 		}
 
+        private static load_comments(result:Method, ast:TypeScript.FunctionDeclaration) : void {
+
+            var comments = ast.getDocComments();
+            
+            for(var n in comments) {
+                
+                result.comments.push(comments[n].content);
+            
+            }        
+        }
+
+        private static load_returns(result:Method, ast:TypeScript.FunctionDeclaration) : void {
+        
+			if(ast.returnTypeAnnotation) {
+
+                var type_reference = <TypeScript.TypeReference>ast.returnTypeAnnotation;
+                
+				result.returns = TypeScript.Api.Reflect.Type.create( type_reference );		
+			}
+            else {
+
+                result.returns = new TypeScript.Api.Reflect.Type();
+            }	            
+        }
+
+        public static load_parameters(result:Method, ast:TypeScript.FunctionDeclaration) : void {
+        
+            for(var n in ast.arguments.members) 
+			{
+				var argument = ast.arguments.members[n];
+
+                var parameter = TypeScript.Api.Reflect.Parameter.create(argument);
+
+                result.parameters.push(parameter);
+			}	
+        }
+        
 		public static create(ast:TypeScript.FunctionDeclaration) : Method  {
 
 			var result           = new Method();
@@ -84,25 +121,12 @@ module TypeScript.Api.Reflect
 
             result.minChar       = ast.minChar;
 
-            var comments         = ast.getDocComments();
-            
-            for(var n in comments) {
-                
-                result.comments.push(comments[n].content);
-            
-            }
-            
-			if(ast.returnTypeAnnotation) {
+            Method.load_comments(result, ast);
 
-                var type_reference = <TypeScript.TypeReference>ast.returnTypeAnnotation;
-                
-				result.returns = TypeScript.Api.Reflect.Type.create( type_reference );		
-			}
-            else {
-
-                result.returns = new TypeScript.Api.Reflect.Type();
-            }	
+            Method.load_returns(result, ast);
 			
+            Method.load_parameters(result, ast);
+            
 			return result;
 		}
 	}

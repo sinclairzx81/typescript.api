@@ -10,7 +10,6 @@
 // limitations under the License.
 
 /// <reference path="../decl/typescript.d.ts" />
-/// <reference path="../ast/ASTWalker.ts" />
 /// <reference path="Script.ts" />
 /// <reference path="Module.ts" />
 /// <reference path="Import.ts" />
@@ -30,97 +29,6 @@ module TypeScript.Api.Reflect  {
 		constructor() 
 		{
 			this.scripts = [];
-		}
-		
-		public static create( compiledUnits : TypeScript.Api.Units.CompiledUnit[] ) : Reflection 
-		{
-			var reflection     = new TypeScript.Api.Reflect.Reflection();
-			var walker         = new TypeScript.Api.Ast.ASTWalker();
-			walker.userdata    = [];
-			
-			walker.userdata.push(reflection);
-		
-			// foreach compilation unit..
-			for(var n in compiledUnits) {
-				
-				// walk the units ast..
-				walker.walk(compiledUnits[n].ast, (walker, ast) => 
-				{
-					
-					// catch here....
-					if(walker.stack.length < walker.userdata.length - 1) 
-					{
-						do    
-						{ 
-							walker.userdata.pop(); 
-						} 
-						while (walker.stack.length < walker.userdata.length - 1);
-					}
-					
-					// set the parent node...
-					var parent = walker.userdata[walker.userdata.length - 1];
-					
-					// what node did we get?
-					switch (ast.nodeType) 
-					{
-						case TypeScript.NodeType.VariableDeclarator:
-							var variable = Variable.create(<TypeScript.VariableDeclarator>ast);
-							parent.variables.push(variable);
-							walker.userdata.push(variable);
-							break;
-						
-						case TypeScript.NodeType.TypeRef: 
-							var type = Type.create(<TypeScript.TypeReference>ast);
-							parent.type = type;
-							walker.userdata.push(type);							
-							break;
-							
-						case TypeScript.NodeType.Parameter:
-							var parameter = Parameter.create(<TypeScript.Parameter>ast);
-							parent.parameters.push(parameter);
-							walker.userdata.push(parameter);
-							break;
-							
-						case TypeScript.NodeType.FunctionDeclaration:
-							var method = Method.create(<TypeScript.FunctionDeclaration>ast);
-							parent.methods.push(method);
-							walker.userdata.push(method);
-							break;
-							
-						case TypeScript.NodeType.ClassDeclaration:
-							var _class = Class.create(<TypeScript.ClassDeclaration>ast);
-							parent.classes.push(_class);
-							walker.userdata.push(_class);
-							break;
-
-						case TypeScript.NodeType.InterfaceDeclaration:
-							var _interface = Interface.create(<TypeScript.InterfaceDeclaration>ast);
-							parent.interfaces.push(_interface);
-							walker.userdata.push(_interface);
-							break;
-
-						case TypeScript.NodeType.ImportDeclaration:
-							var _import = Import.create(<TypeScript.ImportDeclaration>ast);
-							parent.imports.push(_import);
-							walker.userdata.push(_import);
-							break;
-							
-						case TypeScript.NodeType.ModuleDeclaration:
-							var _module = Module.create(<TypeScript.ModuleDeclaration>ast);
-							parent.modules.push(_module);
-							walker.userdata.push(_module);
-							break;	
-							
-						case TypeScript.NodeType.Script:
-							var _script = Script.create(compiledUnits[n].path, <TypeScript.Script>ast);
-							parent.scripts.push(_script);
-							walker.userdata.push(_script);
-							break;						
-					}
-				});
-			}
-			
-			return reflection;
 		}
 	}
 }

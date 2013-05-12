@@ -22,7 +22,7 @@ module TypeScript.Api.Reflect
         public limChar    : number;
 
         public minChar    : number;
-		
+
 		public static create(ast:TypeScript.ImportDeclaration) : Import 
 		{
 			var result     = new Import();

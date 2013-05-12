@@ -51,9 +51,9 @@ module TypeScript.Api.Reflect
                 switch(ast.nodeType)
                 {
                     case TypeScript.NodeType.Name:
-
+                        
                         var name = <TypeScript.Identifier>ast;
-					
+
                         result.push(name.text);
 
                         break;
@@ -61,9 +61,9 @@ module TypeScript.Api.Reflect
                     case TypeScript.NodeType.MemberAccessExpression:
 
                         var expression = <TypeScript.BinaryExpression>ast;
-                        
+
                         walk(expression.operand1);
-					
+					    
                         walk(expression.operand2);
 
                         break;
@@ -82,16 +82,19 @@ module TypeScript.Api.Reflect
 					
                         var expression = <TypeScript.BinaryExpression>generic_type.name;
 					    
-                        if(expression.nodeType == TypeScript.NodeType.Name) 
-                        {
-                            walk(expression);
-                        }
-					
-                        if(expression.nodeType == TypeScript.NodeType.MemberAccessExpression) 
-                        {
-                            walk(expression.operand1);
-						
-                            walk(expression.operand2);				
+                        switch(expression.nodeType){
+                        
+                            case TypeScript.NodeType.Name:
+
+                                walk(expression);
+
+                                break;
+
+                            case TypeScript.NodeType.MemberAccessExpression:
+
+                                walk(expression);
+
+                                break;
                         }
 
                         break;
@@ -111,12 +114,31 @@ module TypeScript.Api.Reflect
         
         public static create (ast:TypeScript.AST) : Type 
         {
-            // invoked on variable, return, and parameter types.
+            // called on namespaced extends or implements.
+            var create_member_access_expression = (ast:TypeScript.AST) : Type => { // 32
 
+                var type = new TypeScript.Api.Reflect.Type();
+
+                type.name = Type.qualifyName(ast);
+
+                return type;
+            }  
+
+            // called on non namespaced extends or implements.
+            var create_named_type = (namedDeclaraion:TypeScript.NamedDeclaration) : Type => {
+                
+                var type = new TypeScript.Api.Reflect.Type();
+
+                type.name = Type.qualifyName(namedDeclaraion);
+
+                return type;
+            }
+
+            // called when referencing variables, return types.
             var create_type = (typeRef:TypeScript.TypeReference) : Type => 
             {
-                var type  = new Type();
-
+                var type = new TypeScript.Api.Reflect.Type();
+                
                 type.name       = Type.qualifyName(typeRef);
 
                 type.arrayCount = typeRef.arrayCount;
@@ -140,19 +162,16 @@ module TypeScript.Api.Reflect
                 return type;
             };
             
-            // note: invoked on implement and extends lists. (see Class and Interface)
-
+            // called when referencing generic types.
             var create_generic_type = (genericType:TypeScript.GenericType) : Type =>
             {
-                var type     = new Type();
-            
+                var type = new TypeScript.Api.Reflect.Type();
+                
                 type.name    = Type.qualifyName(genericType);
-
+                
                 type.limChar = genericType.limChar;
 
                 type.minChar = genericType.minChar;
-
-                // note: no arrayCount as types cannot inheriate arrays. 
                 
                 for(var n in genericType.typeArguments.members) 
                 {
@@ -163,13 +182,17 @@ module TypeScript.Api.Reflect
                  
                 return type;
             };
-
-            // check the type passed....
-
+            
             var type:TypeScript.Api.Reflect.Type = null;
 
             switch(ast.nodeType)
             {
+                case TypeScript.NodeType.Name:
+
+                    type = create_named_type(<TypeScript.NamedDeclaration>ast);
+
+                    break;
+
                 case TypeScript.NodeType.GenericType:
 
                     type = create_generic_type(<TypeScript.GenericType>ast);
@@ -179,6 +202,12 @@ module TypeScript.Api.Reflect
                 case TypeScript.NodeType.TypeRef:
 
                     type = create_type(<TypeScript.TypeReference>ast);
+
+                    break;
+
+                case TypeScript.NodeType.MemberAccessExpression:
+
+                    type = create_member_access_expression(ast); // unsure of the NodeType.
 
                     break;
             }

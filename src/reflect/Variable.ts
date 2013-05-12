@@ -44,6 +44,28 @@ module TypeScript.Api.Reflect {
 
         }
 
+        private static load_comments(result:Variable, ast:TypeScript.VariableDeclarator) : void {
+        
+            var comments                   = ast.getDocComments();
+            
+            for(var n in comments) {
+                
+                result.comments.push(comments[n].content);
+            }
+        }
+
+        private static load_type (result:Variable, ast:TypeScript.VariableDeclarator) : void {
+        
+			if(!ast.typeExpr) 
+			{ 
+				result.type  = new TypeScript.Api.Reflect.Type();
+
+                return;
+			}   
+
+            result.type = TypeScript.Api.Reflect.Type.create(ast.typeExpr);        
+        }
+
 		public static create(ast:TypeScript.VariableDeclarator): Variable 
 		{
 			var result = new Variable();
@@ -66,19 +88,10 @@ module TypeScript.Api.Reflect {
 
             result.minChar                 = ast.minChar;            
 
-            var comments                   = ast.getDocComments();
+            Variable.load_type(result, ast);
+
+            Variable.load_comments(result, ast);
             
-            for(var n in comments) {
-                
-                result.comments.push(comments[n].content);
-            
-            }
-            
-			if(!ast.typeExpr) 
-			{ 
-				result.type  = new TypeScript.Api.Reflect.Type();
-			}  
-			
 			return result;
 		}  
 	}

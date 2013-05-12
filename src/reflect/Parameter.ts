@@ -14,7 +14,6 @@
 
 module TypeScript.Api.Reflect 
 {
-	
 	export class Parameter 
 	{
 		public name		  : string;
@@ -24,6 +23,19 @@ module TypeScript.Api.Reflect
         public limChar    : number;
 
         public minChar    : number;
+
+
+        private static load_type(result:Parameter, ast:TypeScript.Parameter) : void {
+        
+			if(!ast.typeExpr) 
+			{ 
+				result.type = new TypeScript.Api.Reflect.Type()
+			    
+                return;
+            } 
+            
+            result.type = TypeScript.Api.Reflect.Type.create(ast.typeExpr); 
+        }
 
 		public static create(ast:TypeScript.Parameter) : Parameter 
 		{
@@ -35,12 +47,7 @@ module TypeScript.Api.Reflect
 
             result.minChar = ast.minChar;
 
-			if(!ast.typeExpr) 
-			{ 
-				result.type = new TypeScript.Api.Reflect.Type()
-			} 
-
-            
+            Parameter.load_type(result, ast);
 			
 			return result;
 		}   

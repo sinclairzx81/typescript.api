@@ -43,16 +43,8 @@ module TypeScript.Api.Reflect
 			this.parameters = [];
 		}
 		
-		public static create(ast:TypeScript.InterfaceDeclaration): Interface 
-		{
-			var result  = new Interface();
-			
-			result.name    = ast.name.text;
-
-            result.limChar = ast.limChar;
-
-            result.minChar = ast.minChar;
-            
+        private static load_parameters(result:Interface, ast:TypeScript.InterfaceDeclaration): void {
+        
 			if(ast.typeParameters)
 			{
 				if (ast.typeParameters.members) 
@@ -63,19 +55,74 @@ module TypeScript.Api.Reflect
 					}
 				}
 			}
-			
+        }
+
+        private static load_extends (result:Interface, ast:TypeScript.InterfaceDeclaration) : void {
+        
 			if (ast.extendsList) 
 			{
 				if (ast.extendsList.members) 
 				{
 					for(var n in ast.extendsList.members) 
 					{ 
-                        var type = TypeScript.Api.Reflect.Type.create( ast.extendsList.members[n] );
+                        var obj = TypeScript.Api.Reflect.Type.create( ast.extendsList.members[n] );
 
-						result.extends.push( type );
+						result.extends.push( obj );
 					}
 				}
-			}
+			} 
+        }
+        
+        private static load_methods(result:TypeScript.Api.Reflect.Interface, ast:TypeScript.InterfaceDeclaration) : void {
+            
+            for(var n in ast.members.members) {
+            
+                var member = ast.members.members[n];
+
+                if(member.nodeType == TypeScript.NodeType.FunctionDeclaration) {
+                
+                    var obj = TypeScript.Api.Reflect.Method.create(member);
+
+                    result.methods.push(obj);
+                }
+            }
+          
+        }
+
+        private static load_variables(result:TypeScript.Api.Reflect.Interface, ast:TypeScript.InterfaceDeclaration) : void {
+        
+            for(var n in ast.members.members) {
+            
+                var member = ast.members.members[n];
+
+                if(member.nodeType == TypeScript.NodeType.VariableDeclarator){
+                
+                    var obj = TypeScript.Api.Reflect.Variable.create(member);
+
+                    result.variables.push(obj);
+                }
+            }
+        }
+
+
+		public static create(ast:TypeScript.InterfaceDeclaration): Interface 
+		{
+			var result     = new Interface();
+			
+			result.name    = ast.name.text;
+
+            result.limChar = ast.limChar;
+
+            result.minChar = ast.minChar;
+            
+            Interface.load_parameters (result, ast);
+
+            Interface.load_extends    (result, ast);
+
+            Interface.load_methods    (result, ast);
+
+            Interface.load_variables  (result, ast);
+
 			return result;
 		}
 	}

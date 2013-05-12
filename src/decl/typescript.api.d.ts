@@ -165,28 +165,6 @@ declare module TypeScript.Api.Compile {
         public compile(sourceUnits: Units.SourceUnit[], callback: (compiledUnits: Units.CompiledUnit[]) => void): void;
     }
 }
-declare module TypeScript.Api.Ast {
-    class ASTWalker {
-        public stack: AST[];
-        public callback: (sender: ASTWalker, ast: AST) => void;
-        public userdata: any;
-        constructor();
-        private walk_varstatement(ast);
-        private walk_type_ref(ast);
-        private walk_parameter(ast);
-        private walk_vardecl(ast);
-        private walk_funcdecl(ast);
-        private walk_classdecl(ast);
-        private walk_interface(ast);
-        private walk_module(ast);
-        private walk_import(ast);
-        private walk_script(ast);
-        private walk_astlist(ast);
-        public walk_ast(ast: AST): void;
-        public walk_ast_array(ast_array: AST[]): void;
-        public walk(ast: AST, callback: (sender: ASTWalker, ast: AST) => void): void;
-    }
-}
 declare module TypeScript.Api.Reflect {
     class Import {
         public name: string;
@@ -214,6 +192,7 @@ declare module TypeScript.Api.Reflect {
         public type: Type;
         public limChar: number;
         public minChar: number;
+        private static load_type(result, ast);
         static create(ast: Parameter): Parameter;
     }
 }
@@ -236,6 +215,9 @@ declare module TypeScript.Api.Reflect {
         public limChar: number;
         public minChar: number;
         constructor();
+        private static load_comments(result, ast);
+        private static load_returns(result, ast);
+        static load_parameters(result: Method, ast: FunctionDeclaration): void;
         static create(ast: FunctionDeclaration): Method;
     }
 }
@@ -253,6 +235,8 @@ declare module TypeScript.Api.Reflect {
         public limChar: number;
         public minChar: number;
         constructor();
+        private static load_comments(result, ast);
+        private static load_type(result, ast);
         static create(ast: VariableDeclarator): Variable;
     }
 }
@@ -266,6 +250,10 @@ declare module TypeScript.Api.Reflect {
         public limChar: number;
         public minChar: number;
         constructor();
+        private static load_parameters(result, ast);
+        private static load_extends(result, ast);
+        private static load_methods(result, ast);
+        private static load_variables(result, ast);
         static create(ast: InterfaceDeclaration): Interface;
     }
 }
@@ -280,6 +268,11 @@ declare module TypeScript.Api.Reflect {
         public limChar: number;
         public minChar: number;
         constructor();
+        private static load_parameters(result, ast);
+        private static load_extends(result, ast);
+        private static load_implements(result, ast);
+        private static load_methods(result, ast);
+        private static load_variables(result, ast);
         static create(ast: ClassDeclaration): Class;
     }
 }
@@ -295,6 +288,12 @@ declare module TypeScript.Api.Reflect {
         public limChar: number;
         public minChar: number;
         constructor();
+        private static load_imports(result, ast);
+        private static load_modules(result, ast);
+        private static load_interfaces(result, ast);
+        private static load_classes(result, ast);
+        private static load_methods(result, ast);
+        private static load_variables(result, ast);
         static create(ast: ModuleDeclaration): Module;
     }
 }
@@ -307,6 +306,11 @@ declare module TypeScript.Api.Reflect {
         public variables: Variable[];
         public path: string;
         constructor();
+        private static load_modules(result, ast);
+        private static load_interfaces(result, ast);
+        private static load_classes(result, ast);
+        private static load_methods(result, ast);
+        private static load_variables(result, ast);
         static create(path: string, ast: Script): Script;
     }
 }
@@ -314,6 +318,5 @@ declare module TypeScript.Api.Reflect {
     class Reflection {
         public scripts: Script[];
         constructor();
-        static create(compiledUnits: Units.CompiledUnit[]): Reflection;
     }
 }
