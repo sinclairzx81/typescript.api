@@ -18,115 +18,177 @@
 
 module TypeScript.Api.Compile {
 
-	export class Compiler  {
+	export class Compiler  
+	{
+		public compiler    : TypeScript.TypeScriptCompiler;
 
-		public compiler : TypeScript.TypeScriptCompiler;
-		
-		public logger   : TypeScript.ILogger;
-		
+		public logger      : TypeScript.ILogger;
+
+		public sourceUnits : TypeScript.Api.Units.SourceUnit [];
+
 		constructor(logger:TypeScript.ILogger)  
 		{
 			this.logger = logger;
-			
+
+			// source Units
+
+			this.sourceUnits = [];
+
 			// settings...
-			
+
 			var settings = new TypeScript.CompilationSettings();
-			
-			settings.codeGenTarget = TypeScript.LanguageVersion.EcmaScript5;
-			
+
+			settings.codeGenTarget   = TypeScript.LanguageVersion.EcmaScript5;
+
 			settings.moduleGenTarget = TypeScript.ModuleGenTarget.Synchronous;
-			
-			settings.disallowBool = true;
-			
+
+			settings.disallowBool    = true;
+
 			// the compiler...
-			
+
 			this.compiler = new TypeScript.TypeScriptCompiler(new TypeScript.Api.Loggers.NullLogger(), settings, TypeScript.diagnosticMessages);
-			
+
 			this.compiler.logger = new TypeScript.Api.Loggers.NullLogger(); 
 		}
-		
+
+		private isSourceUnitInCache(sourceUnit:TypeScript.Api.Units.SourceUnit) : boolean 
+		{
+			for(var n in this.sourceUnits)
+			{
+				if(this.sourceUnits[n].path == sourceUnit.path)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private isSourceUnitUpdated(sourceUnit:TypeScript.Api.Units.SourceUnit) : boolean 
+		{
+			for(var n in this.sourceUnits)
+			{
+				if(this.sourceUnits[n].path == sourceUnit.path)
+				{
+					if(this.sourceUnits[n].content != sourceUnit.content)
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+
 		private addSourceUnit ( sourceUnit : TypeScript.Api.Units.SourceUnit ) : void 
 		{
-			// do not compile units with errors.
-
 			if( !sourceUnit.hasError() ) 
 			{
-				var snapshot = TypeScript.ScriptSnapshot.fromString( sourceUnit.content );
-			
+				var snapshot   = TypeScript.ScriptSnapshot.fromString( sourceUnit.content );
+
 				var references = TypeScript.getReferencedFiles(sourceUnit.path, snapshot);
+
+			    if( !this.isSourceUnitInCache(sourceUnit) )
+			    {
+				    this.compiler.addSourceUnit(sourceUnit.path, snapshot, 0, false, references);
+
+                    this.sourceUnits.push(sourceUnit);
 				
-				this.compiler.addSourceUnit(sourceUnit.path, snapshot, 0, false, references);
-			}
+				    return;
+			    }
+                
+                if(this.isSourceUnitUpdated(sourceUnit))
+                {
+                    var oldSourceUnit = null;
+
+                    for(var n in this.sourceUnits)
+                    {
+                        if(this.sourceUnits[n].path == sourceUnit.path)
+                        {
+                            oldSourceUnit = this.sourceUnits[n];
+                        }
+                    }
+
+                    var textSpan:TypeScript.TextSpan = new TypeScript.TextSpan(0, oldSourceUnit.content.length);
+
+                    var textChange:TypeScript.TextChangeRange = new TypeScript.TextChangeRange(textSpan, sourceUnit.content.length );
+
+				    this.compiler.updateSourceUnit(sourceUnit.path, snapshot, 0, false, textChange);
+                    
+                    oldSourceUnit = sourceUnit;
+
+                    return;
+                }
+            }
 		}
-		
+
 		private syntaxCheck (sourceUnit:TypeScript.Api.Units.SourceUnit) : TypeScript.Api.Units.Diagnostic [] 
 		{
 			var result:TypeScript.Api.Units.Diagnostic[] = [];
-		
+
 			var _diagnostics = this.compiler.getSyntacticDiagnostics(sourceUnit.path);
-			
+
 			for(var n in _diagnostics) 
 			{
 				var diagnostic = new TypeScript.Api.Units.Diagnostic("syntax", _diagnostics[n].fileName(), _diagnostics[n].text(), _diagnostics[n].message());
-				
+
 				diagnostic.computeLineInfo(sourceUnit.content, _diagnostics[n].start());
-				
+
 				result.push( diagnostic );
 			}
 
 			return result;
 		}
-		
+
 		private typeCheck(sourceUnit:TypeScript.Api.Units.SourceUnit) : TypeScript.Api.Units.Diagnostic [] 
 		{
 			var result:TypeScript.Api.Units.Diagnostic[] = [];
-		
+
 			this.compiler.pullTypeCheck();
-			
+
 			var _diagnostics = this.compiler.getSemanticDiagnostics(sourceUnit.path);
-			
+
 			for(var n in _diagnostics) 
 			{
 				var diagnostic = new TypeScript.Api.Units.Diagnostic("typecheck", _diagnostics[n].fileName(), _diagnostics[n].text(), _diagnostics[n].message());
 
 				diagnostic.computeLineInfo(sourceUnit.content, _diagnostics[n].start());
-				
+
 				result.push( diagnostic );
 			}
-			
+
 			return result;
-		 	
-		}		
+
+		}
 
 		private emitUnits( sourceUnits: TypeScript.Api.Units.SourceUnit [] ) : TypeScript.Api.Units.CompiledUnit []
 		{
 			// store a map of the input and output.
-			
+
 			var emitter_io_map = [];
-			
+
 			var emitter = new TypeScript.Api.Compile.Emitter();
-			
+
 			this.compiler.emitAll(emitter, (inputFile: string, outputFile: string) : void => 
 			{
 				emitter_io_map[outputFile] = inputFile;
 			});
-			
+
 			var result:TypeScript.Api.Units.CompiledUnit[] = [];
-			
+
 			// foreach emitted file....
-			
+
 			for(var file in emitter.files) 
 			{
 				var document  = this.compiler.getDocument( emitter_io_map [ file ] );
-				
+
 				// if located emitted source document..
-				
+
 				if(document)
 				{
 					// locate corrosponding source unit.
-					
+
 					var sourceUnit : TypeScript.Api.Units.SourceUnit;
-					
+
 					for(var n in sourceUnits)
 					{
 						if(sourceUnits[n].path == emitter_io_map[ file ] )
@@ -134,29 +196,28 @@ module TypeScript.Api.Compile {
 							sourceUnit = sourceUnits[n];
 						}
 					}
-					
+
 					// if sourceUnit, outout compiledUnit, add diagnostics to compiled unit also.
-					
+
 					if(sourceUnit)
 					{
 						// parameters...
-						
+
 						var path 		= sourceUnit.path;
-					
+
 						var content 	= emitter.files[file].toString();
-						
+
 						var diagnostics = sourceUnit.diagnostics;
-						
+
 						var ast 		= document.script;
-						
+
 						result.push( new TypeScript.Api.Units.CompiledUnit(path, content, diagnostics, ast) );
 					}
 				}
 			}
-			
 			return result;
 		}
-		
+
 		public compile(sourceUnits:TypeScript.Api.Units.SourceUnit[], callback: { (compiledUnits : TypeScript.Api.Units.CompiledUnit [] ) : void;} ) : void 
 		{  
 			// add source units...
@@ -164,33 +225,33 @@ module TypeScript.Api.Compile {
 			{
 				this.addSourceUnit ( sourceUnits[n] );
 			}
-			
+
 			// syntaxcheck
 			for(var n in sourceUnits) 
 			{
 				var syntax_diagnostics = this.syntaxCheck(sourceUnits[n]);
-				
+
 				for(var m in syntax_diagnostics)
 				{
 					sourceUnits[n].diagnostics.push( syntax_diagnostics[m] );
 				}
 			}
-			
+
 			// typecheck
 			for(var n in sourceUnits)
 			{
 				var typecheck_diagnostics = this.typeCheck( sourceUnits[n] );
-				
+
 				for(var m in typecheck_diagnostics)
 				{
 					sourceUnits[n].diagnostics.push( typecheck_diagnostics[m] );
 				}
 			}
-			
+
 			// emit and return...
-			
+
 			var compiledUnits = this.emitUnits( sourceUnits );
-			
+
 			callback(  compiledUnits );
 		}
 	}

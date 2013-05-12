@@ -18,11 +18,11 @@ module TypeScript.Api.Units
 	export class CompiledUnit extends Unit
 	{
 		public ast:TypeScript.AST;
-	
+
 		constructor(path:string, content:string, diagnostics : TypeScript.Api.Units.Diagnostic[], ast:TypeScript.AST) 
 		{
 			super(path, content, diagnostics);
-			
+
 			this.ast = ast;
 		}
 	}

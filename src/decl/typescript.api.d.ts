@@ -155,7 +155,10 @@ declare module TypeScript.Api.Compile {
     class Compiler {
         public compiler: TypeScriptCompiler;
         public logger: ILogger;
+        public sourceUnits: Units.SourceUnit[];
         constructor(logger: ILogger);
+        private isSourceUnitInCache(sourceUnit);
+        private isSourceUnitUpdated(sourceUnit);
         private addSourceUnit(sourceUnit);
         private syntaxCheck(sourceUnit);
         private typeCheck(sourceUnit);

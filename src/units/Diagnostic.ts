@@ -16,47 +16,49 @@ module TypeScript.Api.Units
 		public line_index:number;
 
 		public char_index:number;
-		
-		constructor(public type       : string,
 
-				    public path       : string,
+		constructor(public type : string,
 
-					public text       : string,
+					public path : string,
 
-					public message    : string) 
+					public text : string,
+
+					public message : string) 
 		{
 			this.line_index = 0;
 
 			this.char_index = 0;
-  	    }		
-		
+		}		
+
 		public computeLineInfo(content:string, start:number) : void 
 		{
 			for(var i = 0; i < start; i++) 
 			{
 				var ch = content[i];
-				
+
 				if(ch == '\r\n') 
 				{
 					this.line_index += 1;
-					this.char_index =  0
+					
+					this.char_index =  0;
+					
 					i += 1;
 				}
+				
 				if(ch == '\n') 
 				{
 					this.line_index += 1;
-					this.char_index =  0;				
+					
+					this.char_index =  0;
 				}
-				
+
 				this.char_index += 1;
 			}
 		}
-		
-		public toString() : string {
-			
-			return this.path + " [" + (this.line_index + 1).toString() 
-						     + ":" +  (this.char_index + 1).toString() + "] " + this.message;
-		}
-	}		
 
+		public toString() : string 
+		{
+			return this.path + " [" + (this.line_index + 1).toString() + ":" +  (this.char_index + 1).toString() + "] " + this.message;
+		}
+	}
 }

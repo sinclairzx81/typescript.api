@@ -1,16 +1,45 @@
 ﻿var typescript = require('./bin/index.js');
 
+ 
+    for (var a = 0; a < 100; a++) {
 
+        console.log()
+    }
+
+ 
+function print_units(units) {
+
+    console.log('----------------------------------------------')
+    for (var n in units) {
+
+        console.log(units[n].content)
+
+    }
+
+
+}
 
 typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
 
     typescript.compile(resolved, function(compiled) {
 
-        typescript.reflect(compiled, function(reflect) {
+        print_units(compiled)
+        
+        typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
 
-            console.log(JSON.stringify(reflect, null, ' '));
+            resolved[0].content = "export function this_is_a_really_long_method {}";
 
-        });
+            typescript.compile(resolved, function(compiled) {
+                
+                
+                console.log('----------------------------------')
+                console.log('OUTPUT:')
+                print_units(compiled)
+
+                console.log('----------------------------------')
+            });
+        })        
+         
     });
 })
 

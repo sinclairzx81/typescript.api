@@ -36,14 +36,11 @@ var _path = require("path");
 // compiler options..
 /////////////////////////////////////////////////////////////
 
-export var include_lib_declaration  : boolean = false;
-
-export var include_node_declaration : boolean = false;
-
 export var allowRemote 				: boolean = false;
 
 export var debug       				: boolean = false;
 
+export var compiler                 : TypeScript.Api.Compile.Compiler;
 
 /////////////////////////////////////////////////////////////
 // check: checks to see if the units are ok..
@@ -99,7 +96,7 @@ export function register () : void
 
 				var compiler = new api.Compile.Compiler( logger );
 				
-				compiler.compile( include_declarations( sourceUnits ), ( compiledUnits : TypeScript.Api.Units.CompiledUnit[] ) =>  {
+				compiler.compile( sourceUnits, ( compiledUnits : TypeScript.Api.Units.CompiledUnit[] ) =>  {
 					
                     if( exports.check(compiledUnits) ) {
 
@@ -143,12 +140,18 @@ export function resolve (sources:string[], callback :{ (units : TypeScript.Api.U
     
     var _sources = [];
 
-    switch( getType(sources) ) {
+    switch( getType(sources) ) 
+    {
         case "string":
+
             _sources.push(sources);
+
             break;
+
         case "array":
+
             _sources = sources;
+
             break;
     }
     
@@ -179,9 +182,11 @@ export function compile (sourceUnits: TypeScript.Api.Units.SourceUnit[], callbac
 	
 	if(exports.debug) { logger = new api.Loggers.ConsoleLogger(); }
 	
-	var compiler = new api.Compile.Compiler( logger );
-	
-	compiler.compile( include_declarations( sourceUnits ), callback);
+    if(!exports.compiler)
+    {
+	    exports.compiler = new api.Compile.Compiler( logger );
+	}
+	exports.compiler.compile( sourceUnits , callback);
 }
 
 /////////////////////////////////////////////////////////////
@@ -275,131 +280,76 @@ function get_default_sandbox(): any {
 }
 
 /////////////////////////////////////////////////////////////
-// attaches declarations to compilation units
-/////////////////////////////////////////////////////////////
-
-function include_declarations (units:any[]):any[] 
-{
-	// snap in lib.d.ts
-	if(exports.include_lib_declaration) {
-	
-		var lib_decl  = exports.create('lib.d.ts',  _fs.readFileSync( _path.join(__dirname, "decl/lib.d.ts") , "utf8" ) );
-		
-		units.unshift(lib_decl);
-	}	
-	
-	// snap in node.d.ts
-	if(exports.include_node_declaration) {
-	
-		var node_decl = exports.create('node.d.ts', _fs.readFileSync( _path.join(__dirname, "decl/node.d.ts"), "utf8" ) );
-		
-		units.unshift(node_decl);
-		
-	}
-	
-	return units;
-}
-
-/////////////////////////////////////////////////////////////
-// loads the TypeScript.Api namespace
-/////////////////////////////////////////////////////////////
-
-export function api_namespace() : any {
-
-	return load_typescript_api();
-}
-/////////////////////////////////////////////////////////////
-// loads the TypeScript namespace
-/////////////////////////////////////////////////////////////
-export function typescript_namespace() : any {
-
-	return load_typescript();
-}
-
-/////////////////////////////////////////////////////////////
 //
 // TypeScript and TypeScript.API bindings
 //
 /////////////////////////////////////////////////////////////
 
-/////////////////////////////////////////////////////////////
-// files
-/////////////////////////////////////////////////////////////
+var cache:any               = {};
 
 var typescript_filename     = _path.join(__dirname, "typescript.js");
+
 var typescript_api_filename = _path.join(__dirname, "typescript.api.js");
 
-/////////////////////////////////////////////////////////////
-// module caching variables..
-/////////////////////////////////////////////////////////////
-
-var _cache_typescript_namespace 	= null;
-var _cache_typescript_api_namespace = null;
-
-
-/////////////////////////////////////////////////////////////
-// Runs the TypeScript.API module
-/////////////////////////////////////////////////////////////
-function load_typescript_api() : TypeScript.Api {
-	
-	if(_cache_typescript_api_namespace)  {
-	
-		return <TypeScript.Api>_cache_typescript_api_namespace;
+function load_typescript_api() : TypeScript.Api 
+{	
+	if(cache.typescript_api)  
+    {
+		return <TypeScript.Api>cache.typescript_api;
 	}
 	 
-	var sandbox = {
-		TypeScript  : load_typescript(),
-		__filename  : __filename,
-		__dirname   : __dirname,		
-		global	    : global,
-		process     : process,
-		require     : require,	
-		console     : console,
-		exports     : null
-	};
+    var sandbox = 
+    {
+        TypeScript  : load_typescript(),
+		
+        __filename  : __filename,
+		
+        __dirname   : __dirname,		
+		
+        global	    : global,
+		
+        process     : process,
+		
+        require     : require,	
+		
+        console     : console,
+		
+        exports     : null
+    };
 	
-	_cache_typescript_api_namespace = load_module(typescript_api_filename, sandbox, ["TypeScript"]).Api;
+	cache.typescript_api = load_module(typescript_api_filename, sandbox, ["TypeScript"]).Api;
 	
-	return <TypeScript.Api>_cache_typescript_api_namespace;
+	return <TypeScript.Api>cache.typescript_api;
 }
 
-/////////////////////////////////////////////////////////////
-// Runs the TypeScript module
-/////////////////////////////////////////////////////////////
+function load_typescript() : TypeScript 
+{
+    if(cache.typescript)  
+    {
+        return <TypeScript>cache.typescript;
+    }
+    var sandbox:any = 
+    { 
+        exports : null
+    };
 
-function load_typescript() : TypeScript {
-
-	if(_cache_typescript_namespace)  {
+    cache.typescript = load_module (typescript_filename, sandbox, ["TypeScript"]);
 	
-		return <TypeScript>_cache_typescript_namespace;
-		
-	}
-	 	
-	var sandbox:any = { 
-		exports : null
-		//, console : console 
-	};
-	_cache_typescript_namespace = load_module (typescript_filename, sandbox, ["TypeScript"]);
-	
-	return <TypeScript>_cache_typescript_namespace;
+    return <TypeScript>cache.typescript;
 }
 
-/////////////////////////////////////////////////////////////
-// Runs a module
-/////////////////////////////////////////////////////////////
-function load_module(filename, sandbox, export_type_names) : any {
-
-	var source = _fs.readFileSync(filename, 'utf8');
+function load_module(filename, sandbox, export_type_names) : any 
+{
+    var source = _fs.readFileSync(filename, 'utf8');
 	
-	for(var n in export_type_names) {
+    for(var n in export_type_names) 
+    {
+        source = source.concat('\n\nexports = ' + export_type_names[n] + ';'); 	
+    }
 	
-		source = source.concat('\n\nexports = ' + export_type_names[n] + ';'); 
-		
-	}
+    var script = _vm.createScript( source, _path.basename(filename) );
 	
-	var script = _vm.createScript( source, "typescript.js" );
+    script.runInNewContext( sandbox );
 	
-	script.runInNewContext( sandbox );
-	
-	return sandbox.exports;
+    return sandbox.exports;
 }

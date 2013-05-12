@@ -16,24 +16,28 @@ module TypeScript.Api.Units
 	export class Unit
 	{
 		public path        : string;
+
 		public content     : string;
-		public diagnostics : TypeScript.Api.Units.Diagnostic[];	
-		
+
+		public diagnostics : TypeScript.Api.Units.Diagnostic[];
+
 		constructor(path:string, content:string, diagnostics:TypeScript.Api.Units.Diagnostic[])
 		{
 			this.path 		 = path;
+
 			this.content 	 = content;
+
 			this.diagnostics = diagnostics;
 		}
-		
+
 		public hasError() : boolean
 		{
 			if(this.diagnostics) 
 			{
 				return this.diagnostics.length > 0;
 			}
-			
+
 			return false;
-		}		
+		}
 	}
 }
