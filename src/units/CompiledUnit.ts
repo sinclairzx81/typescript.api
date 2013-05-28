@@ -29,5 +29,34 @@ module TypeScript.Api.Units
 
             this.declaration = declaration;
 		}
+
+        // note: references resolved on declarations.
+		public references() : string [] 
+		{
+			var result : string[] = [];
+
+			if(this.declaration) 
+			{
+				var lines : string[] = this.declaration.split('\r\n');
+                
+				if (lines.length === 1) 
+				{
+					lines = this.declaration.split('\n');
+				}
+                
+				for(var n in lines) 
+				{
+					var reference_pattern = /^(\/\/\/\s*<reference\s+path=)('|")(.+?)\2\s*(static=('|")(.+?)\2\s*)*\/>/gim;
+
+					var match = reference_pattern.exec(lines[n]);
+
+					if(match) 
+					{
+						result.unshift( match[3] );
+					}
+				}
+			}
+			return result;
+		}
 	}
 }

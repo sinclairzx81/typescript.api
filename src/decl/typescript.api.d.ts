@@ -136,6 +136,7 @@ declare module TypeScript.Api.Units {
         public ast: AST;
         public declaration: string;
         constructor(path: string, content: string, diagnostics: Diagnostic[], ast: AST, declaration: string);
+        public references(): string[];
     }
 }
 declare module TypeScript.Api.Compile {
