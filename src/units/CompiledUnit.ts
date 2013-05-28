@@ -17,13 +17,17 @@ module TypeScript.Api.Units
 {
 	export class CompiledUnit extends Unit
 	{
-		public ast:TypeScript.AST;
+		public ast         : TypeScript.AST;
+        
+        public declaration : string;
 
-		constructor(path:string, content:string, diagnostics : TypeScript.Api.Units.Diagnostic[], ast:TypeScript.AST) 
+		constructor(path:string, content:string, diagnostics : TypeScript.Api.Units.Diagnostic[], ast:TypeScript.AST, declaration:string) 
 		{
 			super(path, content, diagnostics);
 
 			this.ast = ast;
+
+            this.declaration = declaration;
 		}
 	}
 }

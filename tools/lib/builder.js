@@ -40,9 +40,14 @@ exports.cutpastefile = function(input_filename, output_filename, callback) {
 }
 
 // compiles source into single output.
-exports.build_single = function(sources, output_filename, callback) {
-		
-	sources.unshift("--out", output_filename);
+exports.build_single = function(sources, arguments , output_filename , callback) {
+	
+    sources.unshift("--out", output_filename);
+
+    for(var n in arguments)
+    {
+        sources.push(arguments[n]);
+    }
 	
 	var tsc = require("child_process").spawn('tsc', sources, { stdio: 'inherit' });
 	

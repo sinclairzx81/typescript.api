@@ -44,6 +44,8 @@ module TypeScript.Api.Compile {
 
 			settings.disallowBool    = true;
 
+            settings.generateDeclarationFiles = true;
+
 			// the compiler...
 
 			this.compiler = new TypeScript.TypeScriptCompiler(new TypeScript.Api.Loggers.NullLogger(), settings, TypeScript.diagnosticMessages);
@@ -186,6 +188,10 @@ module TypeScript.Api.Compile {
 				emitter_io_map[outputFile] = inputFile;
 			});
 
+            // emit declarations
+
+            this.compiler.emitAllDeclarations();
+
 			var result:TypeScript.Api.Units.CompiledUnit[] = [];
 
 			// foreach emitted file....
@@ -216,7 +222,7 @@ module TypeScript.Api.Compile {
 					{
 						// parameters...
 
-						var path 		= sourceUnit.path;
+						var path 		= sourceUnit.path.replace(/\\/g, '/');
 
 						var content 	= emitter.files[file].toString();
 
@@ -224,14 +230,33 @@ module TypeScript.Api.Compile {
 
 						var ast 		= document.script;
 
-						result.push( new TypeScript.Api.Units.CompiledUnit(path, content, diagnostics, ast) );
+                        var declaration = '';
+
+                        // look for associated declaration...
+                        
+                        for(var decl in emitter.files) 
+                        { 
+                            if(decl.indexOf('.d.ts') != -1)
+                            {
+                                var comparer = decl.replace(/\\/g, '/').replace('.d.ts', '.ts');
+
+                                if(path == comparer) 
+                                {
+                                    declaration = emitter.files[decl].toString();
+
+                                    break;
+                                }
+                            }
+                        }
+                        
+						result.push( new TypeScript.Api.Units.CompiledUnit(path, content, diagnostics, ast, declaration) );
 					}
 				}
 			}
 
 			return result;
 		}
-
+        
 		public compile(sourceUnits:TypeScript.Api.Units.SourceUnit[], callback: { (compiledUnits : TypeScript.Api.Units.CompiledUnit [] ) : void;} ) : void 
 		{  
             // remove non referenced source units....
@@ -293,7 +318,7 @@ module TypeScript.Api.Compile {
 			// emit and return...
 
 			var compiledUnits = this.emitUnits( this.sourceUnits );
-
+            
 			callback(  compiledUnits );
 		}
 	}

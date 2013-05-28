@@ -32,9 +32,9 @@ var api_output_decl_filename   = path.join(src_dir, 'decl/typescript.api.d.ts');
 var index_output_directory     = bin_dir;
 var typescript_input_filename  = path.join(src_dir, 'resx/typescript.js');
 var typescript_output_filename = path.join(bin_dir, 'typescript.js');
-var node_decl_input_filename   = path.join(src_dir, 'decl/node.d.ts');
+var node_decl_input_filename   = path.join(src_dir, 'resx/node.d.ts');
 var node_decl_output_filename  = path.join(bin_dir, 'decl/node.d.ts');
-var lib_decl_input_filename    = path.join(src_dir, 'decl/lib.d.ts');
+var lib_decl_input_filename    = path.join(src_dir, 'resx/lib.d.ts');
 var lib_decl_output_filename   = path.join(bin_dir, 'decl/lib.d.ts');
 var package_input_filename     = path.join(src_dir, 'resx/package.json');
 var package_output_filename    = path.join(bin_dir, 'package.json');
@@ -54,41 +54,40 @@ function build () {
 	tools.builder.prepare_directory(bin_dir + '/decl');
 	
 	console.log('compiling typescript api....');
-	tools.builder.build_single([api_input_filename, "--declaration"], api_output_filename , function() {
-		
-      
+	tools.builder.build_single([api_input_filename], ["--declaration" ], api_output_filename , function() {
 
-	        console.log('moving typescript.api.d.ts to src/decl for index.ts build..');
-	        tools.builder.copyfile(api_input_decl_filename, api_output_decl_filename, function() {
+	    console.log('moving typescript.api.d.ts to src/decl for index.ts build..');
+	    tools.builder.copyfile(api_input_decl_filename, api_output_decl_filename, function() {
 		  
-	            console.log('compiling index....');
-	            tools.builder.build_modular([index_input_filename], index_output_directory, function() {
+	        console.log('compiling index....');
+	        tools.builder.build_modular([index_input_filename], index_output_directory, function() {
 				  
-	                console.log('copying typescript.js....');
-	                tools.builder.copyfile(typescript_input_filename, typescript_output_filename, function(){
-					  
-	                    console.log('copying lib.d.ts....');
-	                    tools.builder.copyfile(lib_decl_input_filename, lib_decl_output_filename, function(){	
-					  
-	                        console.log('copying node.d.ts....');
-	                        tools.builder.copyfile(node_decl_input_filename, node_decl_output_filename, function(){	
+	            console.log('copying typescript.js....');
+	            tools.builder.copyfile(typescript_input_filename, typescript_output_filename, function(){
+
+	 	            console.log('copying lib.d.ts....');
+	                tools.builder.copyfile(lib_decl_input_filename, lib_decl_output_filename, function(){	 
+                        
+	                    console.log('copying node.d.ts....');
+	                    tools.builder.copyfile(node_decl_input_filename, node_decl_output_filename, function(){	
 						  
-	                            console.log('copying package.json....');
-	                            tools.builder.copyfile(package_input_filename, package_output_filename, function(){	
+	                        console.log('copying package.json....');
+	                        tools.builder.copyfile(package_input_filename, package_output_filename, function(){	
 							  
-	                                console.log('copying README.md....');
-	                                tools.builder.copyfile(readme_input_filename, readme_output_filename, function(){	
+	                            console.log('copying README.md....');
+	                            tools.builder.copyfile(readme_input_filename, readme_output_filename, function(){	
 								  
-	                                    console.log('running post build....');
-	                                    console.log('-------------------------------------------------------');
-	                                    tools.nodestart.start( post_build_filename );	
-	                                });
+	                                console.log('running post build....');
+	                                console.log('-------------------------------------------------------');
+	                                tools.nodestart.start( post_build_filename );	
 	                            });
 	                        });
 	                    });
-	                });
-	            });	
-	        });
+                    });
+	                    
+	            });
+	        });	
+	    });
         
 	});
 }

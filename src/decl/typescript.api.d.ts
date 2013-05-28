@@ -134,7 +134,8 @@ declare module TypeScript.Api.Resolve {
 declare module TypeScript.Api.Units {
     class CompiledUnit extends Unit {
         public ast: AST;
-        constructor(path: string, content: string, diagnostics: Diagnostic[], ast: AST);
+        public declaration: string;
+        constructor(path: string, content: string, diagnostics: Diagnostic[], ast: AST, declaration: string);
     }
 }
 declare module TypeScript.Api.Compile {
