@@ -190,6 +190,19 @@ export function compile (sourceUnits: TypeScript.Api.Units.SourceUnit[], callbac
 }
 
 /////////////////////////////////////////////////////////////
+// reset: resets the compiler.
+/////////////////////////////////////////////////////////////
+
+export function reset() : void {
+
+    var api = load_typescript_api();
+
+    var logger = new api.Loggers.NullLogger();
+
+    exports.compiler = new api.Compile.Compiler( logger );
+}
+
+/////////////////////////////////////////////////////////////
 // reflect: reflects compilation AST.
 /////////////////////////////////////////////////////////////
 
