@@ -188,8 +188,8 @@ __arguments__
 __example__
 
 The following will create a series of source units which reference each other
-as in the following graph. The units are first randomized and sorted. The 
-resulting sort will be a, b, c, d, e, f. 
+as in the following graph. The units are first randomized and then sorted. The 
+resulting sort will be the order of a, b, c, d, e, f. 
 
 ```javascript
 /*
