@@ -113,9 +113,17 @@ declare module TypeScript.Api.Util {
     }
 }
 declare module TypeScript.Api.Resolve {
-    class UnitTopology {
+    class Node {
+        public path: string;
+        public references: string[];
+        constructor();
+    }
+    class Topology {
+        static graph(units: Units.SourceUnit[]): Node[];
         static sort(units: Units.SourceUnit[]): Units.SourceUnit[];
     }
+}
+declare module TypeScript.Api.Resolve {
     class LoadParameter {
         public parent_filename: string;
         public filename: string;

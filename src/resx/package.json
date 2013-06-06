@@ -1,6 +1,6 @@
 {
   "name": "typescript.api",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "A compiler as a service api enabling nodejs developers to resolve, compile, reflect and run typescript 0.9 source files.",
   "main": "index.js",
   "directories": {

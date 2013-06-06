@@ -177,12 +177,19 @@ export function resolve (sources:string[], callback :{ (units : TypeScript.Api.U
 export function sort(sourceUnits: TypeScript.Api.Units.SourceUnit[]) : TypeScript.Api.Units.SourceUnit[]
 {
     var api = load_typescript_api();
+    
+    return api.Resolve.Topology.sort(sourceUnits);
+}
 
-    var sorted = api.Resolve.UnitTopology.sort(sourceUnits);
+/////////////////////////////////////////////////////////////
+// graph: returns a graph source units.
+/////////////////////////////////////////////////////////////
 
-   
+export function graph(sourceUnits: TypeScript.Api.Units.SourceUnit[]) :  TypeScript.Api.Resolve.Node []
+{
+    var api = load_typescript_api();
 
-    return sorted;
+    return api.Resolve.Topology.graph(sourceUnits);
 }
 
 /////////////////////////////////////////////////////////////
