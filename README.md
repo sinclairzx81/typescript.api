@@ -175,6 +175,62 @@ typescript.compile([sourceUnit], function(compiled) {
 });
 ```
 
+### typescript.sort ( units )
+
+Will attempt to sort source units in order of dependency. If cyclic referencing
+occurs, the sort will return the units in order in which they are received.
+
+__arguments__
+
+* units - An array of source units to be sorted.
+* returns - the sorted units in order of dependency.
+
+__example__
+
+The following will create a series of source units which reference each other
+as in the following graph. The units are first randomized and sorted. The 
+resulting sort will be a, b, c, d, e, f. 
+
+```javascript
+/*
+         [a]
+        /   \
+      [b]   [c]
+     /   \ /   \
+   [d]   [e]   [f]
+*/
+function shuffle(o) {  
+    for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+    return o;
+};
+
+var units = [
+    typescript.create("a.ts", ""),
+
+    typescript.create("b.ts", "/// <reference path='a.ts' />"),
+    
+    typescript.create("c.ts", "/// <reference path='a.ts' />"),
+    
+    typescript.create("d.ts", "/// <reference path='b.ts' />"),
+    
+    typescript.create("e.ts", "/// <reference path='b.ts' />\n/// <reference path='c.ts' />\n"),
+    
+    typescript.create("f.ts", "/// <reference path='c.ts' />"),
+];
+
+// shuffle
+units = shuffle(units);
+
+// sort
+units = typescript.sort(units);
+
+// display
+for (var n in units)  {
+
+    console.log(units[n].path);
+}
+```
+
 ### typescript.compile ( units, callback )
 
 Compiles source units. 

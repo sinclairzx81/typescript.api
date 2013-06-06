@@ -1,7 +1,5 @@
 ﻿var typescript = require('./bin/index.js');
 
- 
-
 
  
 function print_units(units) {
@@ -11,9 +9,7 @@ function print_units(units) {
     for (var n in units) {
 
         console.log(units[n].references())
-
-        
-
+    
         console.log(units[n].declaration);
 
         console.log(units[n].content);

@@ -75,7 +75,7 @@ export function register () : void
 	        {
 		        for(var m in units[n].diagnostics)
 		        {
-			        console.log(units[n].diagnostics[m].toString());
+			        console.log(_fs.basename(units[n].path) + ':' + units[n].diagnostics[m].toString());
 		        }
 	        }        
         };
@@ -168,6 +168,21 @@ export function resolve (sources:string[], callback :{ (units : TypeScript.Api.U
 	var resolver = new api.Resolve.Resolver( io, logger );
 	
 	resolver.resolve(_sources, callback);
+}
+
+/////////////////////////////////////////////////////////////
+// sort: sorts source units into sequential order.
+/////////////////////////////////////////////////////////////
+
+export function sort(sourceUnits: TypeScript.Api.Units.SourceUnit[]) : TypeScript.Api.Units.SourceUnit[]
+{
+    var api = load_typescript_api();
+
+    var sorted = api.Resolve.UnitTopology.sort(sourceUnits);
+
+   
+
+    return sorted;
 }
 
 /////////////////////////////////////////////////////////////

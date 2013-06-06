@@ -113,6 +113,9 @@ declare module TypeScript.Api.Util {
     }
 }
 declare module TypeScript.Api.Resolve {
+    class UnitTopology {
+        static sort(units: Units.SourceUnit[]): Units.SourceUnit[];
+    }
     class LoadParameter {
         public parent_filename: string;
         public filename: string;

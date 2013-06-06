@@ -16,6 +16,87 @@
 
 module TypeScript.Api.Resolve 
 {	
+    export class UnitTopology
+    {
+        // based on the supplied source units, this method will attempt
+        // a best guess topological sort. If cyclic references occur,
+        // will return units as is.  
+        public static sort(units: TypeScript.Api.Units.SourceUnit[]) :  TypeScript.Api.Units.SourceUnit[]
+        {
+            var queue:TypeScript.Api.Units.SourceUnit[]  = [];
+
+            var result:TypeScript.Api.Units.SourceUnit[] = [];
+
+            var max_iterations = units.length * units.length;
+
+            var iteration = 0;
+
+            for(var n in units) 
+            {
+                queue.push(units[n]);
+            }
+
+            while(queue.length > 0)
+            {
+                var item = queue.shift();
+
+                var resolved   = true;
+
+                var references = item.references();
+
+                for(var n in references)
+                {
+                    var reference = Util.Path.relativeToAbsolute(item.path, references[n]);
+                    
+                    var unit = null;
+
+                    for(var m in result) // search for reference in result.
+                    {
+                        if(result[m].path == reference)
+                        {
+                            unit = result[m];
+
+                            break;
+                        }
+                    }
+
+                    if(unit == null)
+                    {
+                        resolved = false;
+
+                        break;
+                    }
+                }
+                
+                if(resolved)
+                {
+                    // if resolved, add to the result.
+                    result.push(item)
+                }
+                else
+                {
+                    // if not resolved, put it back on the queue.
+                    queue.push(item);
+                }
+
+                // increment the iteration,
+                iteration = iteration + 1;
+                
+                // if we exceed the max iterations, then we have cyclic referencing.
+                if(iteration > max_iterations)
+                {
+                    // best guess based on traveral.
+                    units.reverse();
+                    
+                    return units;
+                }
+            }
+            
+            return result;
+        }
+    }
+
+
 	export class LoadParameter 
 	{
 		public parent_filename  : string;
@@ -100,7 +181,7 @@ module TypeScript.Api.Resolve
 				return;
 			} 
 
-			this.units.reverse();
+			this.units = UnitTopology.sort(this.units);
 
 			callback( this.units );
 		}
