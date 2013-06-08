@@ -224,7 +224,7 @@ module TypeScript.Api.Compile {
 
                         var get_source = (sourceUnitPath : string, emitter : Emitter) : string => {
 
-                            sourceUnitPath    = sourceUnitPath.replace(/\\/g, '/').replace(/.ts/, '.js');
+                            sourceUnitPath    = sourceUnitPath.replace(/\\/g, '/').replace(/.ts$/, '.js');
 
                             var content = '';
                         
@@ -239,7 +239,7 @@ module TypeScript.Api.Compile {
                         };
                         var get_declaration_source = (sourceUnitPath : string, emitter : Emitter) : string => {
 
-                            sourceUnitPath    = sourceUnitPath.replace(/\\/g, '/').replace(/.ts/, '.d.ts');
+                            sourceUnitPath    = sourceUnitPath.replace(/\\/g, '/').replace(/.ts$/, '.d.ts');
 
                             var content = '';
                         
