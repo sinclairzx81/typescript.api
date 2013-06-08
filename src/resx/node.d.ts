@@ -1,17 +1,10 @@
+/// <reference no-default-lib="true"/>
 
-/************************************************
-*                                               *
-*              Host API                         *
-*                                               *
-************************************************/
-
-declare var __reflection:any;
-
-/************************************************
-*                                               *
-*              ECMA APIS                        *
-*                                               *
-************************************************/
+///************************************************
+//*                                               *
+//*              ECMA APIS                        *
+//*                                               *
+//************************************************/
 
 declare var NaN: number;
 declare var Infinity: number;
@@ -760,7 +753,7 @@ interface RegExpExecArray {
 
     toString(): string;
     toLocaleString(): string;
-    concat(...items: string[][]): string[];
+    concat(...items: any[]): string[];
     join(separator?: string): string;
     pop(): string;
     push(...items: string[]): number;
@@ -1887,7 +1880,7 @@ declare module crypto {
    }
    interface Hmac {
        update(data: any): void;
-       digest(encoding?: string): void;
+       digest(encoding?: string): string;
    }
    export function createCipher(algorithm: string, password: any): Cipher;
    export function createCipheriv(algorithm: string, key: any, iv: any): Cipher;
