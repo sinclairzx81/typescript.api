@@ -4,8 +4,6 @@ var typescript = require('typescript.api');
 
 var fs = require("fs");
 
-declare var JSON;
-
 export class Program  
 {
     public static Reflect (request:http.ServerRequest, response:http.ServerResponse) : void {

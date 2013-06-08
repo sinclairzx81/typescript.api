@@ -94,7 +94,7 @@ module TypeScript.Api.Compile {
 
                     sourceUnit.typeChecked   = false;
 
-				    this.compiler.addSourceUnit(sourceUnit.path, snapshot, 0, false, references);
+				    this.compiler.addSourceUnit(sourceUnit.path, snapshot, 1 /*ByteOrderMark.Utf8*/, 0, false, references);
 
                     this.sourceUnits.push(sourceUnit);
 				    
@@ -199,7 +199,7 @@ module TypeScript.Api.Compile {
 			for(var file in emitter.files) 
 			{
 				var document  = this.compiler.getDocument( emitter_io_map [ file ] );
-
+                
 				// if located emitted source document..
 
 				if(document)
@@ -211,44 +211,59 @@ module TypeScript.Api.Compile {
 					for(var n in sourceUnits)
 					{
 						if(sourceUnits[n].path == emitter_io_map[ file ] )
-						{
+						{       
 							sourceUnit = sourceUnits[n];
 						}
 					}
 
-					// if sourceUnit, outout compiledUnit, add diagnostics to compiled unit also.
+					// if sourceUnit, output compiledUnit, add diagnostics to compiled unit also.
 
 					if(sourceUnit)
 					{
 						// parameters...
 
-						var path 		= sourceUnit.path.replace(/\\/g, '/');
+                        var get_source = (sourceUnitPath : string, emitter : Emitter) : string => {
 
-						var content 	= emitter.files[file].toString();
+                            sourceUnitPath    = sourceUnitPath.replace(/\\/g, '/').replace(/.ts/, '.js');
 
+                            var content = '';
+                        
+                            for(var filename in emitter.files)
+                            {
+                                if(filename.replace(/\\/g, '/') == sourceUnitPath)
+                                {
+                                    content = emitter.files[filename];
+                                }
+                            }                        
+                            return content;
+                        };
+                        var get_declaration_source = (sourceUnitPath : string, emitter : Emitter) : string => {
+
+                            sourceUnitPath    = sourceUnitPath.replace(/\\/g, '/').replace(/.ts/, '.d.ts');
+
+                            var content = '';
+                        
+                            for(var filename in emitter.files)
+                            {
+                                if(filename.replace(/\\/g, '/') == sourceUnitPath)
+                                {
+                                    content = emitter.files[filename];
+                                }
+                            } 
+                                                   
+                            return content;
+                        };
+
+                        var path        = sourceUnit.path.replace(/\\/g, '/');
+
+                        var content     = get_source (path, emitter);
+
+                        var declaration = get_declaration_source (path, emitter);
+    
 						var diagnostics = sourceUnit.diagnostics;
 
 						var ast 		= document.script;
-
-                        var declaration = '';
-
-                        // look for associated declaration...
-                        
-                        for(var decl in emitter.files) 
-                        { 
-                            if(decl.indexOf('.d.ts') != -1)
-                            {
-                                var comparer = decl.replace(/\\/g, '/').replace('.d.ts', '.ts');
-
-                                if(path == comparer) 
-                                {
-                                    declaration = emitter.files[decl].toString();
-
-                                    break;
-                                }
-                            }
-                        }
-                        
+                          
 						result.push( new TypeScript.Api.Units.CompiledUnit(path, content, diagnostics, ast, declaration) );
 					}
 				}

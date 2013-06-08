@@ -80,7 +80,7 @@ export function register () : void
 	        }        
         };
         
-		var api         = load_typescript_api();
+		var api         = <TypeScript.Api>load_typescript_api();
 		
 		var io          = new api.IO.IOSync();
 		
@@ -125,7 +125,7 @@ export function register () : void
 
 export function create (path:string, content:string) : TypeScript.Api.Units.SourceUnit {
 
-	var api = load_typescript_api();
+	var api = <TypeScript.Api>load_typescript_api();
 	
 	return new api.Units.SourceUnit(path, content, [], false );
 }
@@ -155,7 +155,7 @@ export function resolve (sources:string[], callback :{ (units : TypeScript.Api.U
             break;
     }
     
-	var api      = load_typescript_api();
+	var api      = <TypeScript.Api>load_typescript_api();
 	
 	var io       = new api.IO.IOAsync();
 	
@@ -176,7 +176,7 @@ export function resolve (sources:string[], callback :{ (units : TypeScript.Api.U
 
 export function sort(sourceUnits: TypeScript.Api.Units.SourceUnit[]) : TypeScript.Api.Units.SourceUnit[]
 {
-    var api = load_typescript_api();
+    var api = <TypeScript.Api>load_typescript_api();
     
     return api.Resolve.Topology.sort(sourceUnits);
 }
@@ -187,7 +187,7 @@ export function sort(sourceUnits: TypeScript.Api.Units.SourceUnit[]) : TypeScrip
 
 export function graph(sourceUnits: TypeScript.Api.Units.SourceUnit[]) :  TypeScript.Api.Resolve.Node []
 {
-    var api = load_typescript_api();
+    var api = <TypeScript.Api>load_typescript_api();
 
     return api.Resolve.Topology.graph(sourceUnits);
 }
@@ -198,7 +198,7 @@ export function graph(sourceUnits: TypeScript.Api.Units.SourceUnit[]) :  TypeScr
 
 export function compile (sourceUnits: TypeScript.Api.Units.SourceUnit[], callback : { (compiledUnit:TypeScript.Api.Units.CompiledUnit[] ): void; } ) : void {
 
-	var api = load_typescript_api();
+	var api = <TypeScript.Api>load_typescript_api();
 
 	var logger = new api.Loggers.NullLogger();
 	
@@ -217,7 +217,7 @@ export function compile (sourceUnits: TypeScript.Api.Units.SourceUnit[], callbac
 
 export function reset() : void {
 
-    var api = load_typescript_api();
+    var api = <TypeScript.Api>load_typescript_api();
 
     var logger = new api.Loggers.NullLogger();
 
@@ -230,7 +230,7 @@ export function reset() : void {
 
 export function reflect(compiledUnits:TypeScript.Api.Units.CompiledUnit [], callback :{ ( reflection:TypeScript.Api.Reflect.Reflection ): void; }) : void  {
 
-	var api = load_typescript_api();
+	var api = <TypeScript.Api>load_typescript_api();
 	
     var reflection = new api.Reflect.Reflection();
 
@@ -326,7 +326,7 @@ var typescript_filename     = _path.join(__dirname, "typescript.js");
 
 var typescript_api_filename = _path.join(__dirname, "typescript.api.js");
 
-function load_typescript_api() : TypeScript.Api 
+function load_typescript_api() : any
 {	
 	if(cache.typescript_api)  
     {
@@ -335,7 +335,7 @@ function load_typescript_api() : TypeScript.Api
 	 
     var sandbox = 
     {
-        TypeScript  : load_typescript(),
+        TypeScript  : <TypeScript>load_typescript(),
 		
         __filename  : __filename,
 		
@@ -357,7 +357,7 @@ function load_typescript_api() : TypeScript.Api
 	return <TypeScript.Api>cache.typescript_api;
 }
 
-function load_typescript() : TypeScript 
+function load_typescript() : any
 {
     if(cache.typescript)  
     {

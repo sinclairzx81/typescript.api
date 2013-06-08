@@ -9,16 +9,13 @@ function print_units(units) {
     for (var n in units) {
 
         console.log(units[n].references())
-    
+        
         console.log(units[n].declaration);
 
         console.log(units[n].content);
 
         console.log('------------------------')
-
     }
-
-
 }
 
 typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
@@ -26,6 +23,12 @@ typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
     typescript.compile(resolved, function(compiled) {
 
         print_units(compiled)
+
+        typescript.reflect(compiled, function(reflection){
+
+            console.log(reflection)
+
+        });
          
     });
 })

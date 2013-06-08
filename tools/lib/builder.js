@@ -42,7 +42,11 @@ exports.cutpastefile = function(input_filename, output_filename, callback) {
 // compiles source into single output.
 exports.build_single = function(sources, arguments , output_filename , callback) {
 	
+    
+
     sources.unshift("--out", output_filename);
+
+    //sources.unshift("--nolib");
 
     for(var n in arguments)
     {

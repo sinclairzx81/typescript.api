@@ -10,7 +10,7 @@ npm install typescript.api
 
 ## compiler version
 
-TypeScript 0.9 alpha
+TypeScript 0.9 - (6/6/2013)
 
 ## quick start
 

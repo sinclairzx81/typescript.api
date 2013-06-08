@@ -11,7 +11,7 @@
 
 ////////////////////////////////////////////////////////////////////
 //
-// Note: will build the TypeScript.Api for TypeScript 0.9 alpha
+// Note: will build the TypeScript.Api for TypeScript 0.9 beta
 //
 // 	requires: the tsc 0.9 command line compiler...
 //

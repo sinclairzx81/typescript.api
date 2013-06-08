@@ -20,25 +20,25 @@ module TypeScript.Api.Compile
 		fileExists     (path: string) : boolean;
 
 		resolvePath    (path: string) : string;
-
-		createFile     (path: string, useUTF8?: boolean): ITextWriter;
+        
+        writeFile      (fileName: string, contents: string, writeByteOrderMark: boolean) : void;
 	}
 
 	export class Emitter implements IEmitter 
 	{
-		public files : ITextWriter[];
+		public files : string[];
 
 		constructor() 
 		{
 			this.files = [];
 		}
 
-		public createFile(path: string, useUTF8?: boolean): ITextWriter 
-		{
-			this.files[path] = new TypeScript.Api.Writers.TextWriter();
+        public writeFile(fileName: string, contents: string, writeByteOrderMark: boolean) : void {
+            
+			this.files[fileName] = contents;
 
-			return this.files[path];
-		}
+			return this.files[fileName];
+        }
 
 		public directoryExists(path: string): boolean 
 		{

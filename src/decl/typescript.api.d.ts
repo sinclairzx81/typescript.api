@@ -15,23 +15,23 @@ declare module TypeScript.Api.Units {
     class Unit {
         public path: string;
         public content: string;
-        public diagnostics: Diagnostic[];
-        constructor(path: string, content: string, diagnostics: Diagnostic[]);
+        public diagnostics: Units.Diagnostic[];
+        constructor(path: string, content: string, diagnostics: Units.Diagnostic[]);
         public hasError(): boolean;
     }
 }
 declare module TypeScript.Api.Units {
-    class SourceUnit extends Unit {
+    class SourceUnit extends Units.Unit {
         public remote: boolean;
         public syntaxChecked: boolean;
         public typeChecked: boolean;
-        constructor(path: string, content: string, diagnostics: Diagnostic[], remote: boolean);
+        constructor(path: string, content: string, diagnostics: Units.Diagnostic[], remote: boolean);
         public references(): string[];
     }
 }
 declare module TypeScript.Api.IO {
     interface IIO {
-        readFile(filename: string, callback: (unit: Units.SourceUnit) => void): void;
+        readFile(filename: string, callback: (unit: Api.Units.SourceUnit) => void): void;
     }
 }
 declare module TypeScript.Api.IO {
@@ -40,18 +40,18 @@ declare module TypeScript.Api.IO {
     }
 }
 declare module TypeScript.Api.IO {
-    class IOSync implements IIO {
-        public readFile(path: string, callback: (sourceUnit: Units.SourceUnit) => void): void;
+    class IOSync implements IO.IIO {
+        public readFile(path: string, callback: (sourceUnit: Api.Units.SourceUnit) => void): void;
     }
 }
 declare module TypeScript.Api.IO {
-    class IOAsync implements IIO {
-        public readFile(path: string, callback: (sourceUnit: Units.SourceUnit) => void): void;
+    class IOAsync implements IO.IIO {
+        public readFile(path: string, callback: (sourceUnit: Api.Units.SourceUnit) => void): void;
     }
 }
 declare module TypeScript.Api.IO {
-    class IORemoteAsync implements IIO {
-        public readFile(path: string, callback: (unit: Units.SourceUnit) => void): void;
+    class IORemoteAsync implements IO.IIO {
+        public readFile(path: string, callback: (unit: Api.Units.SourceUnit) => void): void;
         private readFileFromDisk(path, callback);
         private readFileFromHttp(path, callback);
         private isHTTPS(path);
@@ -59,7 +59,7 @@ declare module TypeScript.Api.IO {
     }
 }
 declare module TypeScript.Api.Loggers {
-    class NullLogger implements ILogger {
+    class NullLogger implements TypeScript.ILogger {
         public information(): boolean;
         public debug(): boolean;
         public warning(): boolean;
@@ -69,7 +69,7 @@ declare module TypeScript.Api.Loggers {
     }
 }
 declare module TypeScript.Api.Loggers {
-    class ConsoleLogger implements ILogger {
+    class ConsoleLogger implements TypeScript.ILogger {
         public information(): boolean;
         public debug(): boolean;
         public warning(): boolean;
@@ -90,7 +90,7 @@ declare module TypeScript.Api.Writers {
     }
 }
 declare module TypeScript.Api.Loggers {
-    class BufferedLogger implements ILogger {
+    class BufferedLogger implements TypeScript.ILogger {
         private writer;
         constructor();
         public information(): boolean;
@@ -119,8 +119,8 @@ declare module TypeScript.Api.Resolve {
         constructor();
     }
     class Topology {
-        static graph(units: Units.SourceUnit[]): Node[];
-        static sort(units: Units.SourceUnit[]): Units.SourceUnit[];
+        static graph(units: Api.Units.SourceUnit[]): Node[];
+        static sort(units: Api.Units.SourceUnit[]): Api.Units.SourceUnit[];
     }
 }
 declare module TypeScript.Api.Resolve {
@@ -130,23 +130,23 @@ declare module TypeScript.Api.Resolve {
         constructor(parent_filename: string, filename: string);
     }
     class Resolver {
-        public io: IO.IIO;
-        public logger: ILogger;
+        public io: Api.IO.IIO;
+        public logger: TypeScript.ILogger;
         private pending;
         private closed;
         private units;
-        constructor(io: IO.IIO, logger: ILogger);
-        public resolve(sources: string[], callback: (units: Units.SourceUnit[]) => void): void;
+        constructor(io: Api.IO.IIO, logger: TypeScript.ILogger);
+        public resolve(sources: string[], callback: (units: Api.Units.SourceUnit[]) => void): void;
         private load(callback);
         private next(callback);
         private visited(parameter);
     }
 }
 declare module TypeScript.Api.Units {
-    class CompiledUnit extends Unit {
-        public ast: AST;
+    class CompiledUnit extends Units.Unit {
+        public ast: TypeScript.AST;
         public declaration: string;
-        constructor(path: string, content: string, diagnostics: Diagnostic[], ast: AST, declaration: string);
+        constructor(path: string, content: string, diagnostics: Units.Diagnostic[], ast: TypeScript.AST, declaration: string);
         public references(): string[];
     }
 }
@@ -155,12 +155,12 @@ declare module TypeScript.Api.Compile {
         directoryExists(path: string): boolean;
         fileExists(path: string): boolean;
         resolvePath(path: string): string;
-        createFile(path: string, useUTF8?: boolean): ITextWriter;
+        writeFile(fileName: string, contents: string, writeByteOrderMark: boolean): void;
     }
     class Emitter implements IEmitter {
-        public files: ITextWriter[];
+        public files: string[];
         constructor();
-        public createFile(path: string, useUTF8?: boolean): ITextWriter;
+        public writeFile(fileName: string, contents: string, writeByteOrderMark: boolean): void;
         public directoryExists(path: string): boolean;
         public fileExists(path: string): boolean;
         public resolvePath(path: string): string;
@@ -168,17 +168,17 @@ declare module TypeScript.Api.Compile {
 }
 declare module TypeScript.Api.Compile {
     class Compiler {
-        public compiler: TypeScriptCompiler;
-        public logger: ILogger;
-        public sourceUnits: Units.SourceUnit[];
-        constructor(logger: ILogger);
+        public compiler: TypeScript.TypeScriptCompiler;
+        public logger: TypeScript.ILogger;
+        public sourceUnits: Api.Units.SourceUnit[];
+        constructor(logger: TypeScript.ILogger);
         private isSourceUnitInCache(sourceUnit);
         private isSourceUnitUpdated(sourceUnit);
         private addSourceUnit(sourceUnit);
         private syntaxCheck(sourceUnit);
         private typeCheck(sourceUnit);
         private emitUnits(sourceUnits);
-        public compile(sourceUnits: Units.SourceUnit[], callback: (compiledUnits: Units.CompiledUnit[]) => void): void;
+        public compile(sourceUnits: Api.Units.SourceUnit[], callback: (compiledUnits: Api.Units.CompiledUnit[]) => void): void;
     }
 }
 declare module TypeScript.Api.Reflect {
@@ -187,7 +187,7 @@ declare module TypeScript.Api.Reflect {
         public alias: string;
         public limChar: number;
         public minChar: number;
-        static create(ast: ImportDeclaration): Import;
+        static create(ast: TypeScript.ImportDeclaration): Import;
     }
 }
 declare module TypeScript.Api.Reflect {
@@ -199,24 +199,24 @@ declare module TypeScript.Api.Reflect {
         public minChar: number;
         constructor();
         private static qualifyName(ast);
-        static create(ast: AST): Type;
+        static create(ast: TypeScript.AST): Type;
     }
 }
 declare module TypeScript.Api.Reflect {
     class Parameter {
         public name: string;
-        public type: Type;
+        public type: Reflect.Type;
         public limChar: number;
         public minChar: number;
         private static load_type(result, ast);
-        static create(ast: Parameter): Parameter;
+        static create(ast: TypeScript.Parameter): Parameter;
     }
 }
 declare module TypeScript.Api.Reflect {
     class Method {
         public name: string;
-        public parameters: Parameter[];
-        public returns: Type;
+        public parameters: Reflect.Parameter[];
+        public returns: Reflect.Type;
         public isStatic: boolean;
         public isAccessor: boolean;
         public isSignature: boolean;
@@ -233,14 +233,14 @@ declare module TypeScript.Api.Reflect {
         constructor();
         private static load_comments(result, ast);
         private static load_returns(result, ast);
-        static load_parameters(result: Method, ast: FunctionDeclaration): void;
-        static create(ast: FunctionDeclaration): Method;
+        static load_parameters(result: Method, ast: TypeScript.FunctionDeclaration): void;
+        static create(ast: TypeScript.FunctionDeclaration): Method;
     }
 }
 declare module TypeScript.Api.Reflect {
     class Variable {
         public name: string;
-        public type: Type;
+        public type: Reflect.Type;
         public isProperty: boolean;
         public isStatic: boolean;
         public isStatement: boolean;
@@ -253,15 +253,15 @@ declare module TypeScript.Api.Reflect {
         constructor();
         private static load_comments(result, ast);
         private static load_type(result, ast);
-        static create(ast: VariableDeclarator): Variable;
+        static create(ast: TypeScript.VariableDeclarator): Variable;
     }
 }
 declare module TypeScript.Api.Reflect {
     class Interface {
-        public methods: Method[];
-        public variables: Variable[];
+        public methods: Reflect.Method[];
+        public variables: Reflect.Variable[];
         public parameters: string[];
-        public extends: Type[];
+        public extends: Reflect.Type[];
         public name: string;
         public limChar: number;
         public minChar: number;
@@ -270,16 +270,16 @@ declare module TypeScript.Api.Reflect {
         private static load_extends(result, ast);
         private static load_methods(result, ast);
         private static load_variables(result, ast);
-        static create(ast: InterfaceDeclaration): Interface;
+        static create(ast: TypeScript.InterfaceDeclaration): Interface;
     }
 }
 declare module TypeScript.Api.Reflect {
     class Class {
-        public methods: Method[];
-        public variables: Variable[];
+        public methods: Reflect.Method[];
+        public variables: Reflect.Variable[];
         public parameters: string[];
-        public extends: Type[];
-        public implements: Type[];
+        public extends: Reflect.Type[];
+        public implements: Reflect.Type[];
         public name: string;
         public limChar: number;
         public minChar: number;
@@ -289,17 +289,17 @@ declare module TypeScript.Api.Reflect {
         private static load_implements(result, ast);
         private static load_methods(result, ast);
         private static load_variables(result, ast);
-        static create(ast: ClassDeclaration): Class;
+        static create(ast: TypeScript.ClassDeclaration): Class;
     }
 }
 declare module TypeScript.Api.Reflect {
     class Module {
-        public imports: Import[];
+        public imports: Reflect.Import[];
         public modules: Module[];
-        public interfaces: Interface[];
-        public classes: Class[];
-        public methods: Method[];
-        public variables: Variable[];
+        public interfaces: Reflect.Interface[];
+        public classes: Reflect.Class[];
+        public methods: Reflect.Method[];
+        public variables: Reflect.Variable[];
         public name: string;
         public limChar: number;
         public minChar: number;
@@ -310,16 +310,16 @@ declare module TypeScript.Api.Reflect {
         private static load_classes(result, ast);
         private static load_methods(result, ast);
         private static load_variables(result, ast);
-        static create(ast: ModuleDeclaration): Module;
+        static create(ast: TypeScript.ModuleDeclaration): Module;
     }
 }
 declare module TypeScript.Api.Reflect {
     class Script {
-        public modules: Module[];
-        public interfaces: Interface[];
-        public classes: Class[];
-        public methods: Method[];
-        public variables: Variable[];
+        public modules: Reflect.Module[];
+        public interfaces: Reflect.Interface[];
+        public classes: Reflect.Class[];
+        public methods: Reflect.Method[];
+        public variables: Reflect.Variable[];
         public path: string;
         constructor();
         private static load_modules(result, ast);
@@ -327,12 +327,12 @@ declare module TypeScript.Api.Reflect {
         private static load_classes(result, ast);
         private static load_methods(result, ast);
         private static load_variables(result, ast);
-        static create(path: string, ast: Script): Script;
+        static create(path: string, ast: TypeScript.Script): Script;
     }
 }
 declare module TypeScript.Api.Reflect {
     class Reflection {
-        public scripts: Script[];
+        public scripts: Reflect.Script[];
         constructor();
     }
 }
