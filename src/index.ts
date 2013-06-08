@@ -75,7 +75,7 @@ export function register () : void
 	        {
 		        for(var m in units[n].diagnostics)
 		        {
-			        console.log(_fs.basename(units[n].path) + ':' + units[n].diagnostics[m].toString());
+			        console.log(_path.basename(units[n].path) + ':' + units[n].diagnostics[m].toString());
 		        }
 	        }        
         };
