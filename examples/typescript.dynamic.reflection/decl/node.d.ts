@@ -931,7 +931,7 @@ declare var JSON: JSON;
 
 declare var process: NodeProcess;
 declare var global : any;
-interface console
+declare var console:
 {
    log     (...data: any[]): void;
    info    (...data: any[]): void;
