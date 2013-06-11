@@ -1,5 +1,6 @@
 module TypeScript.Api.IO {
 
+    // Microsoft Buffer Implementation.
 	export class Buffer {
 		
 		public static process (buffer /* NodeBuffer or String */) : string {

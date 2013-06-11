@@ -1,3 +1,4 @@
+// Copyright (c) sinclair 2013.  All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -276,6 +277,55 @@ export function run (compiledUnits:TypeScript.Api.Units.CompiledUnit[], sandbox:
 		
 		console.log(e);
 	}
+}
+
+/////////////////////////////////////////////////////////////
+// build: builds a compilation.
+/////////////////////////////////////////////////////////////
+
+export function build (inputs:string[], callback :{ (diagnostics:TypeScript.Api.Units.Diagnostic[], output:string ): void; }) : void {
+
+    var get_diagnostics = (sourceUnits:TypeScript.Api.Units.Unit[]) : TypeScript.Api.Units.Diagnostic[] => {
+        
+        var result:TypeScript.Api.Units.Diagnostic[] = [];
+
+	    for(var n in sourceUnits) {
+
+		    for(var m in sourceUnits[n].diagnostics) {
+
+			    result.push(sourceUnits[n].diagnostics[m]);
+		    }
+	    }
+
+        return result;   
+    };
+    
+    exports.resolve(inputs, (sourceUnits:TypeScript.Api.Units.SourceUnit[]) => {
+
+        if(!exports.check(sourceUnits)) {
+            callback(get_diagnostics(sourceUnits), null);
+            return;
+        }
+
+        exports.compile(sourceUnits, (compiledUnits:TypeScript.Api.Units.CompiledUnit[]) => {
+
+            if(!exports.check(sourceUnits)) {
+                callback(get_diagnostics(sourceUnits), null);
+                return;
+            }
+            
+            var buffer:string[] = [];
+
+            for(var n in compiledUnits) {
+                buffer.push('////////////////////////////////////////\n');
+                buffer.push('// ' + _path.basename(compiledUnits[n].path) + '\n');
+                buffer.push('////////////////////////////////////////\n');
+                buffer.push(compiledUnits[n].content + '\n\n');
+            }
+
+            callback(null, buffer.join(''));
+        });
+    });
 }
 
 /////////////////////////////////////////////////////////////
