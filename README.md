@@ -237,28 +237,37 @@ typescript.resolve(['program.ts'], function(resolved){
 
 ### typescript.build ( sources, callback )
 
-Builds the supplied source files. 
+A quick means of building a typescript source file(s) and producing the compiled
+source code as a string. 
 
 __arguments__
 
 * sources  - an array of input source filenames.
-* callback - a callback containing errors and the compiled source.
+* callback - a callback containing errors and the compiled source code and declaration.
 
 __example__
 
 The following will build the source file 'program.ts' and write the compiled
-code to the console.
+code and declaration output to the console.
 
 ```javascript	
 var typescript = require("typescript.api");	
 
-typescript.build(['program.ts'], function(errors, output) {
+typescript.build_source(['program.ts'], function(errors, sourcecode, declaration) {
 	
 	if(errors) {
-		// iterate each error.
+
+		for(var n in errors) {
+
+			console.log( errors[n].toString() );
+		}
 	}
 	else {
-		console.log(output);
+		
+		console.log(declaration);
+		
+		console.log(sourcecode);
+	    
 	}
 });
 ```

@@ -280,10 +280,10 @@ export function run (compiledUnits:TypeScript.Api.Units.CompiledUnit[], sandbox:
 }
 
 /////////////////////////////////////////////////////////////
-// build: builds a compilation.
+// build: builds and produces a declaration for the given input.
 /////////////////////////////////////////////////////////////
 
-export function build (inputs:string[], callback :{ (diagnostics:TypeScript.Api.Units.Diagnostic[], output:string ): void; }) : void {
+export function build (filenames:string[], callback :{ (diagnostics:TypeScript.Api.Units.Diagnostic[], source:string, declaration:string ): void; }) : void {
 
     var get_diagnostics = (sourceUnits:TypeScript.Api.Units.Unit[]) : TypeScript.Api.Units.Diagnostic[] => {
         
@@ -300,30 +300,51 @@ export function build (inputs:string[], callback :{ (diagnostics:TypeScript.Api.
         return result;   
     };
     
-    exports.resolve(inputs, (sourceUnits:TypeScript.Api.Units.SourceUnit[]) => {
+    exports.resolve(filenames, (sourceUnits:TypeScript.Api.Units.SourceUnit[]) => {
 
         if(!exports.check(sourceUnits)) {
-            callback(get_diagnostics(sourceUnits), null);
+
+            callback(get_diagnostics(sourceUnits), null, null);
+
             return;
         }
 
         exports.compile(sourceUnits, (compiledUnits:TypeScript.Api.Units.CompiledUnit[]) => {
 
             if(!exports.check(sourceUnits)) {
-                callback(get_diagnostics(sourceUnits), null);
+
+                callback(get_diagnostics(sourceUnits), null, null);
+
                 return;
             }
             
-            var buffer:string[] = [];
+            var source_buffer:string[] = [];
 
             for(var n in compiledUnits) {
-                buffer.push('////////////////////////////////////////\n');
-                buffer.push('// ' + _path.basename(compiledUnits[n].path) + '\n');
-                buffer.push('////////////////////////////////////////\n');
-                buffer.push(compiledUnits[n].content + '\n\n');
+
+                source_buffer.push('////////////////////////////////////////\n');
+                
+                source_buffer.push('// ' + _path.basename(compiledUnits[n].path) + '\n');
+                
+                source_buffer.push('////////////////////////////////////////\n');
+                
+                source_buffer.push(compiledUnits[n].content + '\n\n');
             }
 
-            callback(null, buffer.join(''));
+            var declaration_buffer:string[] = [];
+
+            for(var n in compiledUnits) {
+
+                declaration_buffer.push('////////////////////////////////////////\n');
+                
+                declaration_buffer.push('// ' + _path.basename(compiledUnits[n].path) + '\n');
+                
+                declaration_buffer.push('////////////////////////////////////////\n');
+                
+                declaration_buffer.push(compiledUnits[n].declaration + '\n\n');
+            }
+
+            callback(null, source_buffer.join(''), declaration_buffer.join('') );
         });
     });
 }
