@@ -33,6 +33,16 @@ typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
     });
 })
 
+typescript.build(['c:/input/typescript/program.ts'], function (errors, source, declaration) {
+
+    console.log(declaration);
+
+    console.log('-----');
+
+    console.log(source);
+
+});
+
 
 
  

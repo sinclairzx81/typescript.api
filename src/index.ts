@@ -322,26 +322,22 @@ export function build (filenames:string[], callback :{ (diagnostics:TypeScript.A
 
             for(var n in compiledUnits) {
 
-                source_buffer.push('////////////////////////////////////////\n');
+                var pattern = /\/\/\/ <reference path="(.*?)" \/>/g;
+
+                var content = compiledUnits[n].content.replace(pattern, '');
                 
-                source_buffer.push('// ' + _path.basename(compiledUnits[n].path) + '\n');
-                
-                source_buffer.push('////////////////////////////////////////\n');
-                
-                source_buffer.push(compiledUnits[n].content + '\n\n');
+                source_buffer.push(content + '\n\n');
             }
 
             var declaration_buffer:string[] = [];
 
             for(var n in compiledUnits) {
+                
+                var pattern = /\/\/\/ <reference path="(.*?)" \/>/g;
 
-                declaration_buffer.push('////////////////////////////////////////\n');
+                var content = compiledUnits[n].declaration.replace(pattern, '');
                 
-                declaration_buffer.push('// ' + _path.basename(compiledUnits[n].path) + '\n');
-                
-                declaration_buffer.push('////////////////////////////////////////\n');
-                
-                declaration_buffer.push(compiledUnits[n].declaration + '\n\n');
+                declaration_buffer.push(content + '\n\n');
             }
 
             callback(null, source_buffer.join(''), declaration_buffer.join('') );
