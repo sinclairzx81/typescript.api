@@ -11,9 +11,9 @@
 // limitations under the License.
 
 /// <reference path="../decl/typescript.d.ts" />
-/// <reference path="../units/SourceUnit.ts" />
 /// <reference path="../util/Path.ts" />
 /// <reference path="../io/IIO.ts" />
+/// <reference path="../io/IOFile.ts" />
 /// <reference path="Topology.ts" />
 
 module TypeScript.Api.Resolve 
@@ -69,8 +69,28 @@ module TypeScript.Api.Resolve
 			{
 				this.closed.push(parameter);
 
-				this.io.readFile(parameter.filename, (unit : TypeScript.Api.Units.SourceUnit) =>  
-				{				
+                var parent_filename = parameter.parent_filename;
+
+				this.io.readFile(parameter.filename, (iofile : TypeScript.Api.IO.IOFile) =>  
+				{		
+                    // create unit from iofile.
+                    		
+                    var unit = new TypeScript.Api.Units.SourceUnit(iofile.path, iofile.content, [], iofile.remote );
+
+                    if(iofile.errors.length > 0)
+                    {
+                        for(var n in iofile.errors) 
+                        {
+                            var error = iofile.errors[n];
+
+                            var diagnostic = new TypeScript.Api.Units.Diagnostic("resolve", parent_filename, error.text, error.message);
+
+                            unit.diagnostics.push(diagnostic);
+                        }
+                    }
+
+                    // if no errors..
+
 					if(unit.diagnostics.length == 0)  
 					{
 						for(var n in unit.references() )  
@@ -80,7 +100,7 @@ module TypeScript.Api.Resolve
 							this.pending.push( parameter );
 						}
 					}
-
+                    
 					this.units.push(unit);
 
 					this.next(callback);

@@ -10,9 +10,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// <reference path="../units/SourceUnit.ts" />
 /// <reference path="IIO.ts" />
 /// <reference path="Buffer.ts" />
+/// <reference path="IOFile.ts" />
 
 module TypeScript.Api.IO 
 {	
@@ -26,7 +26,7 @@ module TypeScript.Api.IO
 	
 	export class IORemoteAsync implements IIO  
 	{
-		public readFile(path : string, callback : { ( unit : TypeScript.Api.Units.SourceUnit ) : void; }): void 
+		public readFile(path : string, callback : { ( iofile : TypeScript.Api.IO.IOFile ) : void; }): void 
 		{
 			if(this.isUrl(path)) 
 			{
@@ -38,28 +38,28 @@ module TypeScript.Api.IO
 			this.readFileFromDisk(path, callback);
 		}
 		
-		private readFileFromDisk(path : string, callback : {( unit : TypeScript.Api.Units.SourceUnit ) : void; }) : void 
+		private readFileFromDisk(path : string, callback : {(iofile : TypeScript.Api.IO.IOFile) : void; }) : void 
 		{
 			_fs.readFile(path, (error, data) => 
 			{
 				if (error) 
 				{
-					var text = "could not resolve source unit.";
-				
+					var text    = "could not resolve source unit.";
+					
 					var message = "could not resolve source unit " + path + ".";
-			
-					var diagnostic = new TypeScript.Api.Units.Diagnostic("resolve", path, text, message);
+				    
+					var error   = new TypeScript.Api.IO.IOFileError(text, message);				
 				
-					callback( new TypeScript.Api.Units.SourceUnit(path, null, [diagnostic], false) );  
+					callback( new TypeScript.Api.IO.IOFile (path, null, [error], false) ); 
 				} 
 				else
 				{
-					callback( new TypeScript.Api.Units.SourceUnit(path, TypeScript.Api.IO.Buffer.process (data), [], false) ); 
+					callback( new TypeScript.Api.IO.IOFile(path, TypeScript.Api.IO.Buffer.process (data), [], false) ); 
 				}
 			});			
 		}
 		
-		private readFileFromHttp(path : string, callback:{( unit : TypeScript.Api.Units.SourceUnit ) : void; }) : void 
+		private readFileFromHttp(path : string, callback:{( iofile : TypeScript.Api.IO.IOFile ) : void; }) : void 
 		{
 			var url      = _url.parse(path);
 			
@@ -85,7 +85,7 @@ module TypeScript.Api.IO
 				
 				response.on('end', () => 
 				{ 
-					callback( new TypeScript.Api.Units.SourceUnit (path, TypeScript.Api.IO.Buffer.process( data.join('') ), [], true) );  
+					callback( new TypeScript.Api.IO.IOFile (path, TypeScript.Api.IO.Buffer.process( data.join('') ), [], true) );  
 				});
 			});
 			
@@ -95,9 +95,9 @@ module TypeScript.Api.IO
 				
 				var message = "could not resolve source unit " + path + ".";
 			
-				var diagnostic = new TypeScript.Api.Units.Diagnostic("resolve", path, text, message);
+				var error   = new TypeScript.Api.IO.IOFileError(text, message);				
 				
-				callback( new TypeScript.Api.Units.SourceUnit( path, null, [ diagnostic ], true ) ); 
+				callback( new TypeScript.Api.IO.IOFile (path, null, [error], true) ); 
 			});
 			
 			request.end();  

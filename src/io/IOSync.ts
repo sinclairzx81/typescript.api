@@ -10,10 +10,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// <reference path="../units/SourceUnit.ts" />
 /// <reference path="IIO.ts" />
 /// <reference path="Buffer.ts" />
-
+/// <reference path="IOFile.ts" />
 
 module TypeScript.Api.IO 
 {	
@@ -21,25 +20,23 @@ module TypeScript.Api.IO
 	
 	export class IOSync implements IIO 
 	{
-		public readFile (path : string, callback : { ( sourceUnit:TypeScript.Api.Units.SourceUnit) : void; }): void 
+		public readFile (path : string, callback : { ( iofile : TypeScript.Api.IO.IOFile ) : void; }): void 
 		{
-			
-		
 			try 
 			{
 				var data = _fs.readFileSync(path);
 				
-				callback( new TypeScript.Api.Units.SourceUnit(path, TypeScript.Api.IO.Buffer.process(data), [], false) );  
+				callback( new TypeScript.Api.IO.IOFile (path, TypeScript.Api.IO.Buffer.process(data), [], false) );  
 			} 
 			catch(exception) 
 			{
-				var text = "could not resolve source unit.";
-				
+				var text    = "could not resolve source unit.";
+					
 				var message = "could not resolve source unit " + path + ".";
-			
-				var diagnostic = new TypeScript.Api.Units.Diagnostic("resolve", path, text, message);			
+				    
+				var error   = new TypeScript.Api.IO.IOFileError(text, message);				
 				
-				callback( new TypeScript.Api.Units.SourceUnit(path, null, [diagnostic], false) );  
+				callback( new TypeScript.Api.IO.IOFile (path, null, [error], false) );  
 			}
 		}		
 	}

@@ -10,13 +10,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// <reference path="../units/SourceUnit.ts" />
+/// <reference path="IOFile.ts" />
 
 module TypeScript.Api.IO {
 
 	export interface IIO {
 	
-		readFile(filename:string, callback:{( unit : TypeScript.Api.Units.SourceUnit) : void; }): void;
+		readFile(filename:string, callback:{( iofile : TypeScript.Api.IO.IOFile) : void; }): void;
 		
 	}
 }
