@@ -36,9 +36,7 @@ typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
 
 
     typescript.compile(resolved, function(compiled) {
-
         
-
         typescript.reflect(compiled, function(reflection){
 
             console.log(reflection)
@@ -48,15 +46,15 @@ typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
     });
 })
 
-//typescript.build(['c:/input/typescript/program.ts'], function (errors, source, declaration) {
+typescript.build(['c:/input/typescript/program.ts'], function (errors, source, declaration) {
 
-//    console.log(declaration);
+    console.log(declaration);
 
-//    console.log('-----');
+    console.log('-----');
 
-//    console.log(source);
+    console.log(source);
 
-//});
+});
 
 
 

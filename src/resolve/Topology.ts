@@ -14,6 +14,7 @@
 /// <reference path="../units/SourceUnit.ts" />
 /// <reference path="../util/Path.ts" />
 
+
 module TypeScript.Api.Resolve 
 {	
 	export class Node

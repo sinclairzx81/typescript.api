@@ -34,13 +34,10 @@ module TypeScript.Api.IO
 					var error   = new TypeScript.Api.IO.IOFileError(text, message);				
 				
 					callback( new TypeScript.Api.IO.IOFile (path, null, [ error ], false) );  
-                    //callback( new TypeScript.Api.Units.SourceUnit (path, null, [ diagnostic ], false) ); 
 				} 
 				else 
 				{
-					callback( new TypeScript.Api.IO.IOFile (path, TypeScript.Api.IO.Buffer.process(data), [], false) );
-					//callback( new TypeScript.Api.Units.SourceUnit (path, TypeScript.Api.IO.Buffer.process(data), [], false) ); 
-                   
+					callback( new TypeScript.Api.IO.IOFile (path, TypeScript.Api.IO.Buffer.process(data), [], false) ); 
 				}
 			});			
 		}
