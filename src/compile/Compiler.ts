@@ -27,7 +27,7 @@ module TypeScript.Api.Compile {
 
 		public sourceUnits : TypeScript.Api.Units.SourceUnit [];
 
-		constructor(logger:TypeScript.ILogger)  
+		constructor(languageVersion:TypeScript.LanguageVersion, moduleTarget:TypeScript.ModuleGenTarget, logger:TypeScript.ILogger)  
 		{
 			this.logger = logger;
 
@@ -39,9 +39,9 @@ module TypeScript.Api.Compile {
 
 			var settings = new TypeScript.CompilationSettings();
 
-			settings.codeGenTarget   = TypeScript.LanguageVersion.EcmaScript5;
+			settings.codeGenTarget   = languageVersion; //TypeScript.LanguageVersion.EcmaScript5;
 
-			settings.moduleGenTarget = TypeScript.ModuleGenTarget.Synchronous;
+			settings.moduleGenTarget = moduleTarget; //TypeScript.ModuleGenTarget.Synchronous;
 
 			settings.disallowBool    = true;
 

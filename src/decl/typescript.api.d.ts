@@ -185,7 +185,7 @@ declare module TypeScript.Api.Compile {
         public compiler: TypeScript.TypeScriptCompiler;
         public logger: TypeScript.ILogger;
         public sourceUnits: Api.Units.SourceUnit[];
-        constructor(logger: TypeScript.ILogger);
+        constructor(languageVersion: TypeScript.LanguageVersion, moduleTarget: TypeScript.ModuleGenTarget, logger: TypeScript.ILogger);
         private isSourceUnitInCache(sourceUnit);
         private isSourceUnitUpdated(sourceUnit);
         private addSourceUnit(sourceUnit);

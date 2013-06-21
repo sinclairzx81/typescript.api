@@ -30,18 +30,44 @@ declare var      require    : any;
 /////////////////////////////////////////////////////////////
 
 var _vm   = require("vm");
+
 var _fs   = require("fs");
+
 var _path = require("path");
 
 /////////////////////////////////////////////////////////////
 // compiler options..
 /////////////////////////////////////////////////////////////
 
-export var allowRemote 				: boolean = false;
+export var allowRemote 				: boolean;;
 
-export var debug       				: boolean = false;
+export var debug       				: boolean;
 
 export var compiler                 : TypeScript.Api.Compile.Compiler;
+
+export var languageVersion          : TypeScript.LanguageVersion;  // TypeScript.LanguageVersion.EcmaScript5;
+
+export var moduleTarget             : TypeScript.ModuleGenTarget;  // TypeScript.ModuleGenTarget.Synchronous;
+
+/////////////////////////////////////////////////////////////
+// initialize defaults.
+/////////////////////////////////////////////////////////////
+
+function initialize() {
+
+    exports.allowRemote = false;
+
+    exports.debug       = false;
+
+    exports.compiler    = null;
+
+    exports.languageVersion = "EcmaScript5"; //typescript.LanguageVersion.EcmaScript5;
+
+    exports.moduleTarget    = "Synchronous"; //typescript.ModuleGenTarget.Synchronous;
+    
+}
+
+initialize();
 
 /////////////////////////////////////////////////////////////
 // check: checks to see if the units are ok..
@@ -95,7 +121,7 @@ export function register () : void
 			
             if(exports.check(sourceUnits)) {
 
-				var compiler = new api.Compile.Compiler( logger );
+				var compiler = new api.Compile.Compiler(exports.languageVersion, exports.moduleTarget, logger );
 				
 				compiler.compile( sourceUnits, ( compiledUnits : TypeScript.Api.Units.CompiledUnit[] ) =>  {
 					
@@ -207,7 +233,7 @@ export function compile (sourceUnits: TypeScript.Api.Units.SourceUnit[], callbac
 	
     if(!exports.compiler)
     {
-	    exports.compiler = new api.Compile.Compiler( logger );
+	    exports.compiler = new api.Compile.Compiler(exports.languageVersion, exports.moduleTarget, logger );
 	}
 	exports.compiler.compile( sourceUnits , callback);
 }
@@ -222,7 +248,7 @@ export function reset() : void {
 
     var logger = new api.Loggers.NullLogger();
 
-    exports.compiler = new api.Compile.Compiler( logger );
+    exports.compiler = new api.Compile.Compiler(exports.languageVersion, exports.moduleTarget, logger );
 }
 
 /////////////////////////////////////////////////////////////
