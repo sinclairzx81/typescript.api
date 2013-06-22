@@ -93,8 +93,6 @@ typescript.resolve(['./program.ts'], function(resolved) {
 });
 ```
 
-## reference
-
 <a name="options" />
 ### compiler options
 
@@ -103,12 +101,17 @@ The following are options available on the typescript compiler.
 ```javascript
 var typescript = require("typescript.api");
 
-typescript.allowRemote     = false;         // enables remote resolution of source files over http. false by default.
+// enables remote resolution of source files over http. false by default.
+typescript.allowRemote     = false;         
 
-typescript.languageVersion = "EcmaScript5"; // the javascript language version to target. EcmaScript3 | EcmaScript5
+// the javascript language version to target. EcmaScript3 | EcmaScript5
+typescript.languageVersion = "EcmaScript5"; 
 
-typescript.moduleTarget    = "Synchronous"; // CommonJS or AMD module profiles, Synchronous | Asynchronous. Synchronous is the default.
+// CommonJS or AMD module profiles, Synchronous | Asynchronous. Synchronous is the default.
+typescript.moduleTarget    = "Synchronous"; 
 ```
+
+## reference
 
 <a name="resolve" />
 ### typescript.resolve (sources, callback)
