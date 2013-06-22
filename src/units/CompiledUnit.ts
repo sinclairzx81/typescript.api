@@ -11,6 +11,7 @@
 // limitations under the License.
 
 /// <reference path="../decl/typescript.d.ts" />
+/// <reference path="../reflect/Reflection.ts" />
 /// <reference path="Diagnostic.ts" />
 /// <reference path="Unit.ts" />
 
@@ -22,13 +23,27 @@ module TypeScript.Api.Units
         
         public declaration : string;
 
-		constructor(path:string, content:string, diagnostics : TypeScript.Api.Units.Diagnostic[], ast:TypeScript.AST, declaration:string) 
+        public sourcemap   : string;
+
+        public reflection  : TypeScript.Api.Reflect.Script;
+
+		constructor(path        : string, 
+                    content     : string, 
+                    diagnostics : TypeScript.Api.Units.Diagnostic[], 
+                    ast         : TypeScript.AST, 
+                    declaration : string, 
+                    sourcemap   : string, 
+                    reflection  : TypeScript.Api.Reflect.Script) 
 		{
 			super(path, content, diagnostics);
 
-			this.ast = ast;
+			this.ast         = ast;
 
             this.declaration = declaration;
+
+            this.sourcemap   = sourcemap;
+
+            this.reflection  = reflection;
 		}
 
         // note: references resolved on declarations.

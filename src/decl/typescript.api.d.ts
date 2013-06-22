@@ -156,45 +156,6 @@ declare module TypeScript.Api.Resolve {
         private visited(parameter);
     }
 }
-declare module TypeScript.Api.Units {
-    class CompiledUnit extends Units.Unit {
-        public ast: TypeScript.AST;
-        public declaration: string;
-        constructor(path: string, content: string, diagnostics: Units.Diagnostic[], ast: TypeScript.AST, declaration: string);
-        public references(): string[];
-    }
-}
-declare module TypeScript.Api.Compile {
-    interface IEmitter {
-        directoryExists(path: string): boolean;
-        fileExists(path: string): boolean;
-        resolvePath(path: string): string;
-        writeFile(fileName: string, contents: string, writeByteOrderMark: boolean): void;
-    }
-    class Emitter implements IEmitter {
-        public files: string[];
-        constructor();
-        public writeFile(fileName: string, contents: string, writeByteOrderMark: boolean): void;
-        public directoryExists(path: string): boolean;
-        public fileExists(path: string): boolean;
-        public resolvePath(path: string): string;
-    }
-}
-declare module TypeScript.Api.Compile {
-    class Compiler {
-        public compiler: TypeScript.TypeScriptCompiler;
-        public logger: TypeScript.ILogger;
-        public sourceUnits: Api.Units.SourceUnit[];
-        constructor(languageVersion: TypeScript.LanguageVersion, moduleTarget: TypeScript.ModuleGenTarget, logger: TypeScript.ILogger);
-        private isSourceUnitInCache(sourceUnit);
-        private isSourceUnitUpdated(sourceUnit);
-        private addSourceUnit(sourceUnit);
-        private syntaxCheck(sourceUnit);
-        private typeCheck(sourceUnit);
-        private emitUnits(sourceUnits);
-        public compile(sourceUnits: Api.Units.SourceUnit[], callback: (compiledUnits: Api.Units.CompiledUnit[]) => void): void;
-    }
-}
 declare module TypeScript.Api.Reflect {
     class Import {
         public name: string;
@@ -348,5 +309,46 @@ declare module TypeScript.Api.Reflect {
     class Reflection {
         public scripts: Reflect.Script[];
         constructor();
+    }
+}
+declare module TypeScript.Api.Units {
+    class CompiledUnit extends Units.Unit {
+        public ast: TypeScript.AST;
+        public declaration: string;
+        public sourcemap: string;
+        public reflection: Api.Reflect.Script;
+        constructor(path: string, content: string, diagnostics: Units.Diagnostic[], ast: TypeScript.AST, declaration: string, sourcemap: string, reflection: Api.Reflect.Script);
+        public references(): string[];
+    }
+}
+declare module TypeScript.Api.Compile {
+    interface IEmitter {
+        directoryExists(path: string): boolean;
+        fileExists(path: string): boolean;
+        resolvePath(path: string): string;
+        writeFile(fileName: string, contents: string, writeByteOrderMark: boolean): void;
+    }
+    class Emitter implements IEmitter {
+        public files: string[];
+        constructor();
+        public writeFile(fileName: string, contents: string, writeByteOrderMark: boolean): void;
+        public directoryExists(path: string): boolean;
+        public fileExists(path: string): boolean;
+        public resolvePath(path: string): string;
+    }
+}
+declare module TypeScript.Api.Compile {
+    class Compiler {
+        public compiler: TypeScript.TypeScriptCompiler;
+        public logger: TypeScript.ILogger;
+        public sourceUnits: Api.Units.SourceUnit[];
+        constructor(languageVersion: TypeScript.LanguageVersion, moduleTarget: TypeScript.ModuleGenTarget, logger: TypeScript.ILogger);
+        private isSourceUnitInCache(sourceUnit);
+        private isSourceUnitUpdated(sourceUnit);
+        private addSourceUnit(sourceUnit);
+        private syntaxCheck(sourceUnit);
+        private typeCheck(sourceUnit);
+        private emitUnits(sourceUnits);
+        public compile(sourceUnits: Api.Units.SourceUnit[], callback: (compiledUnits: Api.Units.CompiledUnit[]) => void): void;
     }
 }

@@ -27,13 +27,29 @@ require("typescript.api").register();
 
 var program = require("./program.ts");
 ```
+### overview
 
+* [manual compilation](#manual_compilation)
+* [compiler options](#options)
+
+### methods
+
+* [create](#create)
+* [resolve](#resolve)
+* [compile](#compile)
+* [check](#check)
+* [build](#build)
+* [run](#run)
+* [reset](#reset)
+* [sort](#sort)
+
+<a name="manual_compilation" />
 ### manual compilation
 
 The following is an example of using the api to compile a source file named 'program.ts'. 
 
 The process will first resolve 'program.ts' and all its referenced sources files. The resolved 
-sources (units) then checked prior to being sent to the compiler for compilation. Once compiled,
+sources array (resolved) are then checked prior to being sent to the compiler for compilation. Once compiled,
 the compilation is checked again for problems prior to being run.
 
 ```javascript
@@ -79,14 +95,31 @@ typescript.resolve(['./program.ts'], function(resolved) {
 
 ## reference
 
+<a name="options" />
+### compiler options
+
+The following are options available on the typescript compiler.
+
+```javascript
+var typescript = require("typescript.api");
+
+typescript.allowRemote     = false;         // enables remote resolution of source files over http. false by default.
+
+typescript.languageVersion = "EcmaScript5"; // the javascript language version to target. EcmaScript3 | EcmaScript5
+
+typescript.moduleTarget    = "Synchronous"; // CommonJS or AMD module profiles, Synchronous | Asynchronous. Synchronous is the default.
+```
+
+<a name="resolve" />
 ### typescript.resolve (sources, callback)
 
-Will resolve source units by traversing each source files reference element.
+Will resolve source units by traversing each source files reference element. The result will be an 
+ordered (in order of dependancy) array of source units. 
 
 __arguments__
 
 * sources - A filename, or a array of filenames to resolve. 
-* callback(units) - A callback with the resolved units.
+* callback(units) - A callback which passes the resolved source units.
 
 __example__
 
@@ -99,27 +132,27 @@ var typescript = require("typescript.api");
 typescript.resolve(["program.ts"], function(resolved) { 
 
 	for(var n in resolved) {
-	
-		console.log( resolved[n].path );
+
+		console.log( resolved[n].path ); // the source files path
 		
-		console.log( resolved[n].content );
+		console.log( resolved[n].content ); // the source files content (typescript)
 		
 		for(var m in resolved[n].references) {
 		
-			console.log( resolved[n].references[m] )
+			console.log( resolved[n].references[m] ) // paths to referenced source files.
 			
 		}
 	}
 });
 ```
-
+<a name="check" />
 ### typescript.check (units)
 
-Checks source units for diagnostic errors. 
+Utility method to check if a source or compiled unit has errors.
 
 __arguments__
 
-* units - units to be checked. 
+* units   - units to be checked. 
 * returns - true if ok. 
 
 __example__
@@ -131,11 +164,11 @@ var typescript = require("typescript.api");
 
 typescript.resolve(["program.ts"], function(resolved) { 
 
-	if(typescript.check (resolved)) {
+	if(typescript.check (resolved)) { // check here for reference errors.
 		
 		typescript.compile(resolved, function(compiled) {
 		
-			if( typescript.check (compiled) ) {
+			if( typescript.check (compiled) ) { // check here for syntax and type errors.
 			
 				typescript.run(compiled, null, function(context) {
 					
@@ -145,15 +178,19 @@ typescript.resolve(["program.ts"], function(resolved) {
 	}
 });
 ```
-
+<a name="create" />
 ### typescript.create ( filename, code )
 
-Will create a unit from the supplied filename and source code.
+Creates a source unit from a string. 
 
 __arguments__
 
-* filename - A filename that other units can reference.
-* code - The source code for this unit.
+* filename - A filename that other units may reference.
+* code	   - The source code for this unit.
+
+__returns__
+
+* unit	   - A source unit.
 
 __example__
 
@@ -174,15 +211,15 @@ typescript.compile([sourceUnit], function(compiled) {
 	
 });
 ```
-
+<a name="compile" />
 ### typescript.compile ( units, callback )
 
 Compiles source units. 
 
 __arguments__
 
-* units - An array of source units. 
-* callback - A callback that passes the compiled output.
+* units	   - An array of source units. 
+* callback - A callback that passed the compiled output.
 
 __example__
 
@@ -202,39 +239,7 @@ typescript.compile([sourceUnit], function(compiled) {
 	}
 });
 ```
-
-### typescript.reflect ( compilation, callback )
-
-Reflects compilation AST and produces meta data about the modules, classes, 
-methods and variables contained within the compilation. 
-
-__arguments__
-
-* units - The compilation to be reflected. 
-* callback - A callback that passes the reflected metadata.
-
-__example__
-
-The following will resolve the source file 'program.ts', compile it, then reflect its
-meta data to the console as a JSON string.
-
-```javascript
-var typescript = require("typescript.api");
-
-typescript.resolve(['program.ts'], function(resolved){
-
-	typescript.compile(resolved, function(compiled) {
-		
-		typescript.reflect(compiled, function(reflection) {
-			
-			var json = JSON.stringify(reflection, null, ' ');
-			
-			console.log(json);
-		});
-	});
-});
-```
-
+<a name="build" />
 ### typescript.build ( sources, callback )
 
 A quick means of building a typescript source file(s) and producing the compiled
@@ -271,16 +276,16 @@ typescript.build_source(['program.ts'], function(errors, sourcecode, declaration
 	}
 });
 ```
-
-### typescript.run ( compilation, sandbox, callback )
+<a name="run" />
+### typescript.run ( compiledUnits, sandbox, callback )
 
 Runs a compilation. 
 
 __arguments__
 
-* compilation - The compilation to be run.
-* sandbox - A sandbox. pass null to inherit the current sandbox.
-* callback - A callback that passes a context containing any exported variables and function.
+* compiledUnits - compiled source units.
+* sandbox	    - A sandbox. pass null to inherit the current sandbox. code in executed in nodejs vm.
+* callback      - A callback that passes a context containing any exported variables and function.
 
 __example__
 
@@ -296,12 +301,23 @@ typescript.compile([sourceUnit], function(compiled) {
 
 	typescript.run(compiled, null, function(context) { 
 	
-		console.log(context.value);
+		console.log(context.value); // outputs 123
 		
 	});
 });
 ```
+<a name="reset" />
+### typescript.reset ()
 
+Resets the compiler. 
+
+```javascript	
+var typescript = require("typescript.api");	
+
+typescript.reset();
+```
+
+<a name="sort" />
 ### typescript.sort ( units )
 
 Will attempt to sort source units in order of dependency. If cyclic referencing

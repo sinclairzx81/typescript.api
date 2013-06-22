@@ -1246,7 +1246,7 @@ declare module cluster
    export interface Worker 
    {
        id: string;
-       process: child_process;
+       process: any;
        suicide: boolean;
        send(message: any, sendHandle?: any): void;
        destroy(): void;

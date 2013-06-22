@@ -2,21 +2,6 @@
 
 
  
-function print_units(units) {
-
-    console.log('----------------------------------------------')
-
-    for (var n in units) {
-
-        console.log(units[n].references())
-        
-        console.log(units[n].declaration);
-
-        console.log(units[n].content);
-
-        console.log('------------------------')
-    }
-}
 
 function print_diagnostics(units)
 {
@@ -30,30 +15,32 @@ function print_diagnostics(units)
     }
 }
 
+function print_unit(unit) {
+
+    console.log('------------------------')
+
+    console.log(unit.path);
+
+    console.log(unit.content);
+
+    console.log(unit.declaration);
+
+    console.log(unit.sourcemap);
+
+    console.log(unit.reflection);
+}
+
 typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
 
     print_diagnostics(resolved);
-
-
+    
     typescript.compile(resolved, function(compiled) {
         
-        typescript.reflect(compiled, function(reflection){
+        for (var n in compiled) {
 
-            console.log(reflection)
-
-        });
-         
+            print_unit(compiled[n]);
+        }
     });
-})
-
-typescript.build(['c:/input/typescript/program.ts'], function (errors, source, declaration) {
-
-    console.log(declaration);
-
-    console.log('-----');
-
-    console.log(source);
-
 });
 
 

@@ -12,6 +12,7 @@
 
 /// <reference path="../decl/typescript.d.ts" />
 /// <reference path="../loggers/NullLogger.ts" />
+/// <reference path="../reflect/Reflection.ts" />
 /// <reference path="../units/Diagnostic.ts" />
 /// <reference path="../units/SourceUnit.ts" />
 /// <reference path="../units/CompiledUnit.ts" />
@@ -39,13 +40,15 @@ module TypeScript.Api.Compile {
 
 			var settings = new TypeScript.CompilationSettings();
 
-			settings.codeGenTarget   = languageVersion; //TypeScript.LanguageVersion.EcmaScript5;
+			settings.codeGenTarget            = languageVersion; //TypeScript.LanguageVersion.EcmaScript5;
 
-			settings.moduleGenTarget = moduleTarget; //TypeScript.ModuleGenTarget.Synchronous;
+			settings.moduleGenTarget          = moduleTarget; //TypeScript.ModuleGenTarget.Synchronous;
 
-			settings.disallowBool    = true;
+			settings.disallowBool             = true;
 
             settings.generateDeclarationFiles = true;
+            
+            settings.mapSourceFiles           = true;
 
 			// the compiler...
 
@@ -178,6 +181,66 @@ module TypeScript.Api.Compile {
 
 		private emitUnits( sourceUnits: TypeScript.Api.Units.SourceUnit [] ) : TypeScript.Api.Units.CompiledUnit []
 		{
+            // gets the content from the compiled units.
+            var get_source = (sourceUnitPath : string, emitter : Emitter) : string => {
+
+                sourceUnitPath    = sourceUnitPath.replace(/\\/g, '/').replace(/.ts$/, '.js');
+
+                var content = '';
+                        
+                for(var filename in emitter.files)
+                {
+                    if(filename.replace(/\\/g, '/') == sourceUnitPath)
+                    {
+                        content = emitter.files[filename];
+                    }
+                }                        
+                return content;
+            };
+            // gets the declaration from the compiled units.
+            var get_declaration_source = (sourceUnitPath : string, emitter : Emitter) : string => {
+
+                sourceUnitPath    = sourceUnitPath.replace(/\\/g, '/').replace(/.ts$/, '.d.ts');
+
+                var content = '';
+                        
+                for(var filename in emitter.files)
+                {
+                    if(filename.replace(/\\/g, '/') == sourceUnitPath)
+                    {
+                        content = emitter.files[filename];
+                    }
+                } 
+                                                   
+                return content;
+            };
+
+            // gets the sourcemap from the compiled units.
+            var get_sourcemap_source = (sourceUnitPath : string, emitter : Emitter) : string => {
+
+                sourceUnitPath    = sourceUnitPath.replace(/\\/g, '/').replace(/.ts$/, '.js.map');
+
+                var content = '';
+                        
+                for(var filename in emitter.files)
+                {
+                    if(filename.replace(/\\/g, '/') == sourceUnitPath)
+                    {
+                        content = emitter.files[filename];
+                    }
+                } 
+                                                   
+                return content;
+            };
+
+            // computes the reflection for this unit.
+            var get_reflection = (path:string, ast:TypeScript.Script) => {
+                
+	            return TypeScript.Api.Reflect.Script.create(path, ast); 
+
+            };
+
+
 			// store a map of the input and output.
 
 			var emitter_io_map = [];
@@ -221,51 +284,21 @@ module TypeScript.Api.Compile {
 
 					if(sourceUnit)
 					{
-						// parameters...
-
-                        var get_source = (sourceUnitPath : string, emitter : Emitter) : string => {
-
-                            sourceUnitPath    = sourceUnitPath.replace(/\\/g, '/').replace(/.ts$/, '.js');
-
-                            var content = '';
-                        
-                            for(var filename in emitter.files)
-                            {
-                                if(filename.replace(/\\/g, '/') == sourceUnitPath)
-                                {
-                                    content = emitter.files[filename];
-                                }
-                            }                        
-                            return content;
-                        };
-                        var get_declaration_source = (sourceUnitPath : string, emitter : Emitter) : string => {
-
-                            sourceUnitPath    = sourceUnitPath.replace(/\\/g, '/').replace(/.ts$/, '.d.ts');
-
-                            var content = '';
-                        
-                            for(var filename in emitter.files)
-                            {
-                                if(filename.replace(/\\/g, '/') == sourceUnitPath)
-                                {
-                                    content = emitter.files[filename];
-                                }
-                            } 
-                                                   
-                            return content;
-                        };
+                        var ast 		= document.script;
 
                         var path        = sourceUnit.path.replace(/\\/g, '/');
 
-                        var content     = get_source (path, emitter);
+                        var content     = get_source             ( path, emitter );
 
-                        var declaration = get_declaration_source (path, emitter);
+                        var declaration = get_declaration_source ( path, emitter );
+
+                        var sourcemap   = get_sourcemap_source   ( path, emitter );
+
+                        var reflection = get_reflection          ( path, ast );
     
 						var diagnostics = sourceUnit.diagnostics;
-
-						var ast 		= document.script;
-                          
-						result.push( new TypeScript.Api.Units.CompiledUnit(path, content, diagnostics, ast, declaration) );
+                        
+						result.push( new TypeScript.Api.Units.CompiledUnit(path, content, diagnostics, ast, declaration, sourcemap, reflection) );
 					}
 				}
 			}

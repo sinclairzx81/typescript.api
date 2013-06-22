@@ -147,6 +147,19 @@ export function register () : void
 }
 
 /////////////////////////////////////////////////////////////
+// reset: resets the compiler.
+/////////////////////////////////////////////////////////////
+
+export function reset() : void {
+
+    var api = <TypeScript.Api>load_typescript_api();
+
+    var logger = new api.Loggers.NullLogger();
+
+    exports.compiler = new api.Compile.Compiler(exports.languageVersion, exports.moduleTarget, logger );
+}
+
+/////////////////////////////////////////////////////////////
 // create: creates a new source unit
 /////////////////////////////////////////////////////////////
 
@@ -239,20 +252,7 @@ export function compile (sourceUnits: TypeScript.Api.Units.SourceUnit[], callbac
 }
 
 /////////////////////////////////////////////////////////////
-// reset: resets the compiler.
-/////////////////////////////////////////////////////////////
-
-export function reset() : void {
-
-    var api = <TypeScript.Api>load_typescript_api();
-
-    var logger = new api.Loggers.NullLogger();
-
-    exports.compiler = new api.Compile.Compiler(exports.languageVersion, exports.moduleTarget, logger );
-}
-
-/////////////////////////////////////////////////////////////
-// reflect: reflects compilation AST.
+// reflect: reflects compilation AST. (obsolete, read reflection from compiled unit)
 /////////////////////////////////////////////////////////////
 
 export function reflect(compiledUnits:TypeScript.Api.Units.CompiledUnit [], callback :{ ( reflection:TypeScript.Api.Reflect.Reflection ): void; }) : void  {

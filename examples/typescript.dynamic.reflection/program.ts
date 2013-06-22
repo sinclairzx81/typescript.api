@@ -17,30 +17,35 @@ export class Program
             response.end(); 
         };
 
-        typescript.resolve('program.ts', (units) => 
+        typescript.resolve('program.ts', (resolved) => 
         {
-            if(!typescript.check(units)) 
+            if(!typescript.check(resolved)) 
             {
-                error(units, request, response);
+                error(resolved, request, response);
             }
             else 
             { 
-                typescript.compile(units, (compilation) => 
+                typescript.compile(resolved, (compiled) => 
                 { 
-                    if(!typescript.check(compilation)) 
+                    if(!typescript.check(compiled)) 
                     {
-                        error(compilation, request, response);
+                        error(compiled, request, response);
                     } 
                     else  
                     {
-                        typescript.reflect(compilation, (reflection) => 
-                        {
-                            response.writeHead(200, {'content-type' : 'application/json'}); 
+                        var obj = { scripts :[] };
+                        
+                        for(var n in compiled) {
+                        
+                            obj.scripts.push(compiled[n].reflection);
+                        }
+                        
+                        response.writeHead(200, {'content-type' : 'application/json'}); 
 
-                            response.write(JSON.stringify(reflection, null, " "));
+                        response.write( JSON.stringify(obj, null, " ") );
 
-                            response.end();    
-                        });
+                        response.end();    
+             
                     }
                 }); 
             }
