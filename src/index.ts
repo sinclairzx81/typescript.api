@@ -64,6 +64,8 @@ function initialize() {
     exports.languageVersion = "EcmaScript5"; //typescript.LanguageVersion.EcmaScript5;
 
     exports.moduleTarget    = "Synchronous"; //typescript.ModuleGenTarget.Synchronous;
+
+    exports.outputOption    = '';
     
 }
 

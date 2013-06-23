@@ -126,36 +126,6 @@ declare module TypeScript.Api.Units {
         public references(): string[];
     }
 }
-declare module TypeScript.Api.Resolve {
-    class Node {
-        public path: string;
-        public references: string[];
-        constructor();
-    }
-    class Topology {
-        static graph(units: Api.Units.SourceUnit[]): Node[];
-        static sort(units: Api.Units.SourceUnit[]): Api.Units.SourceUnit[];
-    }
-}
-declare module TypeScript.Api.Resolve {
-    class LoadParameter {
-        public parent_filename: string;
-        public filename: string;
-        constructor(parent_filename: string, filename: string);
-    }
-    class Resolver {
-        public io: Api.IO.IIO;
-        public logger: TypeScript.ILogger;
-        private pending;
-        private closed;
-        private units;
-        constructor(io: Api.IO.IIO, logger: TypeScript.ILogger);
-        public resolve(sources: string[], callback: (units: Api.Units.SourceUnit[]) => void): void;
-        private load(callback);
-        private next(callback);
-        private visited(parameter);
-    }
-}
 declare module TypeScript.Api.Reflect {
     class Import {
         public name: string;
@@ -319,6 +289,36 @@ declare module TypeScript.Api.Units {
         public reflection: Api.Reflect.Script;
         constructor(path: string, content: string, diagnostics: Units.Diagnostic[], ast: TypeScript.AST, declaration: string, sourcemap: string, reflection: Api.Reflect.Script);
         public references(): string[];
+    }
+}
+declare module TypeScript.Api.Resolve {
+    class Node {
+        public path: string;
+        public references: string[];
+        constructor();
+    }
+    class Topology {
+        static graph(units: Api.Units.SourceUnit[]): Node[];
+        static sort(units: Api.Units.SourceUnit[]): Api.Units.SourceUnit[];
+    }
+}
+declare module TypeScript.Api.Resolve {
+    class LoadParameter {
+        public parent_filename: string;
+        public filename: string;
+        constructor(parent_filename: string, filename: string);
+    }
+    class Resolver {
+        public io: Api.IO.IIO;
+        public logger: TypeScript.ILogger;
+        private pending;
+        private closed;
+        private units;
+        constructor(io: Api.IO.IIO, logger: TypeScript.ILogger);
+        public resolve(sources: string[], callback: (units: Api.Units.SourceUnit[]) => void): void;
+        private load(callback);
+        private next(callback);
+        private visited(parameter);
     }
 }
 declare module TypeScript.Api.Compile {

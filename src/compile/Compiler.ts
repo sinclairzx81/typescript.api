@@ -50,6 +50,8 @@ module TypeScript.Api.Compile {
             
             settings.mapSourceFiles           = true;
 
+            settings.outputOption = '';
+
 			// the compiler...
 
 			this.compiler = new TypeScript.TypeScriptCompiler(new TypeScript.Api.Loggers.NullLogger(), settings, TypeScript.diagnosticMessages);

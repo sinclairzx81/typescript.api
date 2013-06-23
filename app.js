@@ -1,8 +1,6 @@
 ﻿var typescript = require('./bin/index.js');
 
 
- 
-
 function print_diagnostics(units)
 {
     for (var n in units) {

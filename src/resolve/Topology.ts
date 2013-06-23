@@ -12,6 +12,7 @@
 
 /// <reference path="../decl/typescript.d.ts" />
 /// <reference path="../units/SourceUnit.ts" />
+/// <reference path="../units/CompiledUnit.ts" />
 /// <reference path="../util/Path.ts" />
 
 
@@ -137,5 +138,8 @@ module TypeScript.Api.Resolve
             return result;
         }
     }
+
+        
+   
 
 }
