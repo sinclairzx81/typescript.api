@@ -1,7 +1,7 @@
 {
   "name": "typescript.api",
   "version": "0.4.3",
-  "description": "TypeScript CaaS: A compiler as a service api enabling nodejs developers to programatically resolve, compile, reflect and run typescript 0.9 source files.",
+  "description": "A compiler as a service api enabling nodejs developers to programatically resolve, compile, reflect and run typescript 0.9 source files.",
   "main": "index.js",
   "directories": {
      
