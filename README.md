@@ -1,6 +1,6 @@
 # typescript.api
 
-A compiler as a service api enabling nodejs developers to resolve, compile, reflect and run typescript 0.9 source files.
+TypeScript CaaS: A compiler as a service api enabling nodejs developers to programatically resolve, compile, reflect and run typescript 0.9 source files.
 
 ## install
 
