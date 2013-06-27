@@ -122,7 +122,7 @@ typescript.moduleTarget    = "Synchronous";
 
 By default, the typescript.api does not automatically reference any declarations (such as lib.d.ts) for compilation. Because
 of this, your source files will need to reference the appropriate *.d.ts your application needs for compilation. This is unlike 
-the tsc command line compiler which will, by default reference the lib.d.ts declaration by default, but is otherwise unnessasary in
+the tsc command line compiler which will, by default reference the lib.d.ts declaration, but is otherwise unnessasary in
 nodejs applications. 
 
 However, the typescript.api comes bundled with two declarations:
@@ -160,9 +160,9 @@ sourceUnit = {
 
 ```
 
-Note: For manually creating source units, see [create](#create)
+note: For manually creating source units, see [create](#create)
 
-Note: For loading source units from disk. see [resolve](#resolve)
+note: For loading source units from disk. see [resolve](#resolve)
 
 <a name="compiled_unit" />
 ### compiled unit
