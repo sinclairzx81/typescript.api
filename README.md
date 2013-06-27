@@ -143,6 +143,7 @@ For additional declarations for various API's, see https://github.com/borisyanko
 
 ## objects
 
+<a name="source_unit" />
 ### source unit
 
 The typescript.api accepts source units for compilation. A source unit consists of the following properties: 
@@ -163,6 +164,7 @@ Note: For manually creating source units, see [create](#create)
 
 Note: For loading source units from disk. see [resolve](#resolve)
 
+<a name="compiled_unit" />
 ### compiled unit
 
 A compiled unit is the output from a [compilation](#compile). A compiled unit consists of the following properties:
