@@ -36,6 +36,8 @@ var node_decl_input_filename   = path.join(src_dir, 'resx/node.d.ts');
 var node_decl_output_filename  = path.join(bin_dir, 'decl/node.d.ts');
 var lib_decl_input_filename    = path.join(src_dir, 'resx/lib.d.ts');
 var lib_decl_output_filename   = path.join(bin_dir, 'decl/lib.d.ts');
+var ecma_decl_input_filename   = path.join(src_dir, 'resx/ecma.d.ts');
+var ecma_decl_output_filename  = path.join(bin_dir, 'decl/ecma.d.ts');
 var package_input_filename     = path.join(src_dir, 'resx/package.json');
 var package_output_filename    = path.join(bin_dir, 'package.json');
 var readme_input_filename      = path.join(src_dir, '../readme.md');
@@ -67,28 +69,30 @@ function build () {
 
 	 	            console.log('copying lib.d.ts....');
 	                tools.builder.copyfile(lib_decl_input_filename, lib_decl_output_filename, function(){	 
+	 	            
+                        console.log('copying ecma.d.ts....');
+	                    tools.builder.copyfile(ecma_decl_input_filename, ecma_decl_output_filename, function(){	
                         
-	                    console.log('copying node.d.ts....');
-	                    tools.builder.copyfile(node_decl_input_filename, node_decl_output_filename, function(){	
+	                        console.log('copying node.d.ts....');
+	                        tools.builder.copyfile(node_decl_input_filename, node_decl_output_filename, function(){	
 						  
-	                        console.log('copying package.json....');
-	                        tools.builder.copyfile(package_input_filename, package_output_filename, function(){	
+	                            console.log('copying package.json....');
+	                            tools.builder.copyfile(package_input_filename, package_output_filename, function(){	
 							  
-	                            console.log('copying README.md....');
-	                            tools.builder.copyfile(readme_input_filename, readme_output_filename, function(){	
+	                                console.log('copying README.md....');
+	                                tools.builder.copyfile(readme_input_filename, readme_output_filename, function(){	
 								  
-	                                console.log('running post build....');
-	                                console.log('-------------------------------------------------------');
-	                                tools.nodestart.start( post_build_filename );	
+	                                    console.log('running post build....');
+	                                    console.log('-------------------------------------------------------');
+	                                    tools.nodestart.start( post_build_filename );	
+	                                });
 	                            });
 	                        });
-	                    });
+                        });
                     });
-	                    
 	            });
 	        });	
 	    });
-        
 	});
 }
 

@@ -120,26 +120,30 @@ typescript.moduleTarget    = "Synchronous";
 <a name="declarations" />
 ### declarations
 
-By default, the typescript.api does not automatically reference any declarations (such as lib.d.ts) for compilation. Because
-of this, your source files will need to reference the appropriate *.d.ts your application needs for compilation. This is unlike 
-the tsc command line compiler which will, by default reference the lib.d.ts declaration, but is otherwise unnessasary in
-nodejs applications. 
+It is important to note that the typescript.api does not automatically reference any declarations (such as lib.d.ts) for compilation. 
+Because of this, you will need to reference the appropriate *.d.ts required by your application for compilation. This is unlike the 
+tsc command line compiler which will, by default reference the lib.d.ts declaration if not stated otherwise. (see --nolib option). 
 
-However, the typescript.api comes bundled with two declarations:
+In the context of nodejs, the dom declarations declared in lib.d.ts are unnessasary and dramatically slow compilation times. The
+typescript.api splits these declarations out to provide suitable environment declarations that you can reference in your project.
+
+The typescript.api comes bundled with following declarations:
 
 ```javascript
-// standard lib.d.ts supplied with the compiler
+// ecma api + html dom declarations (suitable for browser development)
 [node_modules]/typescript.api/decl/lib.d.ts 
 
-// A custom node.d.ts declaration which contains the 
-// ECMA API's and node.js core declarations. 
-[node_modules]/typescript.api/decl/node.d.ts 
+// ecma api + node.d.ts declarations (suitable for nodejs development)
+[node_modules]/typescript.api/decl/node.d.ts
 
+// ecma api only.
+[node_modules]/typescript.api/decl/ecma.d.ts 
 ```
-If programming against nodejs directly, it is recommened to copy the node.d.ts declaration into your project structure and reference
-them accordingly. 
 
-For additional declarations for various API's, see https://github.com/borisyankov/DefinitelyTyped.
+It is recommended that developers copy the appropriate declarations suitable for their environment into their project structure and
+reference them accordingly. 
+
+For other additional declarations, see https://github.com/borisyankov/DefinitelyTyped.
 
 ## objects
 
@@ -151,10 +155,10 @@ The typescript.api accepts source units for compilation. A source unit consists 
 ```javascript
 
 sourceUnit = {
-	path          : string,  // (public) the path of this source unit.
-	content       : string,  // (public) the typescript source of this unit.
-	remote        : boolean, // (public) if this source file is loaded over http.
-	references    : Function // (public) returns an array of references for this source unit.
+	path          : string,   // (public) the path of this source unit.
+	content       : string,   // (public) the typescript source of this unit.
+	remote        : boolean,  // (public) if this source file is loaded over http.
+	references    : Function  // (public) returns an array of references for this source unit.
 	diagnostics   : [object], // (public) compilation errors for this unit. 0 length if none.
 };
 
