@@ -31,6 +31,12 @@ var program = require("./program.ts");
 
 * [manual compilation](#manual_compilation)
 * [compiler options](#options)
+* [declarations](#declarations)
+
+### objects
+
+* [source unit](#source_unit)
+* [compiled unit](#compiled_unit)
 
 ### methods
 
@@ -111,7 +117,72 @@ typescript.languageVersion = "EcmaScript5";
 typescript.moduleTarget    = "Synchronous"; 
 ```
 
-## reference
+<a name="declarations" />
+### declarations
+
+By default, the typescript.api does not automatically reference any declarations (such as lib.d.ts) for compilation. Because
+of this, your source files will need to reference the appropriate *.d.ts your application needs for compilation. This is unlike 
+the tsc command line compiler which will, by default reference the lib.d.ts declaration by default, but is otherwise unnessasary in
+nodejs applications. 
+
+However, the typescript.api comes bundled with two declarations:
+
+```javascript
+// standard lib.d.ts supplied with the compiler
+[node_modules]/typescript.api/decl/lib.d.ts 
+
+// A custom node.d.ts declaration which contains the 
+// ECMA API's and node.js core declarations. 
+[node_modules]/typescript.api/decl/node.d.ts 
+
+```
+If programming against nodejs directly, it is recommened to copy the node.d.ts declaration into your project structure and reference
+them accordingly. 
+
+For additional declarations for various API's, see https://github.com/borisyankov/DefinitelyTyped.
+
+## objects
+
+### source unit
+
+The typescript.api accepts source units for compilation. A source unit consists of the following properties: 
+
+```javascript
+
+sourceUnit = {
+	path          : string,  // (public) the path of this source unit.
+	content       : string,  // (public) the typescript source of this unit.
+	remote        : boolean, // (public) if this source file is loaded over http.
+	references    : Function // (public) returns an array of references for this source unit.
+	diagnostics   : [object], // (public) compilation errors for this unit. 0 length if none.
+};
+
+```
+
+Note: For manually creating source units, see [create](#create)
+
+Note: For loading source units from disk. see [resolve](#resolve)
+
+### compiled unit
+
+A compiled unit is the output from a [compilation](#compile). A compiled unit consists of the following properties:
+
+```javascript
+
+compiledUnit = {
+	path          : string,   // (public) the path of this unit.
+	content       : string,   // (public) the javascript source of this unit.
+	references    : Function  // (public) returns an array of references for this unit.
+	diagnostics   : [object], // (public) compilation errors for this unit. 0 length if none.
+	ast           : object,   // (public) AST for this unit.
+	declaration   : string,   // (public) The declaration source for this unit.
+	sourcemap     : string,   // (public) The sourcemap for this unit.
+	reflection    : object,   // (public) The units reflected members.  
+};
+
+```
+
+## methods
 
 <a name="resolve" />
 ### typescript.resolve (sources, callback)
@@ -203,13 +274,13 @@ The compilation is then run.
 ```javascript
 var typescript = require("typescript.api");
 
-var sourceUnit = typescript.create("temp.ts", "console.log('hello world');");
+var sourceUnit = typescript.create("temp.ts", "export var message = 'hello world'");
 
 typescript.compile([sourceUnit], function(compiled) {
 
 	typescript.run(compiled, null, function(context) { 
 		
-		// will output hello world..
+		console.log(context.message); // outputs hello world
 	});
 	
 });
