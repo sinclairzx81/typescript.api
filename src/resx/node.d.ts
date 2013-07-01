@@ -922,6 +922,242 @@ interface JSON {
   */
 declare var JSON: JSON;
 
+////////////////
+/// ECMAScript Array API (specially handled by compiler)
+////////////////
+
+interface Array<T> {
+    toString(): string;
+    toLocaleString(): string;
+    concat<U extends T[]>(...items: U[]): T[];
+    concat(...items: T[]): T[];
+    join(separator?: string): string;
+    pop(): T;
+    push(...items: T[]): number;
+    reverse(): T[];
+    shift(): T;
+    slice(start: number, end?: number): T[];
+    sort(compareFn?: (a: T, b: T) => number): T[];
+    splice(start: number): T[];
+    splice(start: number, deleteCount: number, ...items: T[]): T[];
+    unshift(...items: T[]): number;
+
+    indexOf(searchElement: T, fromIndex?: number): number;
+    lastIndexOf(searchElement: T, fromIndex?: number): number;
+    every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean;
+    some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean;
+    forEach(callbackfn: (value: T, index: number, array: T[]) => void , thisArg?: any): void;
+    map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[];
+    filter(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[];
+    reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue?: U): U;
+    reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue?: U): U;
+
+    length: number;
+
+}
+declare var Array: {
+    new <T>(arrayLength: number): T[];
+    new <T>(...items: T[]): T[];
+    <T>(arrayLength: number): T[];
+    <T>(...items: T[]): T[];
+    isArray(arg: any): boolean;
+    prototype: Array<any>;
+}
+
+
+////////////////
+/// IE10 ECMAScript Extensions
+////////////////
+
+interface ArrayBuffer {
+    byteLength: number;
+}
+declare var ArrayBuffer: {
+    prototype: ArrayBuffer;
+    new (byteLength: number);
+}
+
+interface ArrayBufferView {
+    buffer: ArrayBuffer;
+    byteOffset: number;
+    byteLength: number;
+}
+
+interface Int8Array extends ArrayBufferView {
+    BYTES_PER_ELEMENT: number;
+    length: number;
+    [index: number]: number;
+    get(index: number): number;
+    set(index: number, value: number): void;
+    set(array: Int8Array, offset?: number): void;
+    set(array: number[], offset?: number): void;
+    subarray(begin: number, end?: number): Int8Array;
+}
+declare var Int8Array: {
+    prototype: Int8Array;
+    new (length: number): Int8Array;
+    new (array: Int8Array): Int8Array;
+    new (array: number[]): Int8Array;
+    new (buffer: ArrayBuffer, byteOffset?: number, length?: number): Int8Array;
+    BYTES_PER_ELEMENT: number;
+}
+
+interface Uint8Array extends ArrayBufferView {
+    BYTES_PER_ELEMENT: number;
+    length: number;
+    [index: number]: number;
+    get(index: number): number;
+    set(index: number, value: number): void;
+    set(array: Uint8Array, offset?: number): void;
+    set(array: number[], offset?: number): void;
+    subarray(begin: number, end?: number): Uint8Array;
+}
+declare var Uint8Array: {
+    prototype: Uint8Array;
+    new (length: number): Uint8Array;
+    new (array: Uint8Array): Uint8Array;
+    new (array: number[]): Uint8Array;
+    new (buffer: ArrayBuffer, byteOffset?: number, length?: number): Uint8Array;
+    BYTES_PER_ELEMENT: number;
+}
+
+interface Int16Array extends ArrayBufferView {
+    BYTES_PER_ELEMENT: number;
+    length: number;
+    [index: number]: number;
+    get(index: number): number;
+    set(index: number, value: number): void;
+    set(array: Int16Array, offset?: number): void;
+    set(array: number[], offset?: number): void;
+    subarray(begin: number, end?: number): Int16Array;
+}
+declare var Int16Array: {
+    prototype: Int16Array;
+    new (length: number): Int16Array;
+    new (array: Int16Array): Int16Array;
+    new (array: number[]): Int16Array;
+    new (buffer: ArrayBuffer, byteOffset?: number, length?: number): Int16Array;
+    BYTES_PER_ELEMENT: number;
+}
+
+interface Uint16Array extends ArrayBufferView {
+    BYTES_PER_ELEMENT: number;
+    length: number;
+    [index: number]: number;
+    get(index: number): number;
+    set(index: number, value: number): void;
+    set(array: Uint16Array, offset?: number): void;
+    set(array: number[], offset?: number): void;
+    subarray(begin: number, end?: number): Uint16Array;
+}
+declare var Uint16Array: {
+    prototype: Uint16Array;
+    new (length: number): Uint16Array;
+    new (array: Uint16Array): Uint16Array;
+    new (array: number[]): Uint16Array;
+    new (buffer: ArrayBuffer, byteOffset?: number, length?: number): Uint16Array;
+    BYTES_PER_ELEMENT: number;
+}
+
+interface Int32Array extends ArrayBufferView {
+    BYTES_PER_ELEMENT: number;
+    length: number;
+    [index: number]: number;
+    get(index: number): number;
+    set(index: number, value: number): void;
+    set(array: Int32Array, offset?: number): void;
+    set(array: number[], offset?: number): void;
+    subarray(begin: number, end?: number): Int32Array;
+}
+declare var Int32Array: {
+    prototype: Int32Array;
+    new (length: number): Int32Array;
+    new (array: Int32Array): Int32Array;
+    new (array: number[]): Int32Array;
+    new (buffer: ArrayBuffer, byteOffset?: number, length?: number): Int32Array;
+    BYTES_PER_ELEMENT: number;
+}
+
+interface Uint32Array extends ArrayBufferView {
+    BYTES_PER_ELEMENT: number;
+    length: number;
+    [index: number]: number;
+    get(index: number): number;
+    set(index: number, value: number): void;
+    set(array: Uint32Array, offset?: number): void;
+    set(array: number[], offset?: number): void;
+    subarray(begin: number, end?: number): Uint32Array;
+}
+declare var Uint32Array: {
+    prototype: Uint32Array;
+    new (length: number): Uint32Array;
+    new (array: Uint32Array): Uint32Array;
+    new (array: number[]): Uint32Array;
+    new (buffer: ArrayBuffer, byteOffset?: number, length?: number): Uint32Array;
+    BYTES_PER_ELEMENT: number;
+}
+
+interface Float32Array extends ArrayBufferView {
+    BYTES_PER_ELEMENT: number;
+    length: number;
+    [index: number]: number;
+    get(index: number): number;
+    set(index: number, value: number): void;
+    set(array: Float32Array, offset?: number): void;
+    set(array: number[], offset?: number): void;
+    subarray(begin: number, end?: number): Float32Array;
+}
+declare var Float32Array: {
+    prototype: Float32Array;
+    new (length: number): Float32Array;
+    new (array: Float32Array): Float32Array;
+    new (array: number[]): Float32Array;
+    new (buffer: ArrayBuffer, byteOffset?: number, length?: number): Float32Array;
+    BYTES_PER_ELEMENT: number;
+}
+
+interface Float64Array extends ArrayBufferView {
+    BYTES_PER_ELEMENT: number;
+    length: number;
+    [index: number]: number;
+    get(index: number): number;
+    set(index: number, value: number): void;
+    set(array: Float64Array, offset?: number): void;
+    set(array: number[], offset?: number): void;
+    subarray(begin: number, end?: number): Float64Array;
+}
+declare var Float64Array: {
+    prototype: Float64Array;
+    new (length: number): Float64Array;
+    new (array: Float64Array): Float64Array;
+    new (array: number[]): Float64Array;
+    new (buffer: ArrayBuffer, byteOffset?: number, length?: number): Float64Array;
+    BYTES_PER_ELEMENT: number;
+}
+
+interface DataView extends ArrayBufferView {
+    getInt8(byteOffset: number): number;
+    getUint8(byteOffset: number): number;
+    getInt16(byteOffset: number, littleEndian?: boolean): number;
+    getUint16(byteOffset: number, littleEndian?: boolean): number;
+    getInt32(byteOffset: number, littleEndian?: boolean): number;
+    getUint32(byteOffset: number, littleEndian?: boolean): number;
+    getFloat32(byteOffset: number, littleEndian?: boolean): number;
+    getFloat64(byteOffset: number, littleEndian?: boolean): number;
+
+    setInt8(byteOffset: number, value: number): void;
+    setUint8(byteOffset: number, value: number): void;
+    setInt16(byteOffset: number, value: number, littleEndian?: boolean): void;
+    setUint16(byteOffset: number, value: number, littleEndian?: boolean): void;
+    setInt32(byteOffset: number, value: number, littleEndian?: boolean): void;
+    setUint32(byteOffset: number, value: number, littleEndian?: boolean): void;
+    setFloat32(byteOffset: number, value: number, littleEndian?: boolean): void;
+    setFloat64(byteOffset: number, value: number, littleEndian?: boolean): void;
+}
+declare var DataView: {
+    prototype: DataView;
+    new (buffer: ArrayBuffer, byteOffset?: number, length?: number): DataView;
+}
 
 /************************************************
 *                                               *
