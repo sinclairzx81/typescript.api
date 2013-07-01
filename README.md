@@ -146,9 +146,9 @@ The typescript.api comes bundled with following declarations:
 It is recommended that developers copy the appropriate declarations suitable for their environment into their project structure and
 reference them accordingly. 
 
-For a full definition of this api, see  [typescript.api.d.ts](https://github.com/user/repo/blob/branch/other_file.md)
+For a full definition of this api, see  [typescript.api.d.ts](https://github.com/sinclairzx81/typescript.api/blob/master/src/resx/typescript.api.d.ts)
 
-For other additional declarations, see https://github.com/borisyankov/DefinitelyTyped.
+For other additional declarations, see the [definitely typed](https://github.com/borisyankov/DefinitelyTyped.) project.
 
 ## objects
 
