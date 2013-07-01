@@ -8,6 +8,13 @@ exports.prepare_directory = function(directory) {
 	}
 }
 
+
+exports.remove = function (filename) {
+
+    _fs.unlinkSync(filename);
+
+}
+
 // just copies...
 exports.copyfile = function(input_filename, output_filename, callback) {
 

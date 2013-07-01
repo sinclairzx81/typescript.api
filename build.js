@@ -11,7 +11,7 @@
 
 ////////////////////////////////////////////////////////////////////
 //
-// Note: will build the TypeScript.Api for TypeScript 0.9 beta
+// Note: will build the TypeScript.Api for TypeScript 0.9
 //
 // 	requires: the tsc 0.9 command line compiler...
 //
@@ -22,26 +22,28 @@ var path  = require('path');
 var tools = require('./tools/tools.js');
 
 // variables
-var src_dir					   = path.join( path.dirname( global.process.mainModule.filename ), "/src/");
-var bin_dir					   = path.join( path.dirname( global.process.mainModule.filename ), "/bin/");
-var api_input_filename   	   = path.join(src_dir, 'api.ts' );
-var index_input_filename       = path.join(src_dir, 'index.ts' );
-var api_output_filename        = path.join(bin_dir, 'typescript.api.js');
-var api_input_decl_filename    = path.join(bin_dir, 'typescript.api.d.ts');
-var api_output_decl_filename   = path.join(src_dir, 'decl/typescript.api.d.ts');
-var index_output_directory     = bin_dir;
-var typescript_input_filename  = path.join(src_dir, 'resx/typescript.js');
-var typescript_output_filename = path.join(bin_dir, 'typescript.js');
-var node_decl_input_filename   = path.join(src_dir, 'resx/node.d.ts');
-var node_decl_output_filename  = path.join(bin_dir, 'decl/node.d.ts');
-var lib_decl_input_filename    = path.join(src_dir, 'resx/lib.d.ts');
-var lib_decl_output_filename   = path.join(bin_dir, 'decl/lib.d.ts');
-var ecma_decl_input_filename   = path.join(src_dir, 'resx/ecma.d.ts');
-var ecma_decl_output_filename  = path.join(bin_dir, 'decl/ecma.d.ts');
-var package_input_filename     = path.join(src_dir, 'resx/package.json');
-var package_output_filename    = path.join(bin_dir, 'package.json');
-var readme_input_filename      = path.join(src_dir, '../readme.md');
-var readme_output_filename     = path.join(bin_dir, 'readme.md');
+var src_dir					         = path.join( path.dirname( global.process.mainModule.filename ), "/src/");
+var bin_dir					         = path.join( path.dirname( global.process.mainModule.filename ), "/bin/");
+var api_input_filename   	         = path.join(src_dir, 'api.ts' );
+var index_input_filename             = path.join(src_dir, 'index.ts' );
+var api_output_filename              = path.join(bin_dir, 'typescript.api.js');
+var api_input_decl_filename          = path.join(bin_dir, 'typescript.api.d.ts');
+var api_output_decl_filename         = path.join(src_dir, 'decl/typescript.api.d.ts');
+var api_light_input_decl_filename    = path.join(src_dir, 'resx/typescript.api.d.ts');
+var api_light_output_decl_filename   = path.join(bin_dir, 'decl/typescript.api.d.ts');
+var index_output_directory           = bin_dir;
+var typescript_input_filename        = path.join(src_dir, 'resx/typescript.js');
+var typescript_output_filename       = path.join(bin_dir, 'typescript.js');
+var node_decl_input_filename         = path.join(src_dir, 'resx/node.d.ts');
+var node_decl_output_filename        = path.join(bin_dir, 'decl/node.d.ts');
+var lib_decl_input_filename          = path.join(src_dir, 'resx/lib.d.ts');
+var lib_decl_output_filename         = path.join(bin_dir, 'decl/lib.d.ts');
+var ecma_decl_input_filename         = path.join(src_dir, 'resx/ecma.d.ts');
+var ecma_decl_output_filename        = path.join(bin_dir, 'decl/ecma.d.ts');
+var package_input_filename           = path.join(src_dir, 'resx/package.json');
+var package_output_filename          = path.join(bin_dir, 'package.json');
+var readme_input_filename            = path.join(src_dir, '../readme.md');
+var readme_output_filename           = path.join(bin_dir, 'readme.md');
 
 // thing to run after the build..
 var post_build_filename   = path.join( path.dirname( global.process.mainModule.filename ), "app.js")
@@ -75,18 +77,26 @@ function build () {
                         
 	                        console.log('copying node.d.ts....');
 	                        tools.builder.copyfile(node_decl_input_filename, node_decl_output_filename, function(){	
-						  
-	                            console.log('copying package.json....');
-	                            tools.builder.copyfile(package_input_filename, package_output_filename, function(){	
+
+                                console.log('copying typescript.api.d.ts....(client version)');
+                                tools.builder.copyfile(api_light_input_decl_filename, api_light_output_decl_filename, function(){	
+                                    
+                                    console.log('removing typescript.d.ts...(build version)');
+                                    tools.builder.remove(api_input_decl_filename);
+
+
+	                                console.log('copying package.json....');
+	                                tools.builder.copyfile(package_input_filename, package_output_filename, function(){	
 							  
-	                                console.log('copying README.md....');
-	                                tools.builder.copyfile(readme_input_filename, readme_output_filename, function(){	
+	                                    console.log('copying README.md....');
+	                                    tools.builder.copyfile(readme_input_filename, readme_output_filename, function(){	
 								  
-	                                    console.log('running post build....');
-	                                    console.log('-------------------------------------------------------');
-	                                    tools.nodestart.start( post_build_filename );	
+	                                        console.log('running post build....');
+	                                        console.log('-------------------------------------------------------');
+	                                        tools.nodestart.start( post_build_filename );	
+	                                    });
 	                                });
-	                            });
+                                });
 	                        });
                         });
                     });

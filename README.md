@@ -138,10 +138,15 @@ The typescript.api comes bundled with following declarations:
 
 // ecma api only.
 [node_modules]/typescript.api/decl/ecma.d.ts 
+
+// typescript.api declarations.
+[node_modules]/typescript.api/decl/typescript.api.d.ts
 ```
 
 It is recommended that developers copy the appropriate declarations suitable for their environment into their project structure and
 reference them accordingly. 
+
+For a full definition of this api, see  [typescript.api.d.ts](https://github.com/user/repo/blob/branch/other_file.md)
 
 For other additional declarations, see https://github.com/borisyankov/DefinitelyTyped.
 
