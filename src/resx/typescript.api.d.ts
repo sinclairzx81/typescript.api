@@ -34,7 +34,7 @@ declare module typescript.api
     class Type 
     {
         public name       : string;
-        public arguments  : Type[];
+        public arguments  : Array<Type>;
         public arrayCount : number;
         public limChar    : number;
         public minChar    : number;
@@ -51,7 +51,7 @@ declare module typescript.api
     class Method 
     {
         public name          : string;
-        public parameters    : typescript.api.Parameter[];
+        public parameters    : Array<typescript.api.Parameter>;
         public returns       : typescript.api.Type;
         public isStatic      : boolean;
         public isAccessor    : boolean;
@@ -85,10 +85,10 @@ declare module typescript.api
  
     class Interface 
     {
-        public methods    : typescript.api.Method[];
-        public variables  : typescript.api.Variable[];
-        public parameters : string[];
-        public extends    : typescript.api.Type[];
+        public methods    : Array<typescript.api.Method>;
+        public variables  : Array<typescript.api.Variable>;
+        public parameters : Array<string>;
+        public extends    : Array<typescript.api.Type>;
         public name       : string;
         public limChar    : number;
         public minChar    : number;
@@ -96,11 +96,11 @@ declare module typescript.api
  
     class Class 
     {
-        public methods    : typescript.api.Method[];
-        public variables  : typescript.api.Variable[];
-        public parameters : string[];
-        public extends    : typescript.api.Type[];
-        public implements : typescript.api.Type[];
+        public methods    : Array<typescript.api.Method>;
+        public variables  : Array<typescript.api.Variable>;
+        public parameters : Array<string>;
+        public extends    : Array<typescript.api.Type>;
+        public implements : Array<typescript.api.Type>;
         public name       : string;
         public limChar    : number;
         public minChar    : number;
@@ -108,12 +108,12 @@ declare module typescript.api
  
     class Module 
     {
-        public imports    : typescript.api.Import[];
-        public modules    : typescript.api.Module[];
-        public interfaces : typescript.api.Interface[];
-        public classes    : typescript.api.Class[];
-        public methods    : typescript.api.Method[];
-        public variables  : typescript.api.Variable[];
+        public imports    : Array<typescript.api.Import>;
+        public modules    : Array<typescript.api.Module>;
+        public interfaces : Array<typescript.api.Interface>;
+        public classes    : Array<typescript.api.Class>;
+        public methods    : Array<typescript.api.Method>;
+        public variables  : Array<typescript.api.Variable>;
         public name       : string;
         public limChar    : number;
         public minChar    : number;
@@ -122,23 +122,23 @@ declare module typescript.api
     class Script 
     {
         public path       : string;
-        public modules    : typescript.api.Module[];
-        public interfaces : typescript.api.Interface[];
-        public classes    : typescript.api.Class[];
-        public methods    : typescript.api.Method[];
-        public variables  : typescript.api.Variable[];
+        public modules    : Array<typescript.api.Module>;
+        public interfaces : Array<typescript.api.Interface>;
+        public classes    : Array<typescript.api.Class>;
+        public methods    : Array<typescript.api.Method>;
+        public variables  : Array<typescript.api.Variable>;
     }
  
     class Reflection 
     {
-        public scripts: typescript.api.Script[];
+        public scripts: Array<typescript.api.Script>;
     }
     
     class Unit 
     {
         public path        : string;
         public content     : string;
-        public diagnostics : typescript.api.Diagnostic[];
+        public diagnostics : Array<typescript.api.Diagnostic>;
         public hasError()  : boolean;
     }
  
@@ -168,22 +168,22 @@ declare module typescript.api
 
     export function register ()     : void;
 
-    export function check    (units : typescript.api.Unit[]) : boolean;
+    export function check    (units : Array<typescript.api.Unit>) : boolean;
 
     export function reset    () : void;
 
     export function create   (path:string, content:string) : typescript.api.SourceUnit  
 
-    export function resolve  (sources:string[], callback : (units : typescript.api.SourceUnit[] ) => void) : void;  
+    export function resolve  (sources:Array<string>, callback : (units : Array<typescript.api.SourceUnit> ) => void) : void;  
 
-    export function sort     (sourceUnits: typescript.api.SourceUnit[]) : typescript.api.SourceUnit[];
+    export function sort     (sourceUnits: Array<typescript.api.SourceUnit>) : Array<typescript.api.SourceUnit>;
 
-    export function compile (sourceUnits: typescript.api.SourceUnit[], callback : (compiledUnit:typescript.api.CompiledUnit[] )=> void) : void;
+    export function compile (sourceUnits: Array<typescript.api.SourceUnit>, callback : (compiledUnit:Array<typescript.api.CompiledUnit> )=> void) : void;
  
-    export function reflect (compiledUnits:typescript.api.CompiledUnit [], callback :{ ( reflection:typescript.api.Reflection ): void; }) : void;
+    export function reflect (compiledUnits:Array<typescript.api.CompiledUnit>, callback :{ ( reflection:typescript.api.Reflection ): void; }) : void;
 
-    export function run     (compiledUnits:typescript.api.CompiledUnit[], sandbox:any, callback :{ (context:any): void; }) : void;
+    export function run     (compiledUnits:Array<typescript.api.CompiledUnit>, sandbox:any, callback :{ (context:any): void; }) : void;
 
-    export function build   (filenames:string[], callback :(diagnostics:typescript.api.Diagnostic[], source:string, declaration:string )=> void) : void;
+    export function build   (filenames:string[], callback :(diagnostics:Array<typescript.api.Diagnostic>, source:string, declaration:string )=> void) : void;
 
 }
