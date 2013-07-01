@@ -148,7 +148,7 @@ reference them accordingly.
 
 For a full definition of this api, see  [typescript.api.d.ts](https://github.com/sinclairzx81/typescript.api/blob/master/src/resx/typescript.api.d.ts)
 
-For other additional declarations, see the [definitely typed](https://github.com/borisyankov/DefinitelyTyped.) project.
+For other additional declarations, see the [definitely typed](https://github.com/borisyankov/DefinitelyTyped) project.
 
 ## objects
 
