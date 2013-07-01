@@ -11,6 +11,7 @@
 // limitations under the License.
 
 /// <reference path="../decl/typescript.d.ts" />
+/// <reference path="Method.ts" />
 
 module TypeScript.Api.Reflect 
 {
@@ -19,6 +20,8 @@ module TypeScript.Api.Reflect
 		public name 	  : string;
 
 		public arguments  : Type[];
+        
+        public signature  : TypeScript.Api.Reflect.Method;
 
 		public arrayCount : number;
 
@@ -29,7 +32,7 @@ module TypeScript.Api.Reflect
 		constructor() 
 		{
 			this.name       = "any";
-
+            
 			this.arguments  = [];
 
 			this.arrayCount = 0;
@@ -159,6 +162,14 @@ module TypeScript.Api.Reflect
 						type.arguments.push( create_type( typeRef ) );
 					}
 				}
+
+                if(typeRef.term.nodeType == TypeScript.NodeType.FunctionDeclaration) {
+                    
+                    type.name      = "Function";
+
+                    type.signature = Method.create(<TypeScript.FunctionDeclaration> typeRef.term);
+
+                }
 
 				return type;
 			};

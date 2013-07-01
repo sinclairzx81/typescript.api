@@ -139,6 +139,7 @@ declare module TypeScript.Api.Reflect {
     class Type {
         public name: string;
         public arguments: Type[];
+        public signature: Reflect.Method;
         public arrayCount: number;
         public limChar: number;
         public minChar: number;

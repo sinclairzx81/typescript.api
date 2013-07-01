@@ -31,14 +31,7 @@ declare module typescript.api
         public minChar : number;
     }
  
-    class Type 
-    {
-        public name       : string;
-        public arguments  : Array<Type>;
-        public arrayCount : number;
-        public limChar    : number;
-        public minChar    : number;
-    }
+
  
     class Parameter 
     {
@@ -67,7 +60,17 @@ declare module typescript.api
         public limChar       : number;
         public minChar       : number;
     }
- 
+
+    class Type 
+    {
+        public name       : string;
+        public arguments  : Array<Type>;
+        public signature  : Method;
+        public arrayCount : number;
+        public limChar    : number;
+        public minChar    : number;
+    } 
+
     class Variable 
     {
         public name          : string;

@@ -1237,14 +1237,14 @@ declare var Buffer:
 
 interface EventEmitter 
 {
-   addListener       (event: string, listener: Function);
-   on                (event: string, listener: Function);
-   once              (event: string, listener: Function): void;
-   removeListener    (event: string, listener: Function): void;
-   removeAllListener (event: string): void;
-   setMaxListeners   (n: number): void;
-   listeners         (event: string): { Function; }[];
-   emit              (event: string, arg1?: any, arg2?: any): void;
+   addListener        (event: string, listener: Function);
+   on                 (event: string, listener: Function);
+   once               (event: string, listener: Function): void;
+   removeListener     (event: string, listener: Function): void;
+   removeAllListeners (event: string): void;
+   setMaxListeners    (n: number): void;
+   listeners          (event: string): { Function; }[];
+   emit               (event: string, arg1?: any, arg2?: any): void;
 }
 
 interface WritableStream extends EventEmitter {

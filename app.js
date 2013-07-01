@@ -26,6 +26,8 @@ function print_unit(unit) {
     console.log(unit.sourcemap);
 
     console.log(unit.reflection);
+
+    console.log(JSON.stringify(unit.reflection, null, ' '));
 }
 
 typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
