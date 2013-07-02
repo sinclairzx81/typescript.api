@@ -44,6 +44,7 @@ declare module typescript.api
     class Method 
     {
         public name          : string;
+        public fullname      : string;
         public parameters    : Array<typescript.api.Parameter>;
         public returns       : typescript.api.Type;
         public isStatic      : boolean;
@@ -74,6 +75,7 @@ declare module typescript.api
     class Variable 
     {
         public name          : string;
+        public fullname      : string;
         public type          : typescript.api.Type;
         public isProperty    : boolean;
         public isStatic      : boolean;
@@ -93,6 +95,7 @@ declare module typescript.api
         public parameters : Array<string>;
         public extends    : Array<typescript.api.Type>;
         public name       : string;
+        public fullname      : string;
         public limChar    : number;
         public minChar    : number;
     }
@@ -105,6 +108,7 @@ declare module typescript.api
         public extends    : Array<typescript.api.Type>;
         public implements : Array<typescript.api.Type>;
         public name       : string;
+        public fullname      : string;
         public limChar    : number;
         public minChar    : number;
     }
@@ -118,6 +122,7 @@ declare module typescript.api
         public methods    : Array<typescript.api.Method>;
         public variables  : Array<typescript.api.Variable>;
         public name       : string;
+        public fullname   : string;
         public limChar    : number;
         public minChar    : number;
     }

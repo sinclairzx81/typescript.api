@@ -35,6 +35,8 @@ module TypeScript.Api.Reflect
 
 		public name       : string;
 
+        public fullname   : string;
+
 		public limChar    : number;
 
 		public minChar    : number;

@@ -19,6 +19,8 @@ module TypeScript.Api.Reflect
 	{
 		public name                    : string;
 
+        public fullname                : string;
+
 		public type                    : Type;
 
 		public isProperty              : boolean;

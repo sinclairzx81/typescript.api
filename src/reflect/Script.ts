@@ -131,6 +131,54 @@ module TypeScript.Api.Reflect
 			}
 		}
 
+        public static load_qualified_names(script:Script) : void {
+            
+            var scope = [];
+
+            var qualify_module_names = (module:TypeScript.Api.Reflect.Module) => {
+
+                if(scope.length > 0) module.fullname = scope.join('.') + '.' + module.name;
+            
+                scope.push(module.name);
+
+                module.interfaces.forEach((obj)=> {
+                    
+                     if(scope.length > 0) obj.fullname = scope.join('.') + '.' + obj.name;
+
+                });
+                module.classes.forEach((obj)=> {
+                    
+                     if(scope.length > 0) obj.fullname = scope.join('.') + '.' + obj.name;
+
+                });
+                module.methods.forEach((obj)=> {
+                       
+                    if(scope.length > 0) obj.fullname = scope.join('.') + '.' + obj.name;
+
+                });     
+                module.variables.forEach((obj)=> {
+                       
+                    if(scope.length > 0) obj.fullname = scope.join('.') + '.' + obj.name;
+
+                });                                                
+
+                module.modules.forEach((module)=> {
+                    
+                    qualify_module_names(module);
+
+                });
+
+                scope.pop();
+            };
+
+            script.modules.forEach((module) => {
+            
+                qualify_module_names(module);
+
+            });
+        }
+
+
 		public static create(path:string, ast:TypeScript.Script): Script 
 		{
 			var result = new Script();
@@ -146,6 +194,8 @@ module TypeScript.Api.Reflect
 			Script.load_methods    (result, ast);
 
 			Script.load_variables  (result, ast);
+
+            Script.load_qualified_names(result);
 
 			return result;
 		}

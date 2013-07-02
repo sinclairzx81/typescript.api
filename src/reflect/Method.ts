@@ -20,6 +20,8 @@ module TypeScript.Api.Reflect
 	{
 		public name            : string;
 
+        public fullname        : string;
+
 		public parameters      : Parameter[];
 
 		public returns         : Type;
@@ -97,6 +99,8 @@ module TypeScript.Api.Reflect
 			var result           = new Method();
 
 			result.name          = ast.isConstructor ? "constructor" : ast.getNameText();
+
+            result.fullname      = result.name;
 
 			result.isConstructor = ast.isConstructor;
 

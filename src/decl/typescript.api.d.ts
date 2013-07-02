@@ -161,6 +161,7 @@ declare module TypeScript.Api.Reflect {
 declare module TypeScript.Api.Reflect {
     class Method {
         public name: string;
+        public fullname: string;
         public parameters: Reflect.Parameter[];
         public returns: Reflect.Type;
         public isStatic: boolean;
@@ -186,6 +187,7 @@ declare module TypeScript.Api.Reflect {
 declare module TypeScript.Api.Reflect {
     class Variable {
         public name: string;
+        public fullname: string;
         public type: Reflect.Type;
         public isProperty: boolean;
         public isStatic: boolean;
@@ -209,6 +211,7 @@ declare module TypeScript.Api.Reflect {
         public parameters: string[];
         public extends: Reflect.Type[];
         public name: string;
+        public fullname: string;
         public limChar: number;
         public minChar: number;
         constructor();
@@ -227,6 +230,7 @@ declare module TypeScript.Api.Reflect {
         public extends: Reflect.Type[];
         public implements: Reflect.Type[];
         public name: string;
+        public fullname: string;
         public limChar: number;
         public minChar: number;
         constructor();
@@ -247,6 +251,7 @@ declare module TypeScript.Api.Reflect {
         public methods: Reflect.Method[];
         public variables: Reflect.Variable[];
         public name: string;
+        public fullname: string;
         public limChar: number;
         public minChar: number;
         constructor();
@@ -273,6 +278,7 @@ declare module TypeScript.Api.Reflect {
         private static load_classes(result, ast);
         private static load_methods(result, ast);
         private static load_variables(result, ast);
+        static load_qualified_names(script: Script): void;
         static create(path: string, ast: TypeScript.Script): Script;
     }
 }
