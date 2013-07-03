@@ -180,7 +180,7 @@ module TypeScript.Api.Reflect
 
             if(hasFlag(flags, ModuleFlags.Exported)) {
                 
-                this.isExported = true;
+                result.isExported = true;
             }
 
 			Module.load_imports    (result, ast);

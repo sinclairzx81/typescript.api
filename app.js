@@ -25,7 +25,7 @@ function print_unit(unit) {
 
     //console.log(unit.sourcemap);
 
-    console.log(unit.script);
+    //console.log(unit.script);
 
     console.log(JSON.stringify(unit.script, null, ' '));
 }

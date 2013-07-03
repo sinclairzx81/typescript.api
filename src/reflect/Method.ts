@@ -119,12 +119,12 @@ module TypeScript.Api.Reflect
 
             if(hasFlag(flags, FunctionFlags.Public)) {
                 
-                this.isPublic = true;
+                result.isPublic = true;
             }
 
             if(hasFlag(flags, FunctionFlags.Exported)) {
                 
-                this.isExported = true;
+                result.isExported = true;
             }
             
 			result.isConstructor = ast.isConstructor;

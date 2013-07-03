@@ -151,7 +151,7 @@ module TypeScript.Api.Reflect
 
             if(hasFlag(flags, VariableFlags.Exported)) {
                 
-                this.isExported = true;
+                result.isExported = true;
             }
 
 			Class.load_parameters (result, ast);

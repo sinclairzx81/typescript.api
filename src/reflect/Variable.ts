@@ -90,12 +90,12 @@ module TypeScript.Api.Reflect
 
             if(hasFlag(flags, VariableFlags.Public)) {
                 
-                this.isPublic = true;
+                result.isPublic = true;
             }
 
             if(hasFlag(flags, VariableFlags.Exported)) {
 
-                this.isExported = true;
+                result.isExported = true;
             }
 
 
