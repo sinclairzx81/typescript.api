@@ -25,7 +25,7 @@ module TypeScript.Api.Units
 
         public sourcemap   : string;
 
-        public reflection  : TypeScript.Api.Reflect.Script;
+        public script      : TypeScript.Api.Reflect.Script;
 
 		constructor(path        : string, 
                     content     : string, 
@@ -33,7 +33,7 @@ module TypeScript.Api.Units
                     ast         : TypeScript.AST, 
                     declaration : string, 
                     sourcemap   : string, 
-                    reflection  : TypeScript.Api.Reflect.Script) 
+                    script      : TypeScript.Api.Reflect.Script) 
 		{
 			super(path, content, diagnostics);
 
@@ -43,7 +43,7 @@ module TypeScript.Api.Units
 
             this.sourcemap   = sourcemap;
 
-            this.reflection  = reflection;
+            this.script      = script;
 		}
 
         // note: references resolved on declarations.

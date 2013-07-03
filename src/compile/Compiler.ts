@@ -236,7 +236,7 @@ module TypeScript.Api.Compile {
             };
 
             // computes the reflection for this unit.
-            var get_reflection = (path:string, ast:TypeScript.Script) => {
+            var get_script_reflection = (path:string, ast:TypeScript.Script) => {
                 
 	            return TypeScript.Api.Reflect.Script.create(path, ast); 
 
@@ -296,11 +296,11 @@ module TypeScript.Api.Compile {
 
                         var sourcemap   = get_sourcemap_source   ( path, emitter );
 
-                        var reflection = get_reflection          ( path, ast );
+                        var script      = get_script_reflection  ( path, ast );
     
 						var diagnostics = sourceUnit.diagnostics;
                         
-						result.push( new TypeScript.Api.Units.CompiledUnit(path, content, diagnostics, ast, declaration, sourcemap, reflection) );
+						result.push( new TypeScript.Api.Units.CompiledUnit(path, content, diagnostics, ast, declaration, sourcemap, script) );
 					}
 				}
 			}

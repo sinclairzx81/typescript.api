@@ -299,8 +299,8 @@ declare module TypeScript.Api.Units {
         public ast: TypeScript.AST;
         public declaration: string;
         public sourcemap: string;
-        public reflection: Api.Reflect.Script;
-        constructor(path: string, content: string, diagnostics: Units.Diagnostic[], ast: TypeScript.AST, declaration: string, sourcemap: string, reflection: Api.Reflect.Script);
+        public script: Api.Reflect.Script;
+        constructor(path: string, content: string, diagnostics: Units.Diagnostic[], ast: TypeScript.AST, declaration: string, sourcemap: string, script: Api.Reflect.Script);
         public references(): string[];
     }
 }

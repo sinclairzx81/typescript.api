@@ -33,16 +33,16 @@ export class Program
                     } 
                     else  
                     {
-                        var obj = { scripts :[] };
+                        var reflection = { scripts :[] };
                         
                         for(var n in compiled) {
                         
-                            obj.scripts.push(compiled[n].reflection);
+                            reflection.scripts.push(compiled[n].script);
                         }
                         
                         response.writeHead(200, {'content-type' : 'application/json'}); 
 
-                        response.write( JSON.stringify(obj, null, " ") );
+                        response.write( JSON.stringify(reflection, null, " ") );
 
                         response.end();    
              
