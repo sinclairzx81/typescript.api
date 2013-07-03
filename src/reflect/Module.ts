@@ -11,6 +11,7 @@
 // limitations under the License.
 
 /// <reference path="../decl/typescript.d.ts" />
+/// <reference path="ReflectionType.ts" />
 /// <reference path="Import.ts" />
 /// <reference path="Interface.ts" />
 /// <reference path="Class.ts" />
@@ -19,7 +20,7 @@
 
 module TypeScript.Api.Reflect 
 {
-	export class Module 
+	export class Module extends ReflectionType
 	{
 		public imports    : Import    [];
 
@@ -44,6 +45,8 @@ module TypeScript.Api.Reflect
 		public minChar    : number;
 
 		constructor () {
+
+            super('module');
 
 			this.imports    = [];
 

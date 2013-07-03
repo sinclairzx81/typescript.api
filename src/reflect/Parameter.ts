@@ -11,11 +11,12 @@
 // limitations under the License.
 
 /// <reference path="../decl/typescript.d.ts" />
+/// <reference path="ReflectionType.ts" />
 /// <reference path="Type.ts" />
 
 module TypeScript.Api.Reflect 
 {
-	export class Parameter 
+	export class Parameter extends ReflectionType
 	{
 		public name		  : string;
 
@@ -24,6 +25,12 @@ module TypeScript.Api.Reflect
 		public limChar    : number;
 
 		public minChar    : number;
+
+        constructor() {
+        
+            super('parameter');
+
+        }
 
 		private static load_type(result:Parameter, ast:TypeScript.Parameter) : void 
 		{

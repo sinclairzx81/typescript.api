@@ -11,13 +11,14 @@
 // limitations under the License.
 
 /// <reference path="../decl/typescript.d.ts" />
+/// <reference path="ReflectionType.ts" />
 /// <reference path="Method.ts" />
 /// <reference path="Variable.ts" />
 /// <reference path="Type.ts" />
 
 module TypeScript.Api.Reflect 
 {	
-	export class Class 
+	export class Class extends ReflectionType
 	{
 		public methods    : Method     [];
 
@@ -41,6 +42,8 @@ module TypeScript.Api.Reflect
 
 		constructor() 
 		{
+            super('class')
+
 			this.methods    = [];
 
 			this.variables  = [];

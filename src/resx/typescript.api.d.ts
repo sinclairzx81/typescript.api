@@ -31,9 +31,12 @@ declare module typescript.api
         public minChar : number;
     }
  
-
+    class ReflectedType {
+    
+        public identifier : string;
+    }
  
-    class Parameter 
+    class Parameter extends ReflectedType
     {
         public name     : string;
         public type     : typescript.api.Type;
@@ -41,7 +44,7 @@ declare module typescript.api
         public minChar  : number;  
     }
  
-    class Method 
+    class Method  extends ReflectedType
     {
         public name          : string;
         public fullname      : string;
@@ -64,7 +67,7 @@ declare module typescript.api
         public minChar       : number;
     }
 
-    class Type 
+    class Type extends ReflectedType
     {
         public name       : string;
         public arguments  : Array<Type>;
@@ -74,7 +77,7 @@ declare module typescript.api
         public minChar    : number;
     } 
 
-    class Variable 
+    class Variable extends ReflectedType
     {
         public name          : string;
         public fullname      : string;
@@ -91,7 +94,7 @@ declare module typescript.api
         public minChar       : number;
     }
  
-    class Interface 
+    class Interface extends ReflectedType
     {
         public methods    : Array<typescript.api.Method>;
         public variables  : Array<typescript.api.Variable>;
@@ -104,7 +107,7 @@ declare module typescript.api
         public minChar    : number;
     }
  
-    class Class 
+    class Class extends ReflectedType
     {
         public methods    : Array<typescript.api.Method>;
         public variables  : Array<typescript.api.Variable>;
@@ -118,7 +121,7 @@ declare module typescript.api
         public minChar    : number;
     }
  
-    class Module 
+    class Module extends ReflectedType
     {
         public imports    : Array<typescript.api.Import>;
         public modules    : Array<typescript.api.Module>;
@@ -133,7 +136,7 @@ declare module typescript.api
         public minChar    : number;
     }
  
-    class Script 
+    class Script extends ReflectedType
     {
         public path       : string;
         public modules    : Array<typescript.api.Module>;

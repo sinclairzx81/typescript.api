@@ -11,11 +11,12 @@
 // limitations under the License.
 
 /// <reference path="../decl/typescript.d.ts" />
+/// <reference path="ReflectionType.ts" />
 /// <reference path="Type.ts" />
 
 module TypeScript.Api.Reflect 
 {
-	export class Variable 
+	export class Variable extends ReflectionType
 	{
 		public name                    : string;
 
@@ -44,6 +45,8 @@ module TypeScript.Api.Reflect
 		public minChar                 : number;
 
 		constructor() {
+
+            super('variable');
 
 			this.comments = [];
 

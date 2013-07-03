@@ -11,11 +11,12 @@
 // limitations under the License.
 
 /// <reference path="../decl/typescript.d.ts" />
+/// <reference path="ReflectionType.ts" />
 /// <reference path="Method.ts" />
 
 module TypeScript.Api.Reflect 
 {
-	export class Type  
+	export class Type extends ReflectionType 
 	{
 		public name 	  : string;
 
@@ -31,6 +32,8 @@ module TypeScript.Api.Reflect
 
 		constructor() 
 		{
+            super('type');
+
 			this.name       = "any";
             
 			this.arguments  = [];
