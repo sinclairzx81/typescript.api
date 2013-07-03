@@ -47,6 +47,8 @@ declare module typescript.api
         public fullname      : string;
         public parameters    : Array<typescript.api.Parameter>;
         public returns       : typescript.api.Type;
+        public isPublic      : boolean;
+        public isExported    : boolean;
         public isStatic      : boolean;
         public isAccessor    : boolean;
         public isSignature   : boolean;
@@ -77,12 +79,13 @@ declare module typescript.api
         public name          : string;
         public fullname      : string;
         public type          : typescript.api.Type;
+        public isPublic      : boolean;
+        public isExported    : boolean;
         public isProperty    : boolean;
         public isStatic      : boolean;
         public isStatement   : boolean;
         public isExpression  : boolean;
         public isStatementOrExpression: boolean;
-        public isExported    : boolean;
         public comments      : string[];
         public limChar       : number;
         public minChar       : number;
@@ -94,8 +97,9 @@ declare module typescript.api
         public variables  : Array<typescript.api.Variable>;
         public parameters : Array<string>;
         public extends    : Array<typescript.api.Type>;
+        public isExported : boolean;
         public name       : string;
-        public fullname      : string;
+        public fullname   : string;
         public limChar    : number;
         public minChar    : number;
     }
@@ -107,8 +111,9 @@ declare module typescript.api
         public parameters : Array<string>;
         public extends    : Array<typescript.api.Type>;
         public implements : Array<typescript.api.Type>;
+        public isExported : boolean;
         public name       : string;
-        public fullname      : string;
+        public fullname   : string;
         public limChar    : number;
         public minChar    : number;
     }
@@ -121,6 +126,7 @@ declare module typescript.api
         public classes    : Array<typescript.api.Class>;
         public methods    : Array<typescript.api.Method>;
         public variables  : Array<typescript.api.Variable>;
+        public isExported : boolean;
         public name       : string;
         public fullname   : string;
         public limChar    : number;

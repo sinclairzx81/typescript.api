@@ -23,6 +23,8 @@ module TypeScript.Api.Reflect
 
 		public type                    : Type;
 
+        public isPublic                : boolean;
+
 		public isProperty              : boolean;
 
 		public isStatic                : boolean;
@@ -44,6 +46,10 @@ module TypeScript.Api.Reflect
 		constructor() {
 
 			this.comments = [];
+
+            this.isExported = false;
+
+            this.isPublic   = false;
 
 		}
 
@@ -74,6 +80,24 @@ module TypeScript.Api.Reflect
 			var result = new Variable();
 
 			result.name                    = ast.id.text;
+
+            var hasFlag = (val : number, flag: number) :boolean  => 
+            {
+                return (val & flag) !== 0;
+            };
+            
+            var flags = ast.getVarFlags();
+
+            if(hasFlag(flags, VariableFlags.Public)) {
+                
+                this.isPublic = true;
+            }
+
+            if(hasFlag(flags, VariableFlags.Exported)) {
+
+                this.isExported = true;
+            }
+
 
 			result.isProperty              = ast.isProperty();
 

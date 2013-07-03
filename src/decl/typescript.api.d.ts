@@ -164,6 +164,8 @@ declare module TypeScript.Api.Reflect {
         public fullname: string;
         public parameters: Reflect.Parameter[];
         public returns: Reflect.Type;
+        public isExported: boolean;
+        public isPublic: boolean;
         public isStatic: boolean;
         public isAccessor: boolean;
         public isSignature: boolean;
@@ -189,6 +191,7 @@ declare module TypeScript.Api.Reflect {
         public name: string;
         public fullname: string;
         public type: Reflect.Type;
+        public isPublic: boolean;
         public isProperty: boolean;
         public isStatic: boolean;
         public isStatement: boolean;
@@ -210,6 +213,7 @@ declare module TypeScript.Api.Reflect {
         public variables: Reflect.Variable[];
         public parameters: string[];
         public extends: Reflect.Type[];
+        public isExported: boolean;
         public name: string;
         public fullname: string;
         public limChar: number;
@@ -229,6 +233,7 @@ declare module TypeScript.Api.Reflect {
         public parameters: string[];
         public extends: Reflect.Type[];
         public implements: Reflect.Type[];
+        public isExported: boolean;
         public name: string;
         public fullname: string;
         public limChar: number;
@@ -250,6 +255,7 @@ declare module TypeScript.Api.Reflect {
         public classes: Reflect.Class[];
         public methods: Reflect.Method[];
         public variables: Reflect.Variable[];
+        public isExported: boolean;
         public name: string;
         public fullname: string;
         public limChar: number;

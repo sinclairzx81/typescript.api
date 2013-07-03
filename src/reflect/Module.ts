@@ -33,6 +33,8 @@ module TypeScript.Api.Reflect
 
 		public variables  : Variable  [];
 
+        public isExported : boolean;
+
 		public name       : string;
 
         public fullname   : string;
@@ -54,6 +56,8 @@ module TypeScript.Api.Reflect
 			this.methods    = [];
 
 			this.variables  = [];
+
+            this.isExported = false;
 		}
 
 		private static load_imports(result:TypeScript.Api.Reflect.Module, ast:TypeScript.ModuleDeclaration) : void 
@@ -166,6 +170,18 @@ module TypeScript.Api.Reflect
 			result.limChar = ast.limChar;
 
 			result.minChar = ast.minChar;
+            
+            var hasFlag = (val : number, flag: number) :boolean  => 
+            {
+                return (val & flag) !== 0;
+            };
+            
+            var flags      = ast.getModuleFlags();
+
+            if(hasFlag(flags, ModuleFlags.Exported)) {
+                
+                this.isExported = true;
+            }
 
 			Module.load_imports    (result, ast);
 

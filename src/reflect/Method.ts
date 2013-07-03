@@ -26,6 +26,10 @@ module TypeScript.Api.Reflect
 
 		public returns         : Type;
 
+        public isExported      : boolean;
+
+        public isPublic        : boolean;
+        
 		public isStatic        : boolean;
 
 		public isAccessor      : boolean; 
@@ -57,6 +61,10 @@ module TypeScript.Api.Reflect
 			this.parameters = [];
 
 			this.comments   = [];
+
+            this.isPublic   = false;
+
+            this.isExported = false;
 		}
 
 		private static load_comments(result:Method, ast:TypeScript.FunctionDeclaration) : void 
@@ -102,6 +110,23 @@ module TypeScript.Api.Reflect
 
             result.fullname      = result.name;
 
+            var hasFlag = (val : number, flag: number) :boolean  => 
+            {
+                return (val & flag) !== 0;
+            };
+
+            var flags = ast.getFunctionFlags();
+
+            if(hasFlag(flags, FunctionFlags.Public)) {
+                
+                this.isPublic = true;
+            }
+
+            if(hasFlag(flags, FunctionFlags.Exported)) {
+                
+                this.isExported = true;
+            }
+            
 			result.isConstructor = ast.isConstructor;
 
 			result.isStatic      = ast.isStatic();

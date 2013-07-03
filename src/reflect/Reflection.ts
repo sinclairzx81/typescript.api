@@ -31,5 +31,7 @@ module TypeScript.Api.Reflect
 		{
 			this.scripts = [];
 		}
+
+        // todo: maybe add some useful methods to help out with reflection?
 	}
 }

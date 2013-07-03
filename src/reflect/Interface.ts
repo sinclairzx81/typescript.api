@@ -27,6 +27,8 @@ module TypeScript.Api.Reflect
 
 		public extends    : Type      [];
 
+        public isExported : boolean;
+        
 		public name       : string;
 
         public fullname   : string;
@@ -44,6 +46,8 @@ module TypeScript.Api.Reflect
 			this.extends    = [];
 
 			this.parameters = [];
+
+            this.isExported = false;
 		}
 
 		private static load_parameters(result:Interface, ast:TypeScript.InterfaceDeclaration): void 
@@ -116,6 +120,18 @@ module TypeScript.Api.Reflect
 			result.limChar = ast.limChar;
 
 			result.minChar = ast.minChar;
+
+            var hasFlag = (val : number, flag: number) :boolean  => 
+            {
+                return (val & flag) !== 0;
+            };
+            
+            var flags      = ast.getVarFlags();
+
+            if(hasFlag(flags, VariableFlags.Exported)) {
+                
+                this.isExported = true;
+            }
 
 			Interface.load_parameters (result, ast);
 

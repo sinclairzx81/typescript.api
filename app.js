@@ -38,7 +38,7 @@ typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
         
         for (var n in compiled) {
 
-            print_unit(compiled[n]);
+          //  print_unit(compiled[n]);
         }
     });
 });
