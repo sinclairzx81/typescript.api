@@ -17,28 +17,28 @@ function print_unit(unit) {
 
     console.log('------------------------')
 
-    console.log(unit.path);
+    //console.log(unit.path);
 
-    console.log(unit.content);
+    //console.log(unit.content);
 
-    console.log(unit.declaration);
+    //console.log(unit.declaration);
 
-    console.log(unit.sourcemap);
+    //console.log(unit.sourcemap);
 
-    console.log(unit.reflection);
+    console.log(unit.script);
 
-    console.log(JSON.stringify(unit.reflection, null, ' '));
+    console.log(JSON.stringify(unit.script, null, ' '));
 }
 
 typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
 
-    print_diagnostics(resolved);
+    //print_diagnostics(resolved);
     
     typescript.compile(resolved, function(compiled) {
         
         for (var n in compiled) {
 
-          //  print_unit(compiled[n]);
+            print_unit(compiled[n]);
         }
     });
 });

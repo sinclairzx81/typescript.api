@@ -296,11 +296,13 @@ module TypeScript.Api.Compile {
 
                         var sourcemap   = get_sourcemap_source   ( path, emitter );
 
-                        var script      = get_script_reflection  ( path, ast );
+                        var _script      = get_script_reflection  ( path, ast );
     
 						var diagnostics = sourceUnit.diagnostics;
+
                         
-						result.push( new TypeScript.Api.Units.CompiledUnit(path, content, diagnostics, ast, declaration, sourcemap, script) );
+                        
+						result.push( new TypeScript.Api.Units.CompiledUnit(path, content, diagnostics, ast, declaration, sourcemap, _script) );
 					}
 				}
 			}
