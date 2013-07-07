@@ -27,7 +27,7 @@ function print_unit(unit) {
 
     //console.log(unit.script);
 
-    console.log(JSON.stringify(unit.script, null, ' '));
+    //console.log(JSON.stringify(unit.script, null, ' '));
 }
 
 typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
@@ -36,9 +36,16 @@ typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
     
     typescript.compile(resolved, function(compiled) {
         
-        for (var n in compiled) {
+        if (!typescript.check(compiled)) {
 
-            print_unit(compiled[n]);
+            console.log('errors');
+
+        } else {
+
+            for (var n in compiled) {
+
+                print_unit(compiled[n]);
+            }
         }
     });
 });

@@ -18,8 +18,6 @@ module TypeScript.Api.Reflect
 {
 	export class Type extends ReflectionType 
 	{
-		public name 	  : string;
-
 		public arguments  : Type[];
         
         public signature  : TypeScript.Api.Reflect.Method;

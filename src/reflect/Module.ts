@@ -36,10 +36,6 @@ module TypeScript.Api.Reflect
 
         public isExported : boolean;
 
-		public name       : string;
-
-        public fullname   : string;
-
 		public limChar    : number;
 
 		public minChar    : number;

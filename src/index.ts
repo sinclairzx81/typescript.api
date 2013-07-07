@@ -250,7 +250,25 @@ export function compile (sourceUnits: TypeScript.Api.Units.SourceUnit[], callbac
     {
 	    exports.compiler = new api.Compile.Compiler(exports.languageVersion, exports.moduleTarget, logger );
 	}
-	exports.compiler.compile( sourceUnits , callback);
+
+    // compute reflection.
+
+
+    exports.compiler.compile(sourceUnits, (compiledUnits)=> {
+    
+        var reflection = new api.Reflect.Reflection();
+
+        for(var n in compiledUnits) {
+
+            var script = api.Reflect.Script.create(compiledUnits[n].path, compiledUnits[n].ast );
+
+            reflection.scripts.push(script);
+        }
+
+        reflection.resolve_type_references();
+           
+        callback(compiledUnits);
+    });
 }
 
 /////////////////////////////////////////////////////////////
@@ -268,8 +286,9 @@ export function reflect(compiledUnits:TypeScript.Api.Units.CompiledUnit [], call
         var script = api.Reflect.Script.create(compiledUnits[n].path, compiledUnits[n].ast );
 
         reflection.scripts.push(script);
-    
     }
+
+    reflection.resolve_type_references();
 	
 	callback( reflection );
 }

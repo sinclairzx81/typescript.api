@@ -32,8 +32,6 @@ module TypeScript.Api.Reflect
 
 		public variables  : Variable  [];
 
-		public path       : string;
-
 		constructor () 
 		{
             super('script');
@@ -134,34 +132,36 @@ module TypeScript.Api.Reflect
 			}
 		}
 
-        public static load_qualified_names(script:Script) : void {
+        public static load_scope(script:Script) : void {
             
             var scope = [];
 
             var qualify_module_names = (module:TypeScript.Api.Reflect.Module) => {
 
-                if(scope.length > 0) module.fullname = scope.join('.') + '.' + module.name;
+                module.scope = scope.slice(0);
             
                 scope.push(module.name);
 
                 module.interfaces.forEach((obj)=> {
-                    
-                     if(scope.length > 0) obj.fullname = scope.join('.') + '.' + obj.name;
+                     
+                     //if(scope.length > 0) obj.fullname = scope.join('.') + '.' + obj.name;
+
+                    obj.scope = scope.slice(0);
 
                 });
                 module.classes.forEach((obj)=> {
                     
-                     if(scope.length > 0) obj.fullname = scope.join('.') + '.' + obj.name;
+                    obj.scope = scope.slice(0);
 
                 });
                 module.methods.forEach((obj)=> {
                        
-                    if(scope.length > 0) obj.fullname = scope.join('.') + '.' + obj.name;
+                    obj.scope = scope.slice(0);
 
                 });     
                 module.variables.forEach((obj)=> {
                        
-                    if(scope.length > 0) obj.fullname = scope.join('.') + '.' + obj.name;
+                    obj.scope = scope.slice(0);
 
                 });                                                
 
@@ -181,12 +181,11 @@ module TypeScript.Api.Reflect
             });
         }
 
-
-		public static create(path:string, ast:TypeScript.Script): Script 
+		public static create(name:string, ast:TypeScript.Script): Script 
 		{
 			var result = new Script();
 
-			result.path = path;
+			result.name = name;
 
 			Script.load_modules    (result, ast);
 
@@ -198,7 +197,7 @@ module TypeScript.Api.Reflect
 
 			Script.load_variables  (result, ast);
 
-            Script.load_qualified_names(result);
+            Script.load_scope      (result);
 
 			return result;
 		}

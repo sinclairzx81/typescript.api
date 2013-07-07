@@ -18,8 +18,6 @@ module TypeScript.Api.Reflect
 {
 	export class Parameter extends ReflectionType
 	{
-		public name		  : string;
-
 		public type		  : Type;
 
 		public limChar    : number;

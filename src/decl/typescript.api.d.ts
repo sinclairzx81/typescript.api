@@ -129,12 +129,13 @@ declare module TypeScript.Api.Units {
 declare module TypeScript.Api.Reflect {
     class ReflectionType {
         public identifier: string;
+        public name: string;
+        public scope: string[];
         constructor(identifier: string);
     }
 }
 declare module TypeScript.Api.Reflect {
     class Import extends Reflect.ReflectionType {
-        public name: string;
         public alias: string;
         public limChar: number;
         public minChar: number;
@@ -144,7 +145,6 @@ declare module TypeScript.Api.Reflect {
 }
 declare module TypeScript.Api.Reflect {
     class Type extends Reflect.ReflectionType {
-        public name: string;
         public arguments: Type[];
         public signature: Reflect.Method;
         public arrayCount: number;
@@ -157,7 +157,6 @@ declare module TypeScript.Api.Reflect {
 }
 declare module TypeScript.Api.Reflect {
     class Parameter extends Reflect.ReflectionType {
-        public name: string;
         public type: Reflect.Type;
         public limChar: number;
         public minChar: number;
@@ -168,8 +167,6 @@ declare module TypeScript.Api.Reflect {
 }
 declare module TypeScript.Api.Reflect {
     class Method extends Reflect.ReflectionType {
-        public name: string;
-        public fullname: string;
         public parameters: Reflect.Parameter[];
         public returns: Reflect.Type;
         public isExported: boolean;
@@ -196,8 +193,6 @@ declare module TypeScript.Api.Reflect {
 }
 declare module TypeScript.Api.Reflect {
     class Variable extends Reflect.ReflectionType {
-        public name: string;
-        public fullname: string;
         public type: Reflect.Type;
         public isPublic: boolean;
         public isProperty: boolean;
@@ -222,8 +217,6 @@ declare module TypeScript.Api.Reflect {
         public parameters: string[];
         public extends: Reflect.Type[];
         public isExported: boolean;
-        public name: string;
-        public fullname: string;
         public limChar: number;
         public minChar: number;
         constructor();
@@ -242,8 +235,6 @@ declare module TypeScript.Api.Reflect {
         public extends: Reflect.Type[];
         public implements: Reflect.Type[];
         public isExported: boolean;
-        public name: string;
-        public fullname: string;
         public limChar: number;
         public minChar: number;
         constructor();
@@ -264,8 +255,6 @@ declare module TypeScript.Api.Reflect {
         public methods: Reflect.Method[];
         public variables: Reflect.Variable[];
         public isExported: boolean;
-        public name: string;
-        public fullname: string;
         public limChar: number;
         public minChar: number;
         constructor();
@@ -285,21 +274,30 @@ declare module TypeScript.Api.Reflect {
         public classes: Reflect.Class[];
         public methods: Reflect.Method[];
         public variables: Reflect.Variable[];
-        public path: string;
         constructor();
         private static load_modules(result, ast);
         private static load_interfaces(result, ast);
         private static load_classes(result, ast);
         private static load_methods(result, ast);
         private static load_variables(result, ast);
-        static load_qualified_names(script: Script): void;
-        static create(path: string, ast: TypeScript.Script): Script;
+        static load_scope(script: Script): void;
+        static create(name: string, ast: TypeScript.Script): Script;
     }
 }
 declare module TypeScript.Api.Reflect {
+    class TypeReference {
+        public name: string;
+        public type: Reflect.ReflectionType;
+        constructor(name: string, type: Reflect.ReflectionType);
+    }
     class Reflection {
         public scripts: Reflect.Script[];
+        public types: TypeReference[];
         constructor();
+        private load_type_references(script);
+        private qualify_type(parent_type, type);
+        private qualify_reflection_type(reflection_type);
+        public resolve_type_references(): void;
     }
 }
 declare module TypeScript.Api.Units {

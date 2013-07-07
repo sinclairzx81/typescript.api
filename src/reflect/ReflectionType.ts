@@ -15,8 +15,14 @@ module TypeScript.Api.Reflect
 {	
     export class ReflectionType {
         
+        public name  : string;
+
+        public scope : string [];
+
         constructor(public identifier : string) {
-        
+            
+            this.scope = [];
+
         }
     }
 

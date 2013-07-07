@@ -31,10 +31,6 @@ module TypeScript.Api.Reflect
 		public implements : Type       [];
 
         public isExported : boolean;
-        
-		public name       : string;
-
-        public fullname   : string;
 
 		public limChar    : number;
 

@@ -17,8 +17,6 @@ module TypeScript.Api.Reflect
 {
 	export class Import extends ReflectionType
 	{
-		public name       : string;
-
 		public alias      : string;
 
 		public limChar    : number;

@@ -18,10 +18,6 @@ module TypeScript.Api.Reflect
 {
 	export class Variable extends ReflectionType
 	{
-		public name                    : string;
-
-        public fullname                : string;
-
 		public type                    : Type;
 
         public isPublic                : boolean;
@@ -47,8 +43,8 @@ module TypeScript.Api.Reflect
 		constructor() {
 
             super('variable');
-
-			this.comments = [];
+            
+			this.comments   = [];
 
             this.isExported = false;
 
@@ -58,7 +54,7 @@ module TypeScript.Api.Reflect
 
 		private static load_comments(result:Variable, ast:TypeScript.VariableDeclarator) : void {
 
-			var comments                   = ast.getDocComments();
+			var comments = ast.getDocComments();
 
 			for(var n in comments) 
 			{
