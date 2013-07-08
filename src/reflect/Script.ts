@@ -11,7 +11,7 @@
 // limitations under the License.
 
 /// <reference path="../decl/typescript.d.ts" />
-/// <reference path="ReflectionType.ts" />
+/// <reference path="ReflectedType.ts" />
 /// <reference path="Module.ts" />
 /// <reference path="Interface.ts" />
 /// <reference path="Class.ts" />
@@ -20,7 +20,7 @@
 
 module TypeScript.Api.Reflect 
 {
-	export class Script extends ReflectionType
+	export class Script extends ReflectedType
 	{
 		public modules    : Module    [];
 

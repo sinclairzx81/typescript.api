@@ -11,11 +11,11 @@
 // limitations under the License.
 
 /// <reference path="../decl/typescript.d.ts" />
-/// <reference path="ReflectionType.ts" />
+/// <reference path="ReflectedType.ts" />
 
 module TypeScript.Api.Reflect 
 {
-	export class Import extends ReflectionType
+	export class Import extends ReflectedType
 	{
 		public alias      : string;
 

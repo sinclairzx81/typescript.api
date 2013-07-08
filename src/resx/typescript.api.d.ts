@@ -31,23 +31,20 @@ declare module typescript.api
         public minChar : number;
     }
  
-    class ReflectedType {
-    
+    class ReflectedType 
+    {
         public identifier : string;
+        public name       : string;
+        public scope      : string [];
     }
  
     class Parameter extends ReflectedType
     {
-        public name     : string;
-        public type     : typescript.api.Type;
-        public limChar  : number;
-        public minChar  : number;  
+        public type : typescript.api.Type;r;  
     }
  
     class Method  extends ReflectedType
     {
-        public name          : string;
-        public fullname      : string;
         public parameters    : Array<typescript.api.Parameter>;
         public returns       : typescript.api.Type;
         public isPublic      : boolean;
@@ -63,23 +60,17 @@ declare module typescript.api
         public isSetAccessor : boolean;
         public isIndexer     : boolean;
         public comments      : string[];
-        public limChar       : number;
-        public minChar       : number;
     }
 
     class Type extends ReflectedType
     {
-        public name       : string;
         public arguments  : Array<Type>;
         public signature  : Method;
         public arrayCount : number;
-        public limChar    : number;
-        public minChar    : number;
     } 
 
     class Variable extends ReflectedType
     {
-        public name          : string;
         public fullname      : string;
         public type          : typescript.api.Type;
         public isPublic      : boolean;
@@ -90,8 +81,6 @@ declare module typescript.api
         public isExpression  : boolean;
         public isStatementOrExpression: boolean;
         public comments      : string[];
-        public limChar       : number;
-        public minChar       : number;
     }
  
     class Interface extends ReflectedType
@@ -101,10 +90,6 @@ declare module typescript.api
         public parameters : Array<string>;
         public extends    : Array<typescript.api.Type>;
         public isExported : boolean;
-        public name       : string;
-        public fullname   : string;
-        public limChar    : number;
-        public minChar    : number;
     }
  
     class Class extends ReflectedType
@@ -115,10 +100,6 @@ declare module typescript.api
         public extends    : Array<typescript.api.Type>;
         public implements : Array<typescript.api.Type>;
         public isExported : boolean;
-        public name       : string;
-        public fullname   : string;
-        public limChar    : number;
-        public minChar    : number;
     }
  
     class Module extends ReflectedType
@@ -130,25 +111,15 @@ declare module typescript.api
         public methods    : Array<typescript.api.Method>;
         public variables  : Array<typescript.api.Variable>;
         public isExported : boolean;
-        public name       : string;
-        public fullname   : string;
-        public limChar    : number;
-        public minChar    : number;
     }
- 
+    
     class Script extends ReflectedType
     {
-        public path       : string;
         public modules    : Array<typescript.api.Module>;
         public interfaces : Array<typescript.api.Interface>;
         public classes    : Array<typescript.api.Class>;
         public methods    : Array<typescript.api.Method>;
         public variables  : Array<typescript.api.Variable>;
-    }
- 
-    class Reflection 
-    {
-        public scripts: Array<typescript.api.Script>;
     }
     
     class Unit 
@@ -196,8 +167,6 @@ declare module typescript.api
     export function sort     (sourceUnits: Array<typescript.api.SourceUnit>) : Array<typescript.api.SourceUnit>;
 
     export function compile (sourceUnits: Array<typescript.api.SourceUnit>, callback : (compiledUnit:Array<typescript.api.CompiledUnit> )=> void) : void;
- 
-    export function reflect (compiledUnits:Array<typescript.api.CompiledUnit>, callback :{ ( reflection:typescript.api.Reflection ): void; }) : void;
 
     export function run     (compiledUnits:Array<typescript.api.CompiledUnit>, sandbox:any, callback :{ (context:any): void; }) : void;
 

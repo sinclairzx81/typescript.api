@@ -127,7 +127,7 @@ declare module TypeScript.Api.Units {
     }
 }
 declare module TypeScript.Api.Reflect {
-    class ReflectionType {
+    class ReflectedType {
         public identifier: string;
         public name: string;
         public scope: string[];
@@ -135,14 +135,14 @@ declare module TypeScript.Api.Reflect {
     }
 }
 declare module TypeScript.Api.Reflect {
-    class Import extends Reflect.ReflectionType {
+    class Import extends Reflect.ReflectedType {
         public alias: string;
         constructor();
         static create(ast: TypeScript.ImportDeclaration): Import;
     }
 }
 declare module TypeScript.Api.Reflect {
-    class Type extends Reflect.ReflectionType {
+    class Type extends Reflect.ReflectedType {
         public arguments: Type[];
         public signature: Reflect.Method;
         public arrayCount: number;
@@ -153,7 +153,7 @@ declare module TypeScript.Api.Reflect {
     }
 }
 declare module TypeScript.Api.Reflect {
-    class Parameter extends Reflect.ReflectionType {
+    class Parameter extends Reflect.ReflectedType {
         public type: Reflect.Type;
         constructor();
         private static load_type(result, ast);
@@ -161,7 +161,7 @@ declare module TypeScript.Api.Reflect {
     }
 }
 declare module TypeScript.Api.Reflect {
-    class Method extends Reflect.ReflectionType {
+    class Method extends Reflect.ReflectedType {
         public parameters: Reflect.Parameter[];
         public returns: Reflect.Type;
         public isExported: boolean;
@@ -185,7 +185,7 @@ declare module TypeScript.Api.Reflect {
     }
 }
 declare module TypeScript.Api.Reflect {
-    class Variable extends Reflect.ReflectionType {
+    class Variable extends Reflect.ReflectedType {
         public type: Reflect.Type;
         public isPublic: boolean;
         public isProperty: boolean;
@@ -202,7 +202,7 @@ declare module TypeScript.Api.Reflect {
     }
 }
 declare module TypeScript.Api.Reflect {
-    class Interface extends Reflect.ReflectionType {
+    class Interface extends Reflect.ReflectedType {
         public methods: Reflect.Method[];
         public variables: Reflect.Variable[];
         public parameters: string[];
@@ -217,7 +217,7 @@ declare module TypeScript.Api.Reflect {
     }
 }
 declare module TypeScript.Api.Reflect {
-    class Class extends Reflect.ReflectionType {
+    class Class extends Reflect.ReflectedType {
         public methods: Reflect.Method[];
         public variables: Reflect.Variable[];
         public parameters: string[];
@@ -234,7 +234,7 @@ declare module TypeScript.Api.Reflect {
     }
 }
 declare module TypeScript.Api.Reflect {
-    class Module extends Reflect.ReflectionType {
+    class Module extends Reflect.ReflectedType {
         public imports: Reflect.Import[];
         public modules: Module[];
         public interfaces: Reflect.Interface[];
@@ -253,7 +253,7 @@ declare module TypeScript.Api.Reflect {
     }
 }
 declare module TypeScript.Api.Reflect {
-    class Script extends Reflect.ReflectionType {
+    class Script extends Reflect.ReflectedType {
         public modules: Reflect.Module[];
         public interfaces: Reflect.Interface[];
         public classes: Reflect.Class[];

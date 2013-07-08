@@ -13,7 +13,7 @@
 
 module TypeScript.Api.Reflect 
 {	
-    export class ReflectionType {
+    export class ReflectedType {
         
         public name  : string;
 
