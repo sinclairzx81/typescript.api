@@ -1,6 +1,5 @@
 ﻿var typescript = require('./bin/index.js');
 
-
 function print_diagnostics(units)
 {
     for (var n in units) {
@@ -27,16 +26,18 @@ function print_unit(unit) {
 
     //console.log(unit.script);
 
-    //console.log(JSON.stringify(unit.script, null, ' '));
+    console.log(JSON.stringify(unit.script, null, ' '));
 }
 
 typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
 
-    //print_diagnostics(resolved);
+    print_diagnostics(resolved);
     
     typescript.compile(resolved, function(compiled) {
         
         if (!typescript.check(compiled)) {
+
+            print_diagnostics(compiled);
 
             console.log('errors');
 
@@ -49,33 +50,3 @@ typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
         }
     });
 });
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
- 

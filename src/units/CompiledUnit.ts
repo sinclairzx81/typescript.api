@@ -11,7 +11,7 @@
 // limitations under the License.
 
 /// <reference path="../decl/typescript.d.ts" />
-/// <reference path="../reflect/Reflection.ts" />
+/// <reference path="../reflect/Script.ts" />
 /// <reference path="Diagnostic.ts" />
 /// <reference path="Unit.ts" />
 

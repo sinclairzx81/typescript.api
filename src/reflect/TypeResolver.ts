@@ -21,22 +21,12 @@
 /// <reference path="Variable.ts" />
 /// <reference path="Type.ts" />
 
-
-// in case i need to qualify again.
-//var name = _module.scope.length == 0 ? _module.name : _module.scope.join('.') + '.' + _module.name
-
 module TypeScript.Api.Reflect  {
 
-	export class Reflection {
-
-		public scripts : Script[];
+    // TypeResolver: Resolves Reflect.
+	export class TypeResolver {
         
-		constructor() 
-		{
-            this.scripts              = [];
-		}
-        
-        private resolve_type(module_scope_stack:TypeScript.Api.Reflect.Module[],  type:TypeScript.Api.Reflect.Type) : void {
+        private static resolve_type(module_scope_stack:TypeScript.Api.Reflect.Module[],  type:TypeScript.Api.Reflect.Type) : void {
             
             if(type.resolved) return;
 
@@ -54,7 +44,7 @@ module TypeScript.Api.Reflect  {
                 type.resolved = true;
 
                 // generic type arguments in this scope also need resolving.
-                type.arguments.forEach((_type) => { this.resolve_type(module_scope_stack, _type); });
+                type.arguments.forEach((_type) => { TypeResolver.resolve_type(module_scope_stack, _type); });
             };
             
             // does a backwards traversal on this assumed type scope.
@@ -103,8 +93,17 @@ module TypeScript.Api.Reflect  {
                 
                 var module = module_scope_stack[i];
                     
-                var module_scope = module.scope.slice(0); module_scope.push(module.name);
+                //var module_scope = module.scope.slice(0); module_scope.push(module.name);
 
+                var module_scope = [];
+
+                for(var n in module.scope) {
+                
+                    module_scope.push(module.scope[n]);
+                }
+
+                module_scope.push(module.name);
+                
                 if(match_scope(module_scope, type_scope)) {
                         
                     for(var n in module.classes) {
@@ -134,7 +133,7 @@ module TypeScript.Api.Reflect  {
 
 
         // resolves types accessible in the reflected types local scope.
-        private resolve_local_scope(reflection_type : TypeScript.Api.Reflect.ReflectionType) : void {
+        private static resolve_local_scope(scripts:TypeScript.Api.Reflect.Script[]) : void {
             
             var module_stack = [];
 
@@ -184,9 +183,9 @@ module TypeScript.Api.Reflect  {
 
                     var _class = <TypeScript.Api.Reflect.Class>reflection_type;
 
-                    _class.implements.forEach ((_type ) => { this.resolve_type(module_stack, _type); });
+                    _class.implements.forEach ((_type ) => { TypeResolver.resolve_type(module_stack, _type); });
 
-                    _class.extends.forEach    ((_type ) => { this.resolve_type(module_stack, _type); });
+                    _class.extends.forEach    ((_type ) => { TypeResolver.resolve_type(module_stack, _type); });
                 
                     _class.methods.forEach    ((_reflection_type) => { _resolve_local_scope(_reflection_type); }); 
 
@@ -197,7 +196,7 @@ module TypeScript.Api.Reflect  {
             
                     var _interface = <TypeScript.Api.Reflect.Interface>reflection_type;
 
-                    _interface.extends.forEach    ((_type ) => { this.resolve_type(module_stack, _type); });
+                    _interface.extends.forEach    ((_type ) => { TypeResolver.resolve_type(module_stack, _type); });
                 
                     _interface.methods.forEach    ((_reflection_type) => { _resolve_local_scope(_reflection_type); }); 
 
@@ -209,7 +208,7 @@ module TypeScript.Api.Reflect  {
             
                     var _method = <TypeScript.Api.Reflect.Method>reflection_type;
 
-                    this.resolve_type(module_stack, _method.returns);
+                    TypeResolver.resolve_type(module_stack, _method.returns);
 
                     _method.parameters.forEach((_reflection_type) => { _resolve_local_scope(_reflection_type); });
                 }   
@@ -218,22 +217,26 @@ module TypeScript.Api.Reflect  {
             
                     var _variable = <TypeScript.Api.Reflect.Variable>reflection_type;
 
-                    this.resolve_type(module_stack, _variable.type);
+                    TypeResolver.resolve_type(module_stack, _variable.type);
                 }
 
                 if(reflection_type.identifier == 'parameter') {
             
                     var _parameter = <TypeScript.Api.Reflect.Parameter>reflection_type;
 
-                    this.resolve_type(module_stack, _parameter.type);                
+                    TypeResolver.resolve_type(module_stack, _parameter.type);                
                 } 
             };
             
-            _resolve_local_scope(reflection_type)
+            scripts.forEach((script) => {
+            
+                _resolve_local_scope(script);
+            
+            });
         }
         
         // resolves types accessible in the reflected types global scope.
-        private resolve_global_scope(reflection_type : TypeScript.Api.Reflect.ReflectionType) : void {
+        private static resolve_global_scope(scripts:TypeScript.Api.Reflect.Script[]) : void {
             
             var module_stack = [];
 
@@ -298,9 +301,9 @@ module TypeScript.Api.Reflect  {
 
                     var _class = <TypeScript.Api.Reflect.Class>reflection_type;
 
-                    _class.implements.forEach ((_type ) => { this.resolve_type(module_stack, _type); });
+                    _class.implements.forEach ((_type ) => { TypeResolver.resolve_type(module_stack, _type); });
 
-                    _class.extends.forEach    ((_type ) => { this.resolve_type(module_stack, _type); });
+                    _class.extends.forEach    ((_type ) => { TypeResolver.resolve_type(module_stack, _type); });
                 
                     _class.methods.forEach    ((_reflection_type) => { _resolve_global_scope(_reflection_type); }); 
 
@@ -311,7 +314,7 @@ module TypeScript.Api.Reflect  {
             
                     var _interface = <TypeScript.Api.Reflect.Interface>reflection_type;
 
-                    _interface.extends.forEach    ((_type ) => { this.resolve_type(module_stack, _type); });
+                    _interface.extends.forEach    ((_type ) => { TypeResolver.resolve_type(module_stack, _type); });
                 
                     _interface.methods.forEach    ((_reflection_type) => { _resolve_global_scope(_reflection_type); }); 
 
@@ -323,7 +326,7 @@ module TypeScript.Api.Reflect  {
             
                     var _method = <TypeScript.Api.Reflect.Method>reflection_type;
 
-                    this.resolve_type(module_stack, _method.returns);
+                    TypeResolver.resolve_type(module_stack, _method.returns);
 
                     _method.parameters.forEach((_reflection_type) => { _resolve_global_scope(_reflection_type); });
                 }   
@@ -332,22 +335,28 @@ module TypeScript.Api.Reflect  {
             
                     var _variable = <TypeScript.Api.Reflect.Variable>reflection_type;
 
-                    this.resolve_type(module_stack, _variable.type);
+                    TypeResolver.resolve_type(module_stack, _variable.type);
                 }
 
                 if(reflection_type.identifier == 'parameter') {
             
                     var _parameter = <TypeScript.Api.Reflect.Parameter>reflection_type;
 
-                    this.resolve_type(module_stack, _parameter.type);                
+                    TypeResolver.resolve_type(module_stack, _parameter.type);                
                 } 
             };
             
             // gather the global scope.
-            _gather_global_scope(reflection_type);
+            scripts.forEach((script) => {
+                
+                _gather_global_scope(script);
+            });
 
             // resolve..
-            _resolve_global_scope(reflection_type)
+            scripts.forEach((script) => {
+                
+                _resolve_global_scope(script)
+            });
 
         }        
         
@@ -355,23 +364,11 @@ module TypeScript.Api.Reflect  {
         // into this reflection. This is required
         // for code whose types reference types
         // spanning multiple source (script) units. 
-        public resolve_type_references() : void {
+        public static resolve(scripts:TypeScript.Api.Reflect.Script[]) : void {
             
-            // resolve types in the local scope. (top down)
-            this.scripts.forEach((script) => {
+            TypeResolver.resolve_local_scope  (scripts);
 
-                this.resolve_local_scope(script);
-
-            });
-
-            // resolve types in the global scope. (bottom up)
-            this.scripts.forEach((script) => {
-
-                this.resolve_global_scope(script);
-
-            });
-            
-
+            TypeResolver.resolve_global_scope (scripts);
         }
 	}
 }

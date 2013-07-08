@@ -143,8 +143,6 @@ module TypeScript.Api.Reflect
                 scope.push(module.name);
 
                 module.interfaces.forEach((obj)=> {
-                     
-                     //if(scope.length > 0) obj.fullname = scope.join('.') + '.' + obj.name;
 
                     obj.scope = scope.slice(0);
 

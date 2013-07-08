@@ -12,7 +12,7 @@
 
 /// <reference path="../decl/typescript.d.ts" />
 /// <reference path="../loggers/NullLogger.ts" />
-/// <reference path="../reflect/Reflection.ts" />
+/// <reference path="../reflect/TypeResolver.ts" />
 /// <reference path="../units/Diagnostic.ts" />
 /// <reference path="../units/SourceUnit.ts" />
 /// <reference path="../units/CompiledUnit.ts" />
@@ -368,9 +368,32 @@ module TypeScript.Api.Compile {
                 }
 			}
 
-			// emit and return...
+			// emit ...
 
 			var compiledUnits = this.emitUnits( this.sourceUnits );
+
+
+            // resolve reflection types...
+
+            // compilation unit script reflections are unresolved
+            // by default due to AST not resolving their fully qualified 
+            // names. In order to resolve them, we can invoke
+            // the TypeResolver at the Script level or here. By
+            // resolving here, we save on additional extra work being 
+            // done as traversing the type space is expensive stuff.
+            // also, as we antipate multiple source files, resolving
+            // here just makes sense.
+
+            var scripts = [];
+
+            for(var n in compiledUnits) {
+
+                scripts.push(compiledUnits[n].script)
+            }
+
+            TypeScript.Api.Reflect.TypeResolver.resolve( scripts );
+
+            // ready to callback.
             
 			callback(  compiledUnits );
 		}

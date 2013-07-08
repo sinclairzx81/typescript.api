@@ -269,16 +269,6 @@ declare module TypeScript.Api.Reflect {
         static create(name: string, ast: TypeScript.Script): Script;
     }
 }
-declare module TypeScript.Api.Reflect {
-    class Reflection {
-        public scripts: Reflect.Script[];
-        constructor();
-        private resolve_type(module_scope_stack, type);
-        private resolve_local_scope(reflection_type);
-        private resolve_global_scope(reflection_type);
-        public resolve_type_references(): void;
-    }
-}
 declare module TypeScript.Api.Units {
     class CompiledUnit extends Units.Unit {
         public ast: TypeScript.AST;
@@ -317,6 +307,14 @@ declare module TypeScript.Api.Resolve {
         private load(callback);
         private next(callback);
         private visited(parameter);
+    }
+}
+declare module TypeScript.Api.Reflect {
+    class TypeResolver {
+        private static resolve_type(module_scope_stack, type);
+        private static resolve_local_scope(scripts);
+        private static resolve_global_scope(scripts);
+        static resolve(scripts: Reflect.Script[]): void;
     }
 }
 declare module TypeScript.Api.Compile {

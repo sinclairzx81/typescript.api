@@ -24,5 +24,4 @@
 // reference apis
 /// <reference path="resolve/Resolver.ts" />
 /// <reference path="compile/Compiler.ts" />
-/// <reference path="reflect/Reflection.ts" />
 

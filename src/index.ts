@@ -250,47 +250,11 @@ export function compile (sourceUnits: TypeScript.Api.Units.SourceUnit[], callbac
     {
 	    exports.compiler = new api.Compile.Compiler(exports.languageVersion, exports.moduleTarget, logger );
 	}
-
-    // compute reflection.
-
-
-    exports.compiler.compile(sourceUnits, (compiledUnits)=> {
     
-        var reflection = new api.Reflect.Reflection();
+    exports.compiler.compile(sourceUnits, (compiledUnits)=> {
 
-        for(var n in compiledUnits) {
-
-            var script = api.Reflect.Script.create(compiledUnits[n].path, compiledUnits[n].ast );
-
-            reflection.scripts.push(script);
-        }
-
-        reflection.resolve_type_references();
-           
         callback(compiledUnits);
     });
-}
-
-/////////////////////////////////////////////////////////////
-// reflect: reflects compilation AST. (obsolete, read reflection from compiled unit)
-/////////////////////////////////////////////////////////////
-
-export function reflect(compiledUnits:TypeScript.Api.Units.CompiledUnit [], callback :{ ( reflection:TypeScript.Api.Reflect.Reflection ): void; }) : void  {
-
-	var api = <TypeScript.Api>load_typescript_api();
-	
-    var reflection = new api.Reflect.Reflection();
-
-    for(var n in compiledUnits)
-    {
-        var script = api.Reflect.Script.create(compiledUnits[n].path, compiledUnits[n].ast );
-
-        reflection.scripts.push(script);
-    }
-
-    reflection.resolve_type_references();
-	
-	callback( reflection );
 }
 
 /////////////////////////////////////////////////////////////
