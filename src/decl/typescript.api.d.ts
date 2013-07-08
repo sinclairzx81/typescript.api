@@ -275,8 +275,8 @@ declare module TypeScript.Api.Reflect {
         public local_module_stack: Reflect.Module[];
         constructor();
         private resolve_type(type);
-        private qualify_reflection_type(reflection_type);
-        private load_modules(script);
+        private resolve_local_scope(reflection_type);
+        private load_global_module_scope(script);
         public resolve_type_references(): void;
     }
 }
