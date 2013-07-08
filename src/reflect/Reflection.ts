@@ -30,21 +30,13 @@ module TypeScript.Api.Reflect  {
 	export class Reflection {
 
 		public scripts : Script[];
-
-        public global_module_stack   : TypeScript.Api.Reflect.Module[];
-
-        public local_module_stack    : TypeScript.Api.Reflect.Module[];
-
+        
 		constructor() 
 		{
-			this.scripts              = [];
-
-            this.global_module_stack  = [];
-
-            this.local_module_stack   = [];
+            this.scripts              = [];
 		}
         
-        private resolve_type(type:TypeScript.Api.Reflect.Type) : void {
+        private resolve_type(module_scope_stack:TypeScript.Api.Reflect.Module[],  type:TypeScript.Api.Reflect.Type) : void {
             
             var associate = (type:TypeScript.Api.Reflect.Type, reflection_type:TypeScript.Api.Reflect.ReflectionType) => {
                 
@@ -66,7 +58,7 @@ module TypeScript.Api.Reflect  {
                 console.log(reflection_type);
 
                 // generic type arguments in this scope also need resolving.
-                type.arguments.forEach((_type) => { this.resolve_type(_type); });
+                type.arguments.forEach((_type) => { this.resolve_type(module_scope_stack, _type); });
             };
             
             // does a backwards traversal on this assumed type scope.
@@ -114,45 +106,14 @@ module TypeScript.Api.Reflect  {
             // var name   = module.scope.length == 0 ? module.name : module.scope.join('.') + '.' + module.name;
             
             // attempt to locate type on the local module stack.
-            for(var i = this.local_module_stack.length - 1; i >= 0; i--) {
+            for(var i = module_scope_stack.length - 1; i >= 0; i--) {
                 
-                var module = this.local_module_stack[i];
+                var module = module_scope_stack[i];
                     
                 var module_scope = module.scope.slice(0); module_scope.push(module.name);
 
                 if(match_scope(module_scope, type_scope)) {
                         
-                    for(var n in module.classes) {
-
-                        if(module.classes[n].name == type_name) {
-
-                            associate(type, module.classes[n]); 
-
-                            return;
-                        }
-                    }
-
-                    for(var n in module.interfaces) {
-
-                        if(module.interfaces[n].name == type_name) {
-
-                            associate(type, module.interfaces[n]); 
-
-                            return;
-                        }
-                    }
-                }
-            }
-            
-            // attempt to locate type on the global module stack.
-            for(var i= 0; i = this.global_module_stack.length; i++) {
-                   
-                var module = this.global_module_stack[i];
-                    
-                var module_scope = module.scope.slice(0); module_scope.push(module.name);
-
-                if(match_scope(module_scope, type_scope)) {
-                    
                     for(var n in module.classes) {
 
                         if(module.classes[n].name == type_name) {
@@ -181,119 +142,103 @@ module TypeScript.Api.Reflect  {
 
         // resolves types accessible in the reflected types local scope.
         private resolve_local_scope(reflection_type : TypeScript.Api.Reflect.ReflectionType) : void {
-
-            if(reflection_type.identifier == 'script') {
-                
-                var __script = <TypeScript.Api.Reflect.Module>reflection_type;
-
-                 this.local_module_stack.push(__script);
-
-                __script.modules.forEach    ((_reflection_type) => { this.resolve_local_scope(_reflection_type); }); 
-
-                __script.classes.forEach    ((_reflection_type) => { this.resolve_local_scope(_reflection_type); }); 
-
-                __script.interfaces.forEach ((_reflection_type) => { this.resolve_local_scope(_reflection_type); }); 
-                
-                __script.methods.forEach    ((_reflection_type) => { this.resolve_local_scope(_reflection_type); }); 
-
-                __script.variables.forEach  ((_reflection_type) => { this.resolve_local_scope(_reflection_type); }); 
-
-                this.local_module_stack.pop();
-
-                return;
-            }
             
-            if(reflection_type.identifier == 'module') {
-                
-                var _module = <TypeScript.Api.Reflect.Module>reflection_type;
+            var module_stack = [];
 
-                this.local_module_stack.push(_module);
-
-                _module.modules.forEach    ((_reflection_type) => { this.resolve_local_scope(_reflection_type); }); 
-
-                _module.classes.forEach    ((_reflection_type) => { this.resolve_local_scope(_reflection_type); }); 
-
-                _module.interfaces.forEach ((_reflection_type) => { this.resolve_local_scope(_reflection_type); }); 
-                
-                _module.methods.forEach    ((_reflection_type) => { this.resolve_local_scope(_reflection_type); }); 
-
-                _module.variables.forEach  ((_reflection_type) => { this.resolve_local_scope(_reflection_type); }); 
-
-                this.local_module_stack.pop();
-            }
-
-            if(reflection_type.identifier == 'class') {
-
-                var _class = <TypeScript.Api.Reflect.Class>reflection_type;
-
-                _class.implements.forEach ((_type ) => { this.resolve_type(_type); });
-
-                _class.extends.forEach    ((_type ) => { this.resolve_type(_type); });
-                
-                _class.methods.forEach    ((_reflection_type) => { this.resolve_local_scope(_reflection_type); }); 
-
-                _class.variables.forEach  ((_reflection_type) => { this.resolve_local_scope(_reflection_type); }); 
-            }
-
-            if(reflection_type.identifier == 'interface') {
+            var _resolve_local_scope = (reflection_type : TypeScript.Api.Reflect.ReflectionType) => {
             
-                var _interface = <TypeScript.Api.Reflect.Interface>reflection_type;
-
-                _interface.extends.forEach    ((_type ) => { this.resolve_type(_type); });
+                if(reflection_type.identifier == 'script') {
                 
-                _interface.methods.forEach    ((_reflection_type) => { this.resolve_local_scope(_reflection_type); }); 
+                    var __script = <TypeScript.Api.Reflect.Module>reflection_type;
 
-                _interface.variables.forEach  ((_reflection_type) => { this.resolve_local_scope(_reflection_type); }); 
+                     module_stack.push(__script);
+
+                    __script.modules.forEach    ((_reflection_type) => { _resolve_local_scope(_reflection_type); }); 
+
+                    __script.classes.forEach    ((_reflection_type) => { _resolve_local_scope(_reflection_type); }); 
+
+                    __script.interfaces.forEach ((_reflection_type) => { _resolve_local_scope(_reflection_type); }); 
                 
-            }
+                    __script.methods.forEach    ((_reflection_type) => { _resolve_local_scope(_reflection_type); }); 
 
-            if(reflection_type.identifier == 'method') {
+                    __script.variables.forEach  ((_reflection_type) => { _resolve_local_scope(_reflection_type); }); 
+
+                    module_stack.pop();
+
+                    return;
+                }
             
-                var _method = <TypeScript.Api.Reflect.Method>reflection_type;
+                if(reflection_type.identifier == 'module') {
+                
+                    var _module = <TypeScript.Api.Reflect.Module>reflection_type;
 
-                this.resolve_type(_method.returns);
+                    module_stack.push(_module);
 
-                _method.parameters.forEach((_reflection_type) => { this.resolve_local_scope(_reflection_type); });
-            }   
+                    _module.modules.forEach    ((_reflection_type) => { _resolve_local_scope(_reflection_type); }); 
+
+                    _module.classes.forEach    ((_reflection_type) => { _resolve_local_scope(_reflection_type); }); 
+
+                    _module.interfaces.forEach ((_reflection_type) => { _resolve_local_scope(_reflection_type); }); 
+                
+                    _module.methods.forEach    ((_reflection_type) => { _resolve_local_scope(_reflection_type); }); 
+
+                    _module.variables.forEach  ((_reflection_type) => { _resolve_local_scope(_reflection_type); }); 
+
+                    module_stack.pop();
+                }
+
+                if(reflection_type.identifier == 'class') {
+
+                    var _class = <TypeScript.Api.Reflect.Class>reflection_type;
+
+                    _class.implements.forEach ((_type ) => { this.resolve_type(module_stack, _type); });
+
+                    _class.extends.forEach    ((_type ) => { this.resolve_type(module_stack, _type); });
+                
+                    _class.methods.forEach    ((_reflection_type) => { _resolve_local_scope(_reflection_type); }); 
+
+                    _class.variables.forEach  ((_reflection_type) => { _resolve_local_scope(_reflection_type); }); 
+                }
+
+                if(reflection_type.identifier == 'interface') {
+            
+                    var _interface = <TypeScript.Api.Reflect.Interface>reflection_type;
+
+                    _interface.extends.forEach    ((_type ) => { this.resolve_type(module_stack, _type); });
+                
+                    _interface.methods.forEach    ((_reflection_type) => { _resolve_local_scope(_reflection_type); }); 
+
+                    _interface.variables.forEach  ((_reflection_type) => { _resolve_local_scope(_reflection_type); }); 
+                
+                }
+
+                if(reflection_type.identifier == 'method') {
+            
+                    var _method = <TypeScript.Api.Reflect.Method>reflection_type;
+
+                    this.resolve_type(module_stack, _method.returns);
+
+                    _method.parameters.forEach((_reflection_type) => { _resolve_local_scope(_reflection_type); });
+                }   
                      
-            if(reflection_type.identifier == 'variable') {
+                if(reflection_type.identifier == 'variable') {
             
-                var _variable = <TypeScript.Api.Reflect.Variable>reflection_type;
+                    var _variable = <TypeScript.Api.Reflect.Variable>reflection_type;
 
-                this.resolve_type(_variable.type);
-            }
+                    this.resolve_type(module_stack, _variable.type);
+                }
 
-            if(reflection_type.identifier == 'parameter') {
+                if(reflection_type.identifier == 'parameter') {
             
-                var _parameter = <TypeScript.Api.Reflect.Parameter>reflection_type;
+                    var _parameter = <TypeScript.Api.Reflect.Parameter>reflection_type;
 
-                this.resolve_type( _parameter.type);                
-            }  
-        }
-
-        
-        private load_global_module_scope (script:TypeScript.Api.Reflect.Script) : void {
-            
-            var _load_module = (module:TypeScript.Api.Reflect.Module) => {
-
-                this.global_module_stack.push(module);                                              
-
-                module.modules.forEach((obj) => {
-
-                    _load_module(obj);
-
-                });
+                    this.resolve_type(module_stack, _parameter.type);                
+                } 
             };
-
-            script.modules.forEach((module) => {
             
-                _load_module(module);
-
-            });
+            _resolve_local_scope(reflection_type)
         }
-
-
-
+        
         // resolves type references for scripts loaded 
         // into this reflection. This is required
         // for code whose types reference types
@@ -307,13 +252,7 @@ module TypeScript.Api.Reflect  {
 
             });
 
-            // load all global modules.
-            this.scripts.forEach((script) => {
-                
-                this.load_global_module_scope(script);
-                
-            }); 
-
+            
 
         }
 	}
