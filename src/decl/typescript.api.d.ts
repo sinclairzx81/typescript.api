@@ -146,6 +146,7 @@ declare module TypeScript.Api.Reflect {
         public arguments: Type[];
         public signature: Reflect.Method;
         public arrayCount: number;
+        public resolved: boolean;
         constructor();
         private static qualifyName(ast);
         static create(ast: TypeScript.AST): Type;
@@ -274,6 +275,7 @@ declare module TypeScript.Api.Reflect {
         constructor();
         private resolve_type(module_scope_stack, type);
         private resolve_local_scope(reflection_type);
+        private resolve_global_scope(reflection_type);
         public resolve_type_references(): void;
     }
 }

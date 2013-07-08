@@ -24,6 +24,8 @@ module TypeScript.Api.Reflect
 
 		public arrayCount : number;
 
+        public resolved   : boolean; // a flag indicating if this type was resolved to another reflected type.
+
 		constructor() 
 		{
             super('type');
@@ -33,6 +35,8 @@ module TypeScript.Api.Reflect
 			this.arguments  = [];
 
 			this.arrayCount = 0;
+
+            this.resolved   = false;
 		}
 
 		private static qualifyName(ast:TypeScript.AST) : string
