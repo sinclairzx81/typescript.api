@@ -223,9 +223,16 @@ module TypeScript.Api.Reflect  {
 
                 if(reflected_type.identifier == 'parameter') {
             
-                    var _parameter = <TypeScript.Api.Reflect.Parameter>reflected_type;
+                     var _parameter = <TypeScript.Api.Reflect.Parameter>reflected_type;
 
-                    TypeResolver.resolve_type(module_stack, _parameter.type);                
+                    if(_parameter.type.name == "Function") {
+                    
+                        _resolve_local_scope(_parameter.type.signature);
+                    }
+                    else {
+                    
+                        TypeResolver.resolve_type(module_stack, _parameter.type);    
+                    }                
                 } 
             };
             
@@ -340,10 +347,17 @@ module TypeScript.Api.Reflect  {
                 }
 
                 if(reflected_type.identifier == 'parameter') {
-            
+                    
                     var _parameter = <TypeScript.Api.Reflect.Parameter>reflected_type;
 
-                    TypeResolver.resolve_type(module_stack, _parameter.type);                
+                    if(_parameter.type.name == "Function") {
+                    
+                        _resolve_global_scope(_parameter.type.signature);
+                    }
+                    else {
+                    
+                        TypeResolver.resolve_type(module_stack, _parameter.type);    
+                    }           
                 } 
             };
             
