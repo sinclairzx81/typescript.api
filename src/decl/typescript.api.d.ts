@@ -137,8 +137,6 @@ declare module TypeScript.Api.Reflect {
 declare module TypeScript.Api.Reflect {
     class Import extends Reflect.ReflectionType {
         public alias: string;
-        public limChar: number;
-        public minChar: number;
         constructor();
         static create(ast: TypeScript.ImportDeclaration): Import;
     }
@@ -148,8 +146,6 @@ declare module TypeScript.Api.Reflect {
         public arguments: Type[];
         public signature: Reflect.Method;
         public arrayCount: number;
-        public limChar: number;
-        public minChar: number;
         constructor();
         private static qualifyName(ast);
         static create(ast: TypeScript.AST): Type;
@@ -158,8 +154,6 @@ declare module TypeScript.Api.Reflect {
 declare module TypeScript.Api.Reflect {
     class Parameter extends Reflect.ReflectionType {
         public type: Reflect.Type;
-        public limChar: number;
-        public minChar: number;
         constructor();
         private static load_type(result, ast);
         static create(ast: TypeScript.Parameter): Parameter;
@@ -182,8 +176,6 @@ declare module TypeScript.Api.Reflect {
         public isSetAccessor: boolean;
         public isIndexer: boolean;
         public comments: string[];
-        public limChar: number;
-        public minChar: number;
         constructor();
         private static load_comments(result, ast);
         private static load_returns(result, ast);
@@ -202,8 +194,6 @@ declare module TypeScript.Api.Reflect {
         public isStatementOrExpression: boolean;
         public isExported: boolean;
         public comments: string[];
-        public limChar: number;
-        public minChar: number;
         constructor();
         private static load_comments(result, ast);
         private static load_type(result, ast);
@@ -217,8 +207,6 @@ declare module TypeScript.Api.Reflect {
         public parameters: string[];
         public extends: Reflect.Type[];
         public isExported: boolean;
-        public limChar: number;
-        public minChar: number;
         constructor();
         private static load_parameters(result, ast);
         private static load_extends(result, ast);
@@ -235,8 +223,6 @@ declare module TypeScript.Api.Reflect {
         public extends: Reflect.Type[];
         public implements: Reflect.Type[];
         public isExported: boolean;
-        public limChar: number;
-        public minChar: number;
         constructor();
         private static load_parameters(result, ast);
         private static load_extends(result, ast);
@@ -255,8 +241,6 @@ declare module TypeScript.Api.Reflect {
         public methods: Reflect.Method[];
         public variables: Reflect.Variable[];
         public isExported: boolean;
-        public limChar: number;
-        public minChar: number;
         constructor();
         private static load_imports(result, ast);
         private static load_modules(result, ast);
@@ -285,18 +269,14 @@ declare module TypeScript.Api.Reflect {
     }
 }
 declare module TypeScript.Api.Reflect {
-    class TypeReference {
-        public name: string;
-        public type: Reflect.ReflectionType;
-        constructor(name: string, type: Reflect.ReflectionType);
-    }
     class Reflection {
         public scripts: Reflect.Script[];
-        public types: TypeReference[];
+        public global_module_stack: Reflect.Module[];
+        public local_module_stack: Reflect.Module[];
         constructor();
-        private load_type_references(script);
-        private qualify_type(parent_type, type);
+        private resolve_type(type);
         private qualify_reflection_type(reflection_type);
+        private load_modules(script);
         public resolve_type_references(): void;
     }
 }

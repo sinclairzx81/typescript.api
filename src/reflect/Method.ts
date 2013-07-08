@@ -49,10 +49,6 @@ module TypeScript.Api.Reflect
 
 		public comments        : string [];
 
-		public limChar         : number;
-
-		public minChar         : number;
-
 		constructor () 
 		{
             super('method');
@@ -141,10 +137,6 @@ module TypeScript.Api.Reflect
 			result.isSetAccessor = ast.isSetAccessor();
 
 			result.isIndexer     = ast.isIndexerMember();
-
-			result.limChar       = ast.limChar;
-
-			result.minChar       = ast.minChar;
 
 			Method.load_comments   (result, ast);
 

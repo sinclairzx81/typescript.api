@@ -19,10 +19,6 @@ module TypeScript.Api.Reflect
 	{
 		public alias      : string;
 
-		public limChar    : number;
-
-		public minChar    : number;
-
         constructor() {
         
             super('import');
@@ -35,10 +31,6 @@ module TypeScript.Api.Reflect
 			result.name    = ast.id.text;
 
 			result.alias   = ast.getAliasName(ast);
-
-			result.limChar = ast.limChar;
-
-			result.minChar = ast.minChar;
 
 			return result;
 		}

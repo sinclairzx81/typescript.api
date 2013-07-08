@@ -30,10 +30,6 @@ module TypeScript.Api.Reflect
 
         public isExported : boolean;
 
-		public limChar    : number;
-
-		public minChar    : number;
-
 		constructor () 
 		{
             super('interface');
@@ -115,10 +111,6 @@ module TypeScript.Api.Reflect
 			var result     = new Interface();
 
 			result.name    = ast.name.text;
-
-			result.limChar = ast.limChar;
-
-			result.minChar = ast.minChar;
 
             var hasFlag = (val : number, flag: number) :boolean  => 
             {

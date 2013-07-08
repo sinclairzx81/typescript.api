@@ -20,10 +20,6 @@ module TypeScript.Api.Reflect
 	{
 		public type		  : Type;
 
-		public limChar    : number;
-
-		public minChar    : number;
-
         constructor() {
         
             super('parameter');
@@ -46,10 +42,6 @@ module TypeScript.Api.Reflect
 			var result     = new Parameter();
 
 			result.name    = ast.id.text;
-
-			result.limChar = ast.limChar;
-
-			result.minChar = ast.minChar;
 
 			Parameter.load_type(result, ast);
 

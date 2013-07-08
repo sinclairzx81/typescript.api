@@ -36,10 +36,6 @@ module TypeScript.Api.Reflect
 
 		public comments                : string[];
 
-		public limChar                 : number;
-
-		public minChar                 : number;
-
 		constructor() {
 
             super('variable');
@@ -109,10 +105,6 @@ module TypeScript.Api.Reflect
 			result.isExported              = ast.isExported();
 
 			result.isStatementOrExpression = ast.isStatementOrExpression();
-
-			result.limChar                 = ast.limChar;
-
-			result.minChar                 = ast.minChar;
 
 			Variable.load_type(result, ast);
 
