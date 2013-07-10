@@ -36,6 +36,14 @@ var _fs   = require("fs");
 var _path = require("path");
 
 /////////////////////////////////////////////////////////////
+// code to bind
+/////////////////////////////////////////////////////////////
+
+var typescript_filename     = _path.join(__dirname, "./node_modules/typescript/bin/typescript.js");
+
+var typescript_api_filename = _path.join(__dirname, "typescript.api.js"); // typescript@0.9.0-1
+
+/////////////////////////////////////////////////////////////
 // compiler options..
 /////////////////////////////////////////////////////////////
 
@@ -399,10 +407,6 @@ function get_default_sandbox(): any {
 /////////////////////////////////////////////////////////////
 
 var cache:any               = {};
-
-var typescript_filename     = _path.join(__dirname, "typescript.js");
-
-var typescript_api_filename = _path.join(__dirname, "typescript.api.js");
 
 function load_typescript_api() : any
 {	

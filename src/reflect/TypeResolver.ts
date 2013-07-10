@@ -139,7 +139,9 @@ module TypeScript.Api.Reflect  {
             var module_stack = [];
 
             var _resolve_local_scope = (reflected_type : TypeScript.Api.Reflect.ReflectedType) => {
-            
+                
+                if(reflected_type == null) return;
+
                 if(reflected_type.identifier == 'script') {
                 
                     var __script = <TypeScript.Api.Reflect.Module>reflected_type;
@@ -250,8 +252,10 @@ module TypeScript.Api.Reflect  {
 
             var _gather_global_scope = (reflected_type : TypeScript.Api.Reflect.ReflectedType) => {
                 
+                if(reflected_type == null) return;
+
                 if(reflected_type.identifier == 'script') {
-                
+                    
                     var _script = <TypeScript.Api.Reflect.Module>reflected_type;
 
                      module_stack.push(_script);
@@ -272,7 +276,9 @@ module TypeScript.Api.Reflect  {
             };
 
             var _resolve_global_scope = (reflected_type : TypeScript.Api.Reflect.ReflectedType) => {
-            
+                
+                if(reflected_type == null) return;
+
                 if(reflected_type.identifier == 'script') {
                 
                     var __script = <TypeScript.Api.Reflect.Module>reflected_type;
