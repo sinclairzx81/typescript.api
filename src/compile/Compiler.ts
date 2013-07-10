@@ -1,4 +1,4 @@
-// Copyright (c) sinclair 2013.  All rights reserved.
+// Copyright (c) 2013 haydn paterson (sinclair).  All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,6 +20,31 @@
 
 module TypeScript.Api.Compile {
 
+    export class CompilerOptions {
+    
+        public logger                   : TypeScript.ILogger;
+
+        public languageVersion          : TypeScript.LanguageVersion;
+        
+        public moduleGenTarget          : TypeScript.ModuleGenTarget;
+        
+        public generateDeclarationFiles : boolean;
+        
+        public mapSourceFiles           : boolean;
+
+        constructor() {
+            
+            this.languageVersion          = TypeScript.LanguageVersion.EcmaScript5;
+
+            this.moduleGenTarget          = TypeScript.ModuleGenTarget.Synchronous;
+
+            this.generateDeclarationFiles = true;
+
+            this.mapSourceFiles           = true;
+        
+        }
+    }
+
 	export class Compiler  
 	{
 		public compiler    : TypeScript.TypeScriptCompiler;
@@ -28,9 +53,9 @@ module TypeScript.Api.Compile {
 
 		public sourceUnits : TypeScript.Api.Units.SourceUnit [];
 
-		constructor(languageVersion:TypeScript.LanguageVersion, moduleTarget:TypeScript.ModuleGenTarget, logger:TypeScript.ILogger)  
+		constructor(options:TypeScript.Api.Compile.CompilerOptions)  
 		{
-			this.logger = logger;
+			this.logger = options.logger;
 
 			// source Units
 
@@ -38,19 +63,19 @@ module TypeScript.Api.Compile {
 
 			// settings...
 
-			var settings = new TypeScript.CompilationSettings();
+            var settings = new TypeScript.CompilationSettings();
 
-			settings.codeGenTarget            = languageVersion; //TypeScript.LanguageVersion.EcmaScript5;
+            settings.codeGenTarget            = options.languageVersion; //TypeScript.LanguageVersion.EcmaScript5;
 
-			settings.moduleGenTarget          = moduleTarget; //TypeScript.ModuleGenTarget.Synchronous;
-
-			settings.disallowBool             = true;
-
-            settings.generateDeclarationFiles = true;
+            settings.moduleGenTarget          = options.moduleGenTarget; //TypeScript.ModuleGenTarget.Synchronous;
             
-            settings.mapSourceFiles           = true;
+            settings.generateDeclarationFiles = options.generateDeclarationFiles;
+            
+            settings.mapSourceFiles           = options.mapSourceFiles;
 
-            settings.outputOption = '';
+            settings.disallowBool             = true;
+
+            settings.outputOption             = '';
 
 			// the compiler...
 

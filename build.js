@@ -1,3 +1,4 @@
+// Copyright (c) 2013 haydn paterson (sinclair).  All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -14,6 +15,8 @@
 // Note: will build the TypeScript.Api for TypeScript 0.9
 //
 // 	requires: the tsc 0.9 command line compiler...
+//
+//  note: if building from github, npm install typescript into bin directory.
 //
 ////////////////////////////////////////////////////////////////////
 
@@ -42,8 +45,6 @@ var readme_input_filename            = path.join(src_dir, '../readme.md');
 var readme_output_filename           = path.join(bin_dir, 'readme.md');
 var package_input_filename           = path.join('./package.json');
 var package_output_filename          = path.join(bin_dir, 'package.json');
-
-
 
 // thing to run after the build..
 var post_build_filename   = path.join( path.dirname( global.process.mainModule.filename ), "app.js")

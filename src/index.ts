@@ -1,4 +1,4 @@
-// Copyright (c) sinclair 2013.  All rights reserved.
+// Copyright (c) 2013 haydn paterson (sinclair).  All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,8 +10,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// <reference path="Decl/typescript.d.ts" />
-/// <reference path="Decl/typescript.api.d.ts" />
+/// <reference path="decl/typescript.d.ts" />
+/// <reference path="decl/typescript.api.d.ts" />
 
 /////////////////////////////////////////////////////////////
 // forward declarations
@@ -57,6 +57,10 @@ export var languageVersion          : TypeScript.LanguageVersion;  // TypeScript
 
 export var moduleTarget             : TypeScript.ModuleGenTarget;  // TypeScript.ModuleGenTarget.Synchronous;
 
+export var generateDeclarations     : boolean; // true
+
+export var generateSourceMaps       : boolean; // true
+
 /////////////////////////////////////////////////////////////
 // initialize defaults.
 /////////////////////////////////////////////////////////////
@@ -69,11 +73,15 @@ function initialize() {
 
     exports.compiler    = null;
 
-    exports.languageVersion = "EcmaScript5"; //typescript.LanguageVersion.EcmaScript5;
+    exports.languageVersion      = "EcmaScript5"; //typescript.LanguageVersion.EcmaScript5;
 
-    exports.moduleTarget    = "Synchronous"; //typescript.ModuleGenTarget.Synchronous;
+    exports.moduleTarget         = "Synchronous"; //typescript.ModuleGenTarget.Synchronous;
 
-    exports.outputOption    = '';
+    exports.generateDeclarations = true;
+
+    exports.generateSourceMaps   = true;
+
+    exports.outputOption         = '';
     
 }
 
@@ -131,7 +139,19 @@ export function register () : void
 			
             if(exports.check(sourceUnits)) {
 
-				var compiler = new api.Compile.Compiler(exports.languageVersion, exports.moduleTarget, logger );
+                var options = new api.Compile.CompilerOptions();
+
+                options.moduleGenTarget          = exports.moduleTarget;
+
+                options.generateDeclarationFiles = exports.generateDeclarations;
+
+                options.mapSourceFiles           = exports.generateSourceMaps;
+
+                options.languageVersion          = exports.languageVersion;
+
+                options.logger                   = logger;
+
+				var compiler = new api.Compile.Compiler( options );
 				
 				compiler.compile( sourceUnits, ( compiledUnits : TypeScript.Api.Units.CompiledUnit[] ) =>  {
 					
@@ -256,7 +276,19 @@ export function compile (sourceUnits: TypeScript.Api.Units.SourceUnit[], callbac
 	
     if(!exports.compiler)
     {
-	    exports.compiler = new api.Compile.Compiler(exports.languageVersion, exports.moduleTarget, logger );
+        var options = new api.Compile.CompilerOptions();
+
+        options.moduleGenTarget          = exports.moduleTarget;
+
+        options.generateDeclarationFiles = exports.generateDeclarations;
+
+        options.mapSourceFiles           = exports.generateSourceMaps;
+
+        options.languageVersion          = exports.languageVersion;
+
+        options.logger                   = logger;
+
+	    exports.compiler = new api.Compile.Compiler( options );
 	}
     
     exports.compiler.compile(sourceUnits, (compiledUnits)=> {

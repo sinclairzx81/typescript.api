@@ -1,4 +1,4 @@
-// Copyright (c) sinclair 2013.  All rights reserved.
+// Copyright (c) 2013 haydn paterson (sinclair).  All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -74,7 +74,7 @@ module TypeScript.Api.Reflect
 		{
 			var result = new Variable();
 
-			result.name                    = ast.id.text;
+			result.name = ast.id.text;
 
             var hasFlag = (val : number, flag: number) :boolean  => 
             {

@@ -155,6 +155,8 @@ declare module TypeScript.Api.Reflect {
 declare module TypeScript.Api.Reflect {
     class Parameter extends Reflect.ReflectedType {
         public type: Reflect.Type;
+        public isOptional: boolean;
+        public isPublic: boolean;
         constructor();
         private static load_type(result, ast);
         static create(ast: TypeScript.Parameter): Parameter;
@@ -334,11 +336,19 @@ declare module TypeScript.Api.Compile {
     }
 }
 declare module TypeScript.Api.Compile {
+    class CompilerOptions {
+        public logger: TypeScript.ILogger;
+        public languageVersion: TypeScript.LanguageVersion;
+        public moduleGenTarget: TypeScript.ModuleGenTarget;
+        public generateDeclarationFiles: boolean;
+        public mapSourceFiles: boolean;
+        constructor();
+    }
     class Compiler {
         public compiler: TypeScript.TypeScriptCompiler;
         public logger: TypeScript.ILogger;
         public sourceUnits: Api.Units.SourceUnit[];
-        constructor(languageVersion: TypeScript.LanguageVersion, moduleTarget: TypeScript.ModuleGenTarget, logger: TypeScript.ILogger);
+        constructor(options: CompilerOptions);
         private isSourceUnitInCache(sourceUnit);
         private isSourceUnitUpdated(sourceUnit);
         private addSourceUnit(sourceUnit);

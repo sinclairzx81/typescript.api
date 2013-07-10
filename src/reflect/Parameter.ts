@@ -1,4 +1,4 @@
-// Copyright (c) sinclair 2013.  All rights reserved.
+// Copyright (c) 2013 haydn paterson (sinclair).  All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,9 +20,17 @@ module TypeScript.Api.Reflect
 	{
 		public type		  : Type;
 
+        public isOptional : boolean;
+
+        public isPublic   : boolean;
+
         constructor() {
         
             super('parameter');
+
+            this.isOptional = false;
+
+            this.isPublic   = false;
 
         }
 
@@ -39,9 +47,23 @@ module TypeScript.Api.Reflect
 
 		public static create(ast:TypeScript.Parameter) : Parameter 
 		{
-			var result     = new Parameter();
+			var result        = new Parameter();
 
-			result.name    = ast.id.text;
+			result.name       = ast.id.text;
+
+            result.isOptional = ast.isOptional;
+
+            var hasFlag = (val : number, flag: number) :boolean  => 
+            {
+                return (val & flag) !== 0;
+            };
+
+            var flags = ast.getVarFlags();
+
+            if(hasFlag(flags, VariableFlags.Public)) {
+                
+                result.isPublic = true;
+            }
 
 			Parameter.load_type(result, ast);
 

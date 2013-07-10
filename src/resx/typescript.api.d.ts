@@ -1,4 +1,4 @@
-﻿// Copyright (c) sinclair 2013.  All rights reserved.
+﻿// Copyright (c) 2013 haydn paterson (sinclair).  All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -40,7 +40,8 @@ declare module typescript.api
  
     class Parameter extends ReflectedType
     {
-        public type : typescript.api.Type;r;  
+        public type       : typescript.api.Type;
+        public isOptional : boolean;
     }
  
     class Method  extends ReflectedType
@@ -71,16 +72,16 @@ declare module typescript.api
 
     class Variable extends ReflectedType
     {
-        public fullname      : string;
-        public type          : typescript.api.Type;
-        public isPublic      : boolean;
-        public isExported    : boolean;
-        public isProperty    : boolean;
-        public isStatic      : boolean;
-        public isStatement   : boolean;
-        public isExpression  : boolean;
-        public isStatementOrExpression: boolean;
-        public comments      : string[];
+        public fullname                : string;
+        public type                    : typescript.api.Type;
+        public isPublic                : boolean;
+        public isExported              : boolean;
+        public isProperty              : boolean;
+        public isStatic                : boolean;
+        public isStatement             : boolean;
+        public isExpression            : boolean;
+        public isStatementOrExpression : boolean;
+        public comments                : string[];
     }
  
     class Interface extends ReflectedType
@@ -91,7 +92,7 @@ declare module typescript.api
         public extends    : Array<typescript.api.Type>;
         public isExported : boolean;
     }
- 
+
     class Class extends ReflectedType
     {
         public methods    : Array<typescript.api.Method>;
@@ -129,7 +130,7 @@ declare module typescript.api
         public diagnostics : Array<typescript.api.Diagnostic>;
         public hasError()  : boolean;
     }
- 
+
     class SourceUnit extends typescript.api.Unit 
     {
         public remote        : boolean;
@@ -153,6 +154,11 @@ declare module typescript.api
     export var languageVersion      : string;
 
     export var moduleTarget         : string;
+
+    export var generateDeclarations : boolean;
+
+    export var generateSourceMaps   : boolean;
+
 
     export function register ()     : void;
 
