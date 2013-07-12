@@ -186,7 +186,19 @@ export function reset() : void {
 
     var logger = new api.Loggers.NullLogger();
 
-    exports.compiler = new api.Compile.Compiler(exports.languageVersion, exports.moduleTarget, logger );
+    var options = new api.Compile.CompilerOptions();
+
+    options.moduleGenTarget          = exports.moduleTarget;
+
+    options.generateDeclarationFiles = exports.generateDeclarations;
+
+    options.mapSourceFiles           = exports.generateSourceMaps;
+
+    options.languageVersion          = exports.languageVersion;
+
+    options.logger                   = logger;
+
+	exports.compiler = new api.Compile.Compiler( options );
 }
 
 /////////////////////////////////////////////////////////////

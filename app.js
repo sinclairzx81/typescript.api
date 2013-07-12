@@ -20,16 +20,16 @@ function print_unit(unit) {
 
     //console.log(unit.content);
 
-    //console.log(unit.declaration);
+    //console.log(unit.references);
 
     //console.log(unit.sourcemap);
 
     //console.log(unit.script);
 
-    console.log(JSON.stringify(unit.script, null, ' '));
+    //console.log(JSON.stringify(unit.script, null, ' '));
 }
 
-typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
+typescript.resolve('e:/development/gold/appex/node_modules/appex/index.ts', function (resolved) {
 
     print_diagnostics(resolved);
     

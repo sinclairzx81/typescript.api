@@ -183,10 +183,9 @@ A compiled unit is the output from a [compilation](#compile). A compiled unit co
 compiledUnit = {
 	path          : string,   // (public) the path of this unit.
 	content       : string,   // (public) the javascript source of this unit.
-	references    : Function  // (public) returns an array of references for this unit.
+	references    : string[], // (public) an array of references for this unit.
 	diagnostics   : [object], // (public) compilation errors for this unit. 0 length if none.
 	ast           : object,   // (public) AST for this unit.
-	declaration   : string,   // (public) The declaration source for this unit.
 	sourcemap     : string,   // (public) The sourcemap for this unit.
 	reflection    : object,   // (public) The units reflected members.  
 };

@@ -274,11 +274,10 @@ declare module TypeScript.Api.Reflect {
 declare module TypeScript.Api.Units {
     class CompiledUnit extends Units.Unit {
         public ast: TypeScript.AST;
-        public declaration: string;
         public sourcemap: string;
+        public references: string[];
         public script: Api.Reflect.Script;
-        constructor(path: string, content: string, diagnostics: Units.Diagnostic[], ast: TypeScript.AST, declaration: string, sourcemap: string, script: Api.Reflect.Script);
-        public references(): string[];
+        constructor(path: string, content: string, diagnostics: Units.Diagnostic[], ast: TypeScript.AST, sourcemap: string, script: Api.Reflect.Script, references: string[]);
     }
 }
 declare module TypeScript.Api.Resolve {

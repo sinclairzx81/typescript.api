@@ -118,7 +118,7 @@ module TypeScript.Api.Compile {
 				var snapshot   = TypeScript.ScriptSnapshot.fromString( sourceUnit.content );
 
 				var references = TypeScript.getReferencedFiles(sourceUnit.path, snapshot);
-
+                
 			    if( !this.isSourceUnitInCache(sourceUnit) )
 			    {
                     sourceUnit.syntaxChecked = false;
@@ -187,10 +187,10 @@ module TypeScript.Api.Compile {
 
 		private typeCheck(sourceUnit:TypeScript.Api.Units.SourceUnit) : TypeScript.Api.Units.Diagnostic [] 
 		{
-			var result:TypeScript.Api.Units.Diagnostic[] = [];
+            var result:TypeScript.Api.Units.Diagnostic[] = [];
 
 			this.compiler.pullTypeCheck();
-
+            
 			var _diagnostics = this.compiler.getSemanticDiagnostics(sourceUnit.path);
 
 			for(var n in _diagnostics) 
@@ -224,27 +224,28 @@ module TypeScript.Api.Compile {
                 }                        
                 return content;
             };
-            // gets the declaration from the compiled units.
-            var get_declaration_source = (sourceUnitPath : string, emitter : Emitter) : string => {
 
-                sourceUnitPath    = sourceUnitPath.replace(/\\/g, '/').replace(/.ts$/, '.d.ts');
+            // gets the declaration from the compiled units. (no longer used)
+            //var get_declaration_source = (sourceUnitPath : string, emitter : Emitter) : string => {
 
-                var content = '';
+            //    sourceUnitPath = sourceUnitPath.replace(/\\/g, '/').replace(/.ts$/, '.d.ts');
+
+            //    var content = '';
                         
-                for(var filename in emitter.files)
-                {
-                    if(filename.replace(/\\/g, '/') == sourceUnitPath)
-                    {
-                        content = emitter.files[filename];
-                    }
-                } 
+            //    for(var filename in emitter.files)
+            //    {
+            //        if(filename.replace(/\\/g, '/') == sourceUnitPath)
+            //        {
+            //            content = emitter.files[filename];
+            //        }
+            //    }
                                                    
-                return content;
-            };
+            //    return content;
+            //};
 
             // gets the sourcemap from the compiled units.
             var get_sourcemap_source = (sourceUnitPath : string, emitter : Emitter) : string => {
-
+                
                 sourceUnitPath    = sourceUnitPath.replace(/\\/g, '/').replace(/.ts$/, '.js.map');
 
                 var content = '';
@@ -262,7 +263,7 @@ module TypeScript.Api.Compile {
 
             // computes the reflection for this unit.
             var get_script_reflection = (path:string, ast:TypeScript.Script) => {
-                
+
 	            return TypeScript.Api.Reflect.Script.create(path, ast); 
 
             };
@@ -278,10 +279,13 @@ module TypeScript.Api.Compile {
 			{
 				emitter_io_map[outputFile] = inputFile;
 			});
+            
 
-            // emit declarations
+            // emit declarations 
 
-            this.compiler.emitAllDeclarations();
+            // this.compiler.emitAllDeclarations(); (no longer safe)
+
+
 
 			var result:TypeScript.Api.Units.CompiledUnit[] = [];
 
@@ -317,17 +321,15 @@ module TypeScript.Api.Compile {
 
                         var content     = get_source             ( path, emitter );
 
-                        var declaration = get_declaration_source ( path, emitter );
-
                         var sourcemap   = get_sourcemap_source   ( path, emitter );
 
-                        var _script      = get_script_reflection  ( path, ast );
+                        var _script     = get_script_reflection  ( path, ast );
     
 						var diagnostics = sourceUnit.diagnostics;
 
+                        var references  = sourceUnit.references();
                         
-                        
-						result.push( new TypeScript.Api.Units.CompiledUnit(path, content, diagnostics, ast, declaration, sourcemap, _script) );
+						result.push( new TypeScript.Api.Units.CompiledUnit(path, content, diagnostics, ast, sourcemap, _script, references ) );
 					}
 				}
 			}

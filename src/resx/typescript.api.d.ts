@@ -141,10 +141,9 @@ declare module typescript.api
     class CompiledUnit extends typescript.api.Unit 
     {
         public ast          : any;
-        public declaration  : string;
         public sourcemap    : string;
         public script       : typescript.api.Script;
-        public references() : string[];
+        public references   : string[];
     }
 
     export var allowRemote 			: boolean; 

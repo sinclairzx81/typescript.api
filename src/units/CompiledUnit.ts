@@ -20,59 +20,30 @@ module TypeScript.Api.Units
 	export class CompiledUnit extends Unit
 	{
 		public ast         : TypeScript.AST;
-        
-        public declaration : string;
 
         public sourcemap   : string;
+
+        public references  : string [];
 
         public script      : TypeScript.Api.Reflect.Script;
 
 		constructor(path        : string, 
                     content     : string, 
                     diagnostics : TypeScript.Api.Units.Diagnostic[], 
-                    ast         : TypeScript.AST, 
-                    declaration : string, 
+                    ast         : TypeScript.AST,
                     sourcemap   : string, 
-                    script      : TypeScript.Api.Reflect.Script) 
+                    script      : TypeScript.Api.Reflect.Script,
+                    references  : string[]) 
 		{
 			super(path, content, diagnostics);
 
 			this.ast         = ast;
 
-            this.declaration = declaration;
-
             this.sourcemap   = sourcemap;
 
             this.script      = script;
-		}
 
-        // note: references resolved on declarations.
-		public references() : string [] 
-		{
-			var result : string[] = [];
-
-			if(this.declaration) 
-			{
-				var lines : string[] = this.declaration.split('\r\n');
-                
-				if (lines.length === 1) 
-				{
-					lines = this.declaration.split('\n');
-				}
-                
-				for(var n in lines) 
-				{
-					var reference_pattern = /^(\/\/\/\s*<reference\s+path=)('|")(.+?)\2\s*(static=('|")(.+?)\2\s*)*\/>/gim;
-
-					var match = reference_pattern.exec(lines[n]);
-
-					if(match) 
-					{
-						result.unshift( match[3] );
-					}
-				}
-			}
-			return result;
+            this.references  = references;
 		}
 	}
 }

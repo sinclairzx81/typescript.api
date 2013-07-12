@@ -134,8 +134,36 @@ module TypeScript.Api.Resolve
                     return units;
                 }
             }
-            
 
+            // ensure declarations are first.
+
+            var declarations = [];
+
+            var sources      = [];
+            
+            for(var i = 0; i < result.length; i++) {
+                
+                if(result[i].path.indexOf('.d.ts') !== -1) {
+                     
+                    declarations.push(result[i]);
+                }
+                else {
+
+                    sources.push(result[i]);
+                }
+            }
+
+            result = [];
+
+            for(var n in declarations) {
+                
+                result.push(declarations[n])
+            }
+
+            for(var n in sources) {
+                
+                result.push(sources[n])
+            }
 
             return result;
         }
