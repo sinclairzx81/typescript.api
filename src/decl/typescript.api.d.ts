@@ -196,6 +196,7 @@ declare module TypeScript.Api.Reflect {
         public isExpression: boolean;
         public isStatementOrExpression: boolean;
         public isExported: boolean;
+        public isOptional: boolean;
         public comments: string[];
         constructor();
         private static load_comments(result, ast);
@@ -354,6 +355,8 @@ declare module TypeScript.Api.Compile {
         private syntaxCheck(sourceUnit);
         private typeCheck(sourceUnit);
         private emitUnits(sourceUnits);
+        public compile_pass(sourceUnits: Api.Units.SourceUnit[], callback: (compiledUnits: Api.Units.CompiledUnit[]) => void): void;
+        private passes;
         public compile(sourceUnits: Api.Units.SourceUnit[], callback: (compiledUnits: Api.Units.CompiledUnit[]) => void): void;
     }
 }

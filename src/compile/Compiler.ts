@@ -102,8 +102,14 @@ module TypeScript.Api.Compile {
 			{
 				if(this.sourceUnits[n].path == sourceUnit.path)
 				{
-					if(this.sourceUnits[n].content != sourceUnit.content)
+                    if(this.sourceUnits[n].content.length != sourceUnit.content.length) {
+
+                        return true;
+                    }
+
+					if(this.sourceUnits[n].content !== sourceUnit.content)
 					{
+                        
 						return true;
 					}
 				}
@@ -153,7 +159,7 @@ module TypeScript.Api.Compile {
                     var textChange:TypeScript.TextChangeRange = new TypeScript.TextChangeRange(textSpan, sourceUnit.content.length );
 
 				    this.compiler.updateSourceUnit(sourceUnit.path, snapshot, 0, false, textChange);
-                    
+
                     for(var n in this.sourceUnits) // update the existing source unit.
                     {
                         if(this.sourceUnits[n].path == sourceUnit.path)
@@ -227,11 +233,11 @@ module TypeScript.Api.Compile {
 
             // gets the declaration from the compiled units. (no longer used)
             //var get_declaration_source = (sourceUnitPath : string, emitter : Emitter) : string => {
-
+            //
             //    sourceUnitPath = sourceUnitPath.replace(/\\/g, '/').replace(/.ts$/, '.d.ts');
-
+            //
             //    var content = '';
-                        
+            //            
             //    for(var filename in emitter.files)
             //    {
             //        if(filename.replace(/\\/g, '/') == sourceUnitPath)
@@ -239,7 +245,7 @@ module TypeScript.Api.Compile {
             //            content = emitter.files[filename];
             //        }
             //    }
-                                                   
+            //                                      
             //    return content;
             //};
 
@@ -279,7 +285,15 @@ module TypeScript.Api.Compile {
 			{
 				emitter_io_map[outputFile] = inputFile;
 			});
-            
+
+            // alternitive emitter approach.
+            //for(var n in this.sourceUnits) {
+            //
+            //    this.compiler.emitUnit(this.sourceUnits[n].path, emitter,  (inputFile: string, outputFile: string) : void => 
+			//    {
+			//	    emitter_io_map[outputFile] = inputFile;
+			//    });
+            //}
 
             // emit declarations 
 
@@ -337,7 +351,7 @@ module TypeScript.Api.Compile {
 			return result;
 		}
         
-		public compile(sourceUnits:TypeScript.Api.Units.SourceUnit[], callback: { (compiledUnits : TypeScript.Api.Units.CompiledUnit [] ) : void;} ) : void 
+		public compile_pass(sourceUnits:TypeScript.Api.Units.SourceUnit[], callback: { (compiledUnits : TypeScript.Api.Units.CompiledUnit [] ) : void;} ) : void 
 		{  
             // remove non referenced source units....
             
@@ -358,6 +372,7 @@ module TypeScript.Api.Compile {
 
 			for(var n in sourceUnits)
 			{
+
 				this.addSourceUnit ( sourceUnits[n] );
 			}
 
@@ -424,5 +439,49 @@ module TypeScript.Api.Compile {
             
 			callback(  compiledUnits );
 		}
+
+
+
+        // ran into issues here. due to reasons unknown, the compiler
+        // was not emitting the _this on lambda in outside referenced
+        // files unless the file was updated. Have introduced a small
+        // fix which compiled once in reverse, (wakes the compiler up)
+        // then again to resolve correctly. tho this has meant compiled
+        // units come out in reverse, it does solve the problem.
+
+        private passes:number = 0;
+        
+        public compile(sourceUnits:TypeScript.Api.Units.SourceUnit[], callback: { (compiledUnits : TypeScript.Api.Units.CompiledUnit [] ) : void;} ) : void {
+
+            if(this.passes == 0) {
+
+                sourceUnits.reverse();
+
+                this.compile_pass(sourceUnits, () => {
+                    
+                    sourceUnits.reverse();
+
+                    this.compile_pass(sourceUnits, (compiledUnits)=>{
+                    
+                        compiledUnits.reverse();
+
+                        callback(compiledUnits);
+                    });
+                });
+
+                this.passes = 1;
+
+                return;
+            }
+
+            this.compile_pass(sourceUnits,(compiledUnits)=>{
+                    
+                compiledUnits.reverse();
+
+                callback(compiledUnits);
+
+            });
+        }
+
 	}
 }

@@ -34,6 +34,8 @@ module TypeScript.Api.Reflect
 
 		public isExported              : boolean;
 
+        public isOptional              : boolean;
+
 		public comments                : string[];
 
 		constructor() {
@@ -45,6 +47,8 @@ module TypeScript.Api.Reflect
             this.isExported = false;
 
             this.isPublic   = false;
+
+            this.isOptional = false;
 
 		}
 
@@ -92,7 +96,13 @@ module TypeScript.Api.Reflect
 
                 result.isExported = true;
             }
+            
+            var ast_flags = ast.id.getFlags();
 
+            if(hasFlag(ast_flags, ASTFlags.OptionalName)) {
+
+                result.isOptional = true;
+            }
 
 			result.isProperty              = ast.isProperty();
 

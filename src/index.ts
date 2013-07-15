@@ -475,7 +475,11 @@ function load_typescript_api() : any
 		
         console     : console,
 		
-        exports     : null
+        exports     : null,
+
+        setInterval : setInterval,
+
+        setTimeout  : setTimeout
     };
 	
 	cache.typescript_api = load_module(typescript_api_filename, sandbox, ["TypeScript"]).Api;

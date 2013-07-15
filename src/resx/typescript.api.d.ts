@@ -81,6 +81,7 @@ declare module typescript.api
         public isStatement             : boolean;
         public isExpression            : boolean;
         public isStatementOrExpression : boolean;
+        public isOptional              : boolean;
         public comments                : string[];
     }
  
