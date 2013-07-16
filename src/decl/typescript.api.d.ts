@@ -121,8 +121,7 @@ declare module TypeScript.Api {
 declare module TypeScript.Api {
     class SourceUnit extends Api.Unit {
         public remote: boolean;
-        public syntaxChecked: boolean;
-        public typeChecked: boolean;
+        public state: string;
         constructor(path: string, content: string, diagnostics: Api.Diagnostic[], remote: boolean);
         public references(): string[];
         public clone(): SourceUnit;
@@ -284,6 +283,7 @@ declare module TypeScript.Api {
         public sourcemap: string;
         public references: string[];
         public script: Api.Script;
+        public state: string;
         constructor(path: string, content: string, diagnostics: Api.Diagnostic[], ast: TypeScript.AST, sourcemap: string, script: Api.Script, references: string[]);
     }
 }
@@ -328,22 +328,6 @@ declare module TypeScript.Api {
     }
 }
 declare module TypeScript.Api {
-    class CompilerCache {
-        public compiler: TypeScript.TypeScriptCompiler;
-        public units: Api.SourceUnit[];
-        constructor(compiler: TypeScript.TypeScriptCompiler);
-        public get_cached_unit(path: string): Api.SourceUnit;
-        public is_in_cache(path: string): boolean;
-        private compare(a, b);
-        public refresh(units: Api.SourceUnit[]): void;
-        private syntaxCheck(unit);
-        private typeCheck(unit);
-        private type_and_syntax_checking();
-        public update(units: Api.SourceUnit[]): void;
-        public reevaluate_references(): void;
-    }
-}
-declare module TypeScript.Api {
     class TypeResolver {
         private static resolve_type(module_scope_stack, type);
         private static resolve_local_scope(scripts);
@@ -352,24 +336,42 @@ declare module TypeScript.Api {
     }
 }
 declare module TypeScript.Api {
-    class Emitter {
+    class Input {
+        public units: Api.SourceUnit[];
+        constructor();
+        private same(a, b);
+        public fetch(path: string): Api.SourceUnit;
+        public merge(units: Api.SourceUnit[]): Api.SourceUnit[];
+    }
+}
+declare module TypeScript.Api {
+    class Output {
         public files: string[];
+        public mapper: any[];
         constructor();
         public writeFile(fileName: string, contents: string, writeByteOrderMark: boolean): void;
         public directoryExists(path: string): boolean;
         public fileExists(path: string): boolean;
         public resolvePath(path: string): string;
+        public get_content(path: string): string;
+        public get_declararion(path: string): string;
+        public get_source_map(path: string): string;
+        public get_reflection(path: string, ast: TypeScript.Script): Api.Script;
     }
-    class CompilerEmitter {
+}
+declare module TypeScript.Api {
+    class Processor {
         public compiler: TypeScript.TypeScriptCompiler;
-        public cache: Api.CompilerCache;
-        public emitter: Emitter;
-        constructor(compiler: TypeScript.TypeScriptCompiler, cache: Api.CompilerCache);
-        private get_content(unit);
-        private get_declararion(unit);
-        private get_source_map(unit);
-        private get_reflection(unit, ast);
-        public emit(): Api.CompiledUnit[];
+        public input: Api.Input;
+        public output: Api.Output;
+        constructor(compiler: TypeScript.TypeScriptCompiler);
+        public add_unit(unit: Api.SourceUnit): void;
+        public update_unit(unit: Api.SourceUnit): void;
+        public syntax_check_unit(unit: Api.SourceUnit): void;
+        public type_check_unit(unit: Api.SourceUnit): void;
+        public emit_unit(unit: Api.SourceUnit): void;
+        public preprocess(): void;
+        public process(): Api.CompiledUnit[];
     }
 }
 declare module TypeScript.Api {
@@ -377,10 +379,8 @@ declare module TypeScript.Api {
         public options: Api.CompilerOptions;
         public compiler: TypeScript.TypeScriptCompiler;
         public logger: TypeScript.ILogger;
-        public cache: Api.CompilerCache;
-        public emitter: Api.CompilerEmitter;
+        public processor: Api.Processor;
         constructor(options: Api.CompilerOptions);
-        private passes;
         public compile(sourceUnits: Api.SourceUnit[], callback: (compiledUnits: Api.CompiledUnit[]) => void): void;
     }
 }

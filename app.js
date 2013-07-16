@@ -18,7 +18,7 @@ function print_unit(unit) {
 
     //console.log(unit.path);
 
-    //console.log(unit.content);
+    console.log(unit.content);
 
     //console.log(unit.references);
 
@@ -26,37 +26,50 @@ function print_unit(unit) {
 
     //console.log(unit.script);
 
-    console.log(JSON.stringify(unit.script, null, ' '));
+    //console.log(JSON.stringify(unit.script, null, ' '));
 }
 
-        //setInterval(function() {
+var count = 0;
 
-//typescript.resolve('e:/development/gold/appex/node_modules/appex/index.ts', function (resolved) {
+function run_compilation(resolved) {
 
-
-  
-    typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
-
-            //print_diagnostics(resolved);
+    print_diagnostics(resolved);
             
-            typescript.compile(resolved, function(compiled) {
-        
-                if (!typescript.check(compiled)) {
+    typescript.compile(resolved, function(compiled) {
+                
+        if (!typescript.check(compiled)) {
 
-                    print_diagnostics(compiled);
+            print_diagnostics(compiled);
 
-                    console.log('errors');
+            console.log('errors');
 
-                } else {
+        } else {
 
-                    for (var n in compiled) {
+            for (var n in compiled) {
 
-                        print_unit(compiled[n]);
-                    }
-                }
-            });
+                print_unit(compiled[n]);
 
-        
+            }
+
+            console.log(count);
+
+            count++;
+
+            run_compilation(resolved)
+        }
     });
+}
 
-//}, 5000);
+
+
+//setInterval(function() {
+ typescript.resolve('e:/development/gold/appex/node_modules/appex/index.ts', function (resolved) {
+
+    run_compilation(resolved);
+})
+
+//run_compilation('c:/node/app12/a.ts');
+
+//run_compilation('c:/input/typescript/program.ts');
+
+//});

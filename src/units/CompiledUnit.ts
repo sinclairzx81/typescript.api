@@ -27,6 +27,8 @@ module TypeScript.Api
 
         public script      : TypeScript.Api.Script;
 
+        public state       : string;
+
 		constructor(path        : string, 
                     content     : string, 
                     diagnostics : TypeScript.Api.Diagnostic[], 
@@ -36,6 +38,8 @@ module TypeScript.Api
                     references  : string[]) 
 		{
 			super(path, content, diagnostics);
+
+            this.state       = 'default';
 
 			this.ast         = ast;
 

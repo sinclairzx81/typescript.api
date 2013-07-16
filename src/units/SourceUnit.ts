@@ -20,22 +20,17 @@ module TypeScript.Api
 	{	
 		public remote        : boolean;   // is this a remote source file...
 
-        public syntaxChecked : boolean;   // compiler flag...
+        public state         : string;
 
-        public typeChecked   : boolean;   // compiler flag...
-
-		constructor(path:string, content:string, diagnostics:Diagnostic[], remote:boolean)
-		{ 
+		constructor(path:string, content:string, diagnostics:Diagnostic[], remote:boolean) {
+             
             if(!content) content = '';
 
-
-			super(path, content, diagnostics);
+            this.state  = 'default';
 
 			this.remote = remote;
 
-            this.syntaxChecked = false;
-
-            this.typeChecked = false;
+			super(path, content, diagnostics);
 		}
 
 		public references() : string [] 
@@ -68,7 +63,6 @@ module TypeScript.Api
 
         public clone() : TypeScript.Api.SourceUnit {
 
-            
             var diagnostics = [];
 
             for(var i = 0; i < this.diagnostics.length; i++) {
@@ -76,11 +70,9 @@ module TypeScript.Api
                 diagnostics.push(this.diagnostics[i].clone());
             }
 
-            var clone = new TypeScript.Api.SourceUnit(this.path.toString(), this.content.toString(), diagnostics, this.remote)
+            var clone = new TypeScript.Api.SourceUnit(this.path.toString(), this.content.toString(), diagnostics, this.remote);
 
-            clone.syntaxChecked = this.syntaxChecked;
-
-            clone.typeChecked   = this.typeChecked;
+            clone.state = this.state.toString();
 
             return clone;
         }

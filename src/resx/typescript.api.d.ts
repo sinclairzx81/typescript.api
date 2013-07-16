@@ -92,6 +92,7 @@ declare module typescript.api
         public parameters : Array<string>;
         public extends    : Array<typescript.api.Type>;
         public isExported : boolean;
+        public comments   : string[];
     }
 
     class Class extends ReflectedType
@@ -102,6 +103,7 @@ declare module typescript.api
         public extends    : Array<typescript.api.Type>;
         public implements : Array<typescript.api.Type>;
         public isExported : boolean;
+        public comments   : string[];
     }
  
     class Module extends ReflectedType

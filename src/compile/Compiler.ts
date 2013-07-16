@@ -15,21 +15,18 @@
 /// <reference path="../units/SourceUnit.ts" />
 /// <reference path="../units/CompiledUnit.ts" />
 /// <reference path="../loggers/NullLogger.ts" />
-/// <reference path="CompilerOptions.ts" />
-/// <reference path="CompilerCache.ts" />
-/// <reference path="CompilerEmitter.ts" />
+/// <reference path="Options.ts" />
+/// <reference path="Processor.ts" />
 
 module TypeScript.Api {
 
-	export class Compiler  
-	{
-		public compiler    : TypeScript.TypeScriptCompiler;
+	export class Compiler {
 
-		public logger      : TypeScript.ILogger;
+		public compiler       : TypeScript.TypeScriptCompiler;
 
-		public cache       : TypeScript.Api.CompilerCache;
+		public logger         : TypeScript.ILogger;
 
-        public emitter     : TypeScript.Api.CompilerEmitter;
+        public processor      : TypeScript.Api.Processor;
 
 		constructor(public options:TypeScript.Api.CompilerOptions)  
 		{
@@ -59,54 +56,16 @@ module TypeScript.Api {
 
 			// compiler unit cache
 
-			this.cache   = new TypeScript.Api.CompilerCache(this.compiler);
-
-            this.emitter = new TypeScript.Api.CompilerEmitter(this.compiler, this.cache);
+            this.processor   = new TypeScript.Api.Processor (this.compiler);
 		}
 
-
-        private passes:number = 0;
-
 		public compile(sourceUnits:TypeScript.Api.SourceUnit[], callback: { (compiledUnits : TypeScript.Api.CompiledUnit [] ) : void;} ) : void {  
-
-            if(this.passes == 0) {
-
-                // due to a unusual bug in the ts compiler, the '_this' was 
-                // not being emitted from lambda expressions on referenced 
-                // source units on first compile, in fact, it would require 
-                // an addiional resolve() with file changes to get it to 
-                // emit the '_this' back in. 
-                //
-                // as such, have updated the source unit to include a clone() 
-                // method and introduced this functionality on 'first pass'. 
-                // Essentially. we send the cache manager clones of the input 
-                // source units, then force a reevalution on referenced source 
-                // files by changing the content.
-                //
-                // next we update the cache with the 'actual' source units, 
-                // which will trigger the update logic required to kick the 
-                // compiler into gear.
-
-                this.cache.update( sourceUnits.map ( (unit)=> { return unit.clone(); }));
-
-                this.cache.reevaluate_references();
-
-                this.cache.update( sourceUnits );
-
-		        var compiled = this.emitter.emit();
-
-                callback( compiled );
-           
-                this.passes = 1;
-                
-                return;
-            }
-
-            this.cache.update(sourceUnits);
-
-		    var compiled = this.emitter.emit();
             
-			callback(  compiled );
+            this.processor.input.merge(sourceUnits);
+
+            var compiled = this.processor.process();
+
+            callback( compiled );
 		}
 	}
 }
