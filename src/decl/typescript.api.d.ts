@@ -341,7 +341,7 @@ declare module TypeScript.Api {
         constructor();
         private same(a, b);
         public fetch(path: string): Api.SourceUnit;
-        public merge(units: Api.SourceUnit[]): Api.SourceUnit[];
+        public merge(units: Api.SourceUnit[]): void;
     }
 }
 declare module TypeScript.Api {
@@ -349,6 +349,7 @@ declare module TypeScript.Api {
         public files: string[];
         public mapper: any[];
         constructor();
+        public javascript_filenames(): string[];
         public writeFile(fileName: string, contents: string, writeByteOrderMark: boolean): void;
         public directoryExists(path: string): boolean;
         public fileExists(path: string): boolean;

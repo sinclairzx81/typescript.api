@@ -31,6 +31,17 @@ module TypeScript.Api {
             this.mapper  = [];
 		}
 
+        public javascript_filenames() : string[] {
+
+            var result = [];
+
+            for(var n in this.mapper) {
+            
+                result.push(n);
+            }
+            return result;
+        }
+
         public writeFile(fileName: string, contents: string, writeByteOrderMark: boolean) : void {
             
 			this.files[fileName] = contents;

@@ -45,7 +45,7 @@ module TypeScript.Api {
 
             var snapshot = TypeScript.ScriptSnapshot.fromString( unit.content );
 
-			var references = TypeScript.getReferencedFiles(unit.path, snapshot);
+            var references = TypeScript.getReferencedFiles(unit.path, snapshot);
 
             this.compiler.addSourceUnit( unit.path, snapshot, 1 /*ByteOrderMark.Utf8*/, 0, false, references);                       
         }
@@ -58,45 +58,45 @@ module TypeScript.Api {
 
             var textChange   = new TypeScript.TextChangeRange(textSpan, unit.content.length );
 
-			this.compiler.updateSourceUnit( unit.path, snapshot, 0, false, textChange);        
+            this.compiler.updateSourceUnit( unit.path, snapshot, 0, false, textChange);        
         }
 
         public syntax_check_unit  (unit:TypeScript.Api.SourceUnit) : void {
 
-			var diagnostics = this.compiler.getSyntacticDiagnostics(unit.path);
+            var diagnostics = this.compiler.getSyntacticDiagnostics(unit.path);
 
-			for(var i = 0; i < diagnostics.length; i++) {
+            for(var i = 0; i < diagnostics.length; i++) {
 
-				var diagnostic = new TypeScript.Api.Diagnostic("syntax", diagnostics[i].fileName(), diagnostics[i].text(), diagnostics[i].message());
+                var diagnostic = new TypeScript.Api.Diagnostic("syntax", diagnostics[i].fileName(), diagnostics[i].text(), diagnostics[i].message());
 
-				diagnostic.computeLineInfo(unit.content, diagnostics[i].start());
+                diagnostic.computeLineInfo(unit.content, diagnostics[i].start());
 
-				unit.diagnostics.push( diagnostic );
-			}
+                unit.diagnostics.push( diagnostic );
+            }
         }
 
         public type_check_unit    (unit:TypeScript.Api.SourceUnit) : void {
 
-			this.compiler.pullTypeCheck();
+            this.compiler.pullTypeCheck();
             
-			var diagnostics = this.compiler.getSemanticDiagnostics(unit.path);
+            var diagnostics = this.compiler.getSemanticDiagnostics(unit.path);
 
-			for(var i = 0; i < diagnostics.length; i++) {
+            for(var i = 0; i < diagnostics.length; i++) {
 
-				var diagnostic = new TypeScript.Api.Diagnostic("typecheck", diagnostics[i].fileName(), diagnostics[i].text(), diagnostics[i].message());
+                var diagnostic = new TypeScript.Api.Diagnostic("typecheck", diagnostics[i].fileName(), diagnostics[i].text(), diagnostics[i].message());
                 
-				diagnostic.computeLineInfo(unit.content, diagnostics[i].start());
+                diagnostic.computeLineInfo(unit.content, diagnostics[i].start());
 
-				unit.diagnostics.push( diagnostic );
-			}
+                unit.diagnostics.push( diagnostic );
+            }
         }
         
         public emit_unit          (unit:TypeScript.Api.SourceUnit) : void {
 
             this.compiler.emitUnit(unit.path, this.output, (inputFile: string, outputFile: string) : void => 
-			{
-				this.output.mapper[outputFile] = inputFile;
-			});
+            {
+                this.output.mapper[outputFile] = inputFile;
+            });
         }
 
         public preprocess () : void {
@@ -121,7 +121,7 @@ module TypeScript.Api {
                     
                     default:
 
-                        break
+                        break;
                 }
             }
 
@@ -144,10 +144,10 @@ module TypeScript.Api {
                         this.emit_unit(unit);
 
                         break;
-                    
+
                     default:
 
-                        break
+                        break;
                 }
             }
         }
@@ -165,17 +165,17 @@ module TypeScript.Api {
 
 
             // get result.
-			var compiled  = [];
+            var compiled  = [];
 
-			for(var file in this.output.files) {
+            for(var file in this.output.files) {
 
-				var document  = this.compiler.getDocument( this.output.mapper [ file ] );
+                var document  = this.compiler.getDocument( this.output.mapper [ file ] );
 
-				if(document) {
+                if(document) {
 
-					var unit = this.input.fetch ( this.output.mapper [ file ] );
+                    var unit = this.input.fetch ( this.output.mapper [ file ] );
 
-					if(unit) {
+                    if(unit) {
 
                         var ast 		= document.script;
 
@@ -186,15 +186,41 @@ module TypeScript.Api {
                         var sourcemap   = this.output.get_source_map   ( unit.path );
 
                         var script      = this.output.get_reflection   ( unit.path, ast );
-    
-						var diagnostics = unit.diagnostics;
+
+                        var diagnostics = unit.diagnostics;
 
                         var references  = unit.references();
+
+                        compiled.push( new TypeScript.Api.CompiledUnit(path, content, diagnostics, ast, sourcemap, script, references ) );
+                    }
+                }
+            }
+
+            // as units can be added and removed in any order,
+            // this will sort the units based on the order
+            // given by the input units (which are assumed
+            // to be appropriately ordered first by a 
+            // prior call to resolve())
+
+            var sorted = [];
+
+            for(var n in this.input.units) {
+                
+                for(var m in compiled) {
+                    
+                    // note: can speed this up by doing the replace a bit earlier..
+                    //       1) in the resolver
+                    //       2) in the Processor input.
+                    if(this.input.units[n].path.replace(/\\/g, '/') == compiled[m].path) {
                         
-						compiled.push( new TypeScript.Api.CompiledUnit(path, content, diagnostics, ast, sourcemap, script, references ) );
-					}
-				}
-			}
+                        sorted.push(compiled[m]);
+
+                        break;
+                    }
+                }
+            }
+
+            compiled = sorted;
 
             // resolve type references on scripts.
             TypeScript.Api.TypeResolver.resolve( compiled.map((unit) => {
@@ -202,7 +228,7 @@ module TypeScript.Api {
                 return unit.script;
             }));
 
-			return compiled; 
+            return compiled; 
         }
     }
 }

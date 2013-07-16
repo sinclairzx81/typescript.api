@@ -70,9 +70,9 @@ module TypeScript.Api {
         *   and deletes, and flags them on state ready for
         *   processing.
         */
-        public merge(units:TypeScript.Api.SourceUnit[]) : TypeScript.Api.SourceUnit[] {
+        public merge(units:TypeScript.Api.SourceUnit[]) : void {
 
-            // deletes
+            // compute delete state.
             this.units.map((local) => {
 
                 for(var i = 0; i < units.length; i++) {
@@ -88,13 +88,14 @@ module TypeScript.Api {
                 return false;
             }); 
 
+            // scan for additions and updates.
             for(var i = 0; i < units.length; i++) {
                 
                 var local = this.fetch(units[i].path) 
                 
                 if(local) 
                 {    
-                    if(!this.same(local, units[i])) {
+                    if(!this.same(local, units[i])) { 
 
                         local.state   = 'updated';
 
@@ -117,19 +118,27 @@ module TypeScript.Api {
                 }
             }
 
-            // invoke the topology resolver.
-            this.units = TypeScript.Api.Topology.sort(this.units);
+            // remove and sort deleted units.
 
-            this.units = this.units.filter((local) => {
+            var sorted = [];
 
-                if(local.state == 'deleted') {
+            for(var n in units) {
+            
+                for(var m in this.units) {
                 
-                    return false;
-                }
-                return true;
-            });
+                    if(this.units[m].path == units[n].path) {
+                        
+                        if(this.units[m].state != 'deleted') {
+                        
+                            sorted.push(this.units[m]);
+                        }
 
-            return this.units;
+                        break;
+                    }
+                }
+            }
+
+            this.units = sorted;
         }
     }
 }

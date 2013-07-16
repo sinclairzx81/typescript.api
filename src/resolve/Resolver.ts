@@ -24,8 +24,8 @@ module TypeScript.Api
 
 		public filename         : string;
 
-		constructor(parent_filename:string, filename:string) 
-		{
+		constructor(parent_filename:string, filename:string) {
+
 			this.parent_filename = parent_filename;
 
 			this.filename = TypeScript.Api.Path.relativeToAbsolute(parent_filename, filename); 
@@ -123,7 +123,6 @@ module TypeScript.Api
 			} 
 
 			this.units = TypeScript.Api.Topology.sort(this.units);
-
 
 			callback( this.units );
 		}
