@@ -16,7 +16,7 @@
 /// <reference path="../util/Path.ts" />
 
 
-module TypeScript.Api.Resolve 
+module TypeScript.Api 
 {	
 	export class Node
 	{
@@ -33,13 +33,13 @@ module TypeScript.Api.Resolve
     export class Topology
     {
 		// returns a dependancy graph. all paths are resolved to absolute....
-        public static graph(units: TypeScript.Api.Units.SourceUnit[]) :  TypeScript.Api.Resolve.Node [] {
+        public static graph(units: TypeScript.Api.SourceUnit[]) :  TypeScript.Api.Node [] {
 			
-			var nodes:TypeScript.Api.Resolve.Node [] = [];
+			var nodes:TypeScript.Api.Node [] = [];
 
             for(var n in units) 
 			{	
-				var node = new TypeScript.Api.Resolve.Node();
+				var node = new TypeScript.Api.Node();
 				
 				node.path = units[n].path;
 
@@ -47,7 +47,7 @@ module TypeScript.Api.Resolve
 
 				for(var m in node.references)
 				{
-					node.references[m] = Util.Path.relativeToAbsolute(node.path, node.references[m]);
+					node.references[m] = TypeScript.Api.Path.relativeToAbsolute(node.path, node.references[m]);
 
 					node.references[m] = node.references[m].replace(/\\/g, '/');
 				}
@@ -64,11 +64,11 @@ module TypeScript.Api.Resolve
         // based on the supplied source units, this method will attempt
         // a best guess topological sort. If cyclic references occur,
         // will return units as is.  
-        public static sort(units: TypeScript.Api.Units.SourceUnit[]) :  TypeScript.Api.Units.SourceUnit[]
+        public static sort(units: TypeScript.Api.SourceUnit[]) :  TypeScript.Api.SourceUnit[]
         {
-            var queue:TypeScript.Api.Units.SourceUnit[]  = [];
+            var queue:TypeScript.Api.SourceUnit[]  = [];
 
-            var result:TypeScript.Api.Units.SourceUnit[] = [];
+            var result:TypeScript.Api.SourceUnit[] = [];
 
             var max_iterations = units.length * units.length;
 
@@ -89,7 +89,7 @@ module TypeScript.Api.Resolve
 
                 for(var n in references)
                 {
-                    var reference = Util.Path.relativeToAbsolute(item.path, references[n]);
+                    var reference = TypeScript.Api.Path.relativeToAbsolute(item.path, references[n]);
                     
                     var unit = null;
 

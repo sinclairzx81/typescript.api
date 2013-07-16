@@ -12,7 +12,7 @@
 
 /// <reference path="../decl/typescript.d.ts" />
 
-module TypeScript.Api.Loggers
+module TypeScript.Api
 {
 	export class NullLogger implements TypeScript.ILogger 
 	{

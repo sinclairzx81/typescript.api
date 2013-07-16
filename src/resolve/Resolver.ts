@@ -16,7 +16,7 @@
 /// <reference path="../io/IOFile.ts" />
 /// <reference path="Topology.ts" />
 
-module TypeScript.Api.Resolve 
+module TypeScript.Api 
 {	
 	export class LoadParameter 
 	{
@@ -28,19 +28,19 @@ module TypeScript.Api.Resolve
 		{
 			this.parent_filename = parent_filename;
 
-			this.filename = Util.Path.relativeToAbsolute(parent_filename, filename); 
+			this.filename = TypeScript.Api.Path.relativeToAbsolute(parent_filename, filename); 
 		} 
 	} 
 
 	export class Resolver 
 	{
-		private pending     : TypeScript.Api.Resolve.LoadParameter  [];
+		private pending     : TypeScript.Api.LoadParameter  [];
 
-		private closed      : TypeScript.Api.Resolve.LoadParameter  [];
+		private closed      : TypeScript.Api.LoadParameter  [];
 
-		private units       : TypeScript.Api.Units.SourceUnit [];
+		private units       : TypeScript.Api.SourceUnit [];
 
-		constructor( public io : TypeScript.Api.IO.IIO, public logger : TypeScript.ILogger ) 
+		constructor( public io : TypeScript.Api.IIO, public logger : TypeScript.ILogger ) 
 		{
 			this.pending      = [];
 
@@ -49,11 +49,11 @@ module TypeScript.Api.Resolve
 			this.units        = [];
 		}
 
-		public resolve(sources:string[], callback: {( units:TypeScript.Api.Units.SourceUnit[] ): void; }) : void 
+		public resolve(sources:string[], callback: {( units:TypeScript.Api.SourceUnit[] ): void; }) : void 
 		{
 			for(var n in sources)  
 			{
-				var parameter = new TypeScript.Api.Resolve.LoadParameter( process.mainModule.filename, sources[n] );
+				var parameter = new TypeScript.Api.LoadParameter( process.mainModule.filename, sources[n] );
 
 				this.pending.push(parameter);
 			}
@@ -61,7 +61,7 @@ module TypeScript.Api.Resolve
 			this.load ( callback );
 		}	
 
-		private load (callback: {( unit : TypeScript.Api.Units.SourceUnit[]): void; }) : void  
+		private load (callback: {( unit : TypeScript.Api.SourceUnit[]): void; }) : void  
 		{
 			var parameter = this.pending.pop();
 
@@ -71,11 +71,11 @@ module TypeScript.Api.Resolve
 
                 var parent_filename = parameter.parent_filename;
 
-				this.io.readFile(parameter.filename, (iofile : TypeScript.Api.IO.IOFile) =>  
+				this.io.readFile(parameter.filename, (iofile : TypeScript.Api.IOFile) =>  
 				{		
                     // create unit from iofile.
                     		
-                    var unit = new TypeScript.Api.Units.SourceUnit(iofile.path, iofile.content, [], iofile.remote );
+                    var unit = new TypeScript.Api.SourceUnit(iofile.path, iofile.content, [], iofile.remote );
 
                     if(iofile.errors.length > 0)
                     {
@@ -83,7 +83,7 @@ module TypeScript.Api.Resolve
                         {
                             var error = iofile.errors[n];
 
-                            var diagnostic = new TypeScript.Api.Units.Diagnostic("resolve", parent_filename, error.text, error.message);
+                            var diagnostic = new TypeScript.Api.Diagnostic("resolve", parent_filename, error.text, error.message);
 
                             unit.diagnostics.push(diagnostic);
                         }
@@ -95,7 +95,7 @@ module TypeScript.Api.Resolve
 					{
 						for(var n in unit.references() )  
 						{
-							var parameter = new TypeScript.Api.Resolve.LoadParameter( unit.path, unit.references() [n] );
+							var parameter = new TypeScript.Api.LoadParameter( unit.path, unit.references() [n] );
 
 							this.pending.push( parameter );
 						}
@@ -122,13 +122,13 @@ module TypeScript.Api.Resolve
 				return;
 			} 
 
-			this.units = TypeScript.Api.Resolve.Topology.sort(this.units);
+			this.units = TypeScript.Api.Topology.sort(this.units);
 
 
 			callback( this.units );
 		}
 
-		private visited (parameter : TypeScript.Api.Resolve.LoadParameter) : boolean 
+		private visited (parameter : TypeScript.Api.LoadParameter) : boolean 
 		{
 			for(var n in this.closed) 
 			{

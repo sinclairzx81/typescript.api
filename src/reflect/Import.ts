@@ -13,10 +13,10 @@
 /// <reference path="../decl/typescript.d.ts" />
 /// <reference path="ReflectedType.ts" />
 
-module TypeScript.Api.Reflect 
+module TypeScript.Api 
 {
-	export class Import extends ReflectedType
-	{
+	export class Import extends TypeScript.Api.ReflectedType {
+
 		public alias      : string;
 
         constructor() {
@@ -26,7 +26,7 @@ module TypeScript.Api.Reflect
 
 		public static create(ast:TypeScript.ImportDeclaration) : Import 
 		{
-			var result     = new Import();
+			var result     = new TypeScript.Api.Import();
 
 			result.name    = ast.id.text;
 

@@ -51,7 +51,7 @@ export var allowRemote 				: boolean;;
 
 export var debug       				: boolean;
 
-export var compiler                 : TypeScript.Api.Compile.Compiler;
+export var compiler                 : TypeScript.Api.Compiler;
 
 export var languageVersion          : TypeScript.LanguageVersion;  // TypeScript.LanguageVersion.EcmaScript5;
 
@@ -91,7 +91,7 @@ initialize();
 // check: checks to see if the units are ok..
 /////////////////////////////////////////////////////////////
 
-export function check (units : TypeScript.Api.Units.Unit[]) : boolean {
+export function check (units : TypeScript.Api.Unit[]) : boolean {
 	
     for(var n in units)
 	{
@@ -114,7 +114,7 @@ export function register () : void
 {
 	require.extensions['.ts'] = function(_module) 
 	{
-        var output_diagnostics = (units:TypeScript.Api.Units.Unit[]) => {
+        var output_diagnostics = (units:TypeScript.Api.Unit[]) => {
 
 	        for(var n in units)
 	        {
@@ -127,19 +127,19 @@ export function register () : void
         
 		var api         = <TypeScript.Api>load_typescript_api();
 		
-		var io          = new api.IO.IOSync();
+		var io          = new api.IOSync();
 		
-		var logger      = new api.Loggers.BufferedLogger();
+		var logger      = new api.BufferedLogger();
 		
-		var resolver    = new api.Resolve.Resolver( io, logger );
+		var resolver    = new api.Resolver( io, logger );
 		
 		var diagnostics = [];
 		
-		resolver.resolve([_module.filename], (sourceUnits:TypeScript.Api.Units.SourceUnit[]) => {
+		resolver.resolve([_module.filename], (sourceUnits:TypeScript.Api.SourceUnit[]) => {
 			
             if(exports.check(sourceUnits)) {
 
-                var options = new api.Compile.CompilerOptions();
+                var options = new api.CompilerOptions();
 
                 options.moduleGenTarget          = exports.moduleTarget;
 
@@ -151,9 +151,9 @@ export function register () : void
 
                 options.logger                   = logger;
 
-				var compiler = new api.Compile.Compiler( options );
+				var compiler = new api.Compiler( options );
 				
-				compiler.compile( sourceUnits, ( compiledUnits : TypeScript.Api.Units.CompiledUnit[] ) =>  {
+				compiler.compile( sourceUnits, ( compiledUnits : TypeScript.Api.CompiledUnit[] ) =>  {
 					
                     if( exports.check(compiledUnits) ) {
 
@@ -184,9 +184,9 @@ export function reset() : void {
 
     var api = <TypeScript.Api>load_typescript_api();
 
-    var logger = new api.Loggers.NullLogger();
+    var logger = new api.NullLogger();
 
-    var options = new api.Compile.CompilerOptions();
+    var options = new api.CompilerOptions();
 
     options.moduleGenTarget          = exports.moduleTarget;
 
@@ -198,25 +198,25 @@ export function reset() : void {
 
     options.logger                   = logger;
 
-	exports.compiler = new api.Compile.Compiler( options );
+	exports.compiler = new api.Compiler( options );
 }
 
 /////////////////////////////////////////////////////////////
 // create: creates a new source unit
 /////////////////////////////////////////////////////////////
 
-export function create (path:string, content:string) : TypeScript.Api.Units.SourceUnit {
+export function create (path:string, content:string) : TypeScript.Api.SourceUnit {
 
 	var api = <TypeScript.Api>load_typescript_api();
 	
-	return new api.Units.SourceUnit(path, content, [], false );
+	return new api.SourceUnit(path, content, [], false );
 }
 
 /////////////////////////////////////////////////////////////
 // resolve: resolves source units.
 /////////////////////////////////////////////////////////////
 
-export function resolve (sources:string[], callback :{ (units : TypeScript.Api.Units.SourceUnit[] ) : void; }) : void  {
+export function resolve (sources:string[], callback :{ (units : TypeScript.Api.SourceUnit[] ) : void; }) : void  {
 
     var getType = (obj:any):string => { return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase() };
     
@@ -239,15 +239,15 @@ export function resolve (sources:string[], callback :{ (units : TypeScript.Api.U
     
 	var api      = <TypeScript.Api>load_typescript_api();
 	
-	var io       = new api.IO.IOAsync();
+	var io       = new api.IOAsync();
 	
-	var logger   = new api.Loggers.NullLogger();
+	var logger   = new api.NullLogger();
 	
-	if(exports.allowRemote) 			 { io = new api.IO.IORemoteAsync(); }
+	if(exports.allowRemote) 			 { io = new api.IORemoteAsync(); }
 	
-	if(exports.debug)       			 { logger = new api.Loggers.ConsoleLogger(); }
+	if(exports.debug)       			 { logger = new api.ConsoleLogger(); }
 	
-	var resolver = new api.Resolve.Resolver( io, logger );
+	var resolver = new api.Resolver( io, logger );
 	
 	resolver.resolve(_sources, callback);
 }
@@ -256,39 +256,39 @@ export function resolve (sources:string[], callback :{ (units : TypeScript.Api.U
 // sort: sorts source units into sequential order.
 /////////////////////////////////////////////////////////////
 
-export function sort(sourceUnits: TypeScript.Api.Units.SourceUnit[]) : TypeScript.Api.Units.SourceUnit[]
+export function sort(sourceUnits: TypeScript.Api.SourceUnit[]) : TypeScript.Api.SourceUnit[]
 {
     var api = <TypeScript.Api>load_typescript_api();
     
-    return api.Resolve.Topology.sort(sourceUnits);
+    return api.Topology.sort(sourceUnits);
 }
 
 /////////////////////////////////////////////////////////////
 // graph: returns a graph source units.
 /////////////////////////////////////////////////////////////
 
-export function graph(sourceUnits: TypeScript.Api.Units.SourceUnit[]) :  TypeScript.Api.Resolve.Node []
+export function graph(sourceUnits: TypeScript.Api.SourceUnit[]) :  TypeScript.Api.Node []
 {
     var api = <TypeScript.Api>load_typescript_api();
 
-    return api.Resolve.Topology.graph(sourceUnits);
+    return api.Topology.graph(sourceUnits);
 }
 
 /////////////////////////////////////////////////////////////
 // compile: compiles source units. outputs a compilation.
 /////////////////////////////////////////////////////////////
 
-export function compile (sourceUnits: TypeScript.Api.Units.SourceUnit[], callback : { (compiledUnit:TypeScript.Api.Units.CompiledUnit[] ): void; } ) : void {
+export function compile (sourceUnits: TypeScript.Api.SourceUnit[], callback : { (compiledUnit:TypeScript.Api.CompiledUnit[] ): void; } ) : void {
 
 	var api = <TypeScript.Api>load_typescript_api();
 
-	var logger = new api.Loggers.NullLogger();
+	var logger = new api.NullLogger();
 	
-	if(exports.debug) { logger = new api.Loggers.ConsoleLogger(); }
+	if(exports.debug) { logger = new api.ConsoleLogger(); }
 	
     if(!exports.compiler)
     {
-        var options = new api.Compile.CompilerOptions();
+        var options = new api.CompilerOptions();
 
         options.moduleGenTarget          = exports.moduleTarget;
 
@@ -300,7 +300,7 @@ export function compile (sourceUnits: TypeScript.Api.Units.SourceUnit[], callbac
 
         options.logger                   = logger;
 
-	    exports.compiler = new api.Compile.Compiler( options );
+	    exports.compiler = new api.Compiler( options );
 	}
     
     exports.compiler.compile(sourceUnits, (compiledUnits)=> {
@@ -313,7 +313,7 @@ export function compile (sourceUnits: TypeScript.Api.Units.SourceUnit[], callbac
 // run: runs a compilation.
 /////////////////////////////////////////////////////////////
 
-export function run (compiledUnits:TypeScript.Api.Units.CompiledUnit[], sandbox:any, callback :{ (context:any): void; }) : void 
+export function run (compiledUnits:TypeScript.Api.CompiledUnit[], sandbox:any, callback :{ (context:any): void; }) : void 
 {
 	try 
 	{
@@ -346,11 +346,11 @@ export function run (compiledUnits:TypeScript.Api.Units.CompiledUnit[], sandbox:
 // build: builds and produces a declaration for the given input.
 /////////////////////////////////////////////////////////////
 
-export function build (filenames:string[], callback :{ (diagnostics:TypeScript.Api.Units.Diagnostic[], source:string, declaration:string ): void; }) : void {
+export function build (filenames:string[], callback :{ (diagnostics:TypeScript.Api.Diagnostic[], source:string, declaration:string ): void; }) : void {
 
-    var get_diagnostics = (sourceUnits:TypeScript.Api.Units.Unit[]) : TypeScript.Api.Units.Diagnostic[] => {
+    var get_diagnostics = (sourceUnits:TypeScript.Api.Unit[]) : TypeScript.Api.Diagnostic[] => {
         
-        var result:TypeScript.Api.Units.Diagnostic[] = [];
+        var result:TypeScript.Api.Diagnostic[] = [];
 
 	    for(var n in sourceUnits) {
 
@@ -363,7 +363,7 @@ export function build (filenames:string[], callback :{ (diagnostics:TypeScript.A
         return result;   
     };
     
-    exports.resolve(filenames, (sourceUnits:TypeScript.Api.Units.SourceUnit[]) => {
+    exports.resolve(filenames, (sourceUnits:TypeScript.Api.SourceUnit[]) => {
 
         if(!exports.check(sourceUnits)) {
 
@@ -372,7 +372,7 @@ export function build (filenames:string[], callback :{ (diagnostics:TypeScript.A
             return;
         }
 
-        exports.compile(sourceUnits, (compiledUnits:TypeScript.Api.Units.CompiledUnit[]) => {
+        exports.compile(sourceUnits, (compiledUnits:TypeScript.Api.CompiledUnit[]) => {
 
             if(!exports.check(sourceUnits)) {
 

@@ -12,7 +12,7 @@
 
 /// <reference path="Diagnostic.ts" />
 
-module TypeScript.Api.Units
+module TypeScript.Api
 {
 	export class Unit
 	{
@@ -20,9 +20,9 @@ module TypeScript.Api.Units
 
 		public content     : string;
 
-		public diagnostics : TypeScript.Api.Units.Diagnostic[];
+		public diagnostics : TypeScript.Api.Diagnostic[];
 
-		constructor(path:string, content:string, diagnostics:TypeScript.Api.Units.Diagnostic[])
+		constructor(path:string, content:string, diagnostics:TypeScript.Api.Diagnostic[])
 		{
 			this.path 		 = path;
 

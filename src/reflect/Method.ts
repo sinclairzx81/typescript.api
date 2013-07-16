@@ -15,10 +15,10 @@
 /// <reference path="Parameter.ts" />
 /// <reference path="Type.ts" />
 
-module TypeScript.Api.Reflect 
+module TypeScript.Api 
 {
-	export class Method extends ReflectedType
-	{
+	export class Method extends TypeScript.Api.ReflectedType {
+
 		public parameters      : Parameter[];
 
 		public returns         : Type;
@@ -62,7 +62,7 @@ module TypeScript.Api.Reflect
             this.isExported = false;
 		}
 
-		private static load_comments(result:Method, ast:TypeScript.FunctionDeclaration) : void 
+		private static load_comments(result:TypeScript.Api.Method, ast:TypeScript.FunctionDeclaration) : void 
 		{
 			var comments = ast.getDocComments();
 
@@ -72,26 +72,26 @@ module TypeScript.Api.Reflect
 			}
 		}
 
-		private static load_returns(result:Method, ast:TypeScript.FunctionDeclaration) : void 
+		private static load_returns(result:TypeScript.Api.Method, ast:TypeScript.FunctionDeclaration) : void 
 		{
 			if(ast.returnTypeAnnotation) 
 			{
 				var type_reference = <TypeScript.TypeReference>ast.returnTypeAnnotation;
 
-				result.returns = TypeScript.Api.Reflect.Type.create( type_reference );	
+				result.returns = TypeScript.Api.Type.create( type_reference );	
 
 				return;
 			}
-			result.returns = new TypeScript.Api.Reflect.Type();            
+			result.returns = new TypeScript.Api.Type();            
 		}
 
-		public static load_parameters(result:Method, ast:TypeScript.FunctionDeclaration) : void 
+		public static load_parameters(result:TypeScript.Api.Method, ast:TypeScript.FunctionDeclaration) : void 
 		{
 			for(var n in ast.arguments.members) 
 			{
 				var argument = ast.arguments.members[n];
 
-				var parameter = TypeScript.Api.Reflect.Parameter.create(argument);
+				var parameter = TypeScript.Api.Parameter.create(argument);
 
 				result.parameters.push(parameter);
 			}
@@ -99,7 +99,7 @@ module TypeScript.Api.Reflect
 
 		public static create(ast:TypeScript.FunctionDeclaration) : Method  
 		{
-			var result           = new Method();
+			var result           = new TypeScript.Api.Method();
 
 			result.name          = ast.isConstructor ? "constructor" : ast.getNameText();
 

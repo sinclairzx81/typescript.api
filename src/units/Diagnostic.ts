@@ -10,7 +10,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module TypeScript.Api.Units 
+module TypeScript.Api 
 {
 	export class Diagnostic
 	{
@@ -61,5 +61,20 @@ module TypeScript.Api.Units
 		{
 			return this.path + " [" + (this.line_index + 1).toString() + ":" +  (this.char_index + 1).toString() + "] " + this.message;
 		}
+
+        public clone() : TypeScript.Api.Diagnostic {
+        
+            var clone = new TypeScript.Api.Diagnostic(this.type.toString(), 
+                                                      this.path.toString(), 
+                                                      this.text.toString(), 
+                                                      this.message.toString());
+
+            clone.char_index = this.char_index;
+
+            clone.line_index = this.line_index;
+
+            return clone;
+
+        }
 	}
 }

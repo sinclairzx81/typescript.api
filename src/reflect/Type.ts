@@ -14,13 +14,13 @@
 /// <reference path="ReflectedType.ts" />
 /// <reference path="Method.ts" />
 
-module TypeScript.Api.Reflect 
+module TypeScript.Api 
 {
-	export class Type extends ReflectedType 
-	{
+	export class Type extends TypeScript.Api.ReflectedType {
+
 		public arguments  : Type[];
         
-        public signature  : TypeScript.Api.Reflect.Method;
+        public signature  : TypeScript.Api.Method;
 
 		public arrayCount : number;
 
@@ -122,7 +122,7 @@ module TypeScript.Api.Reflect
 			// called on namespaced extends or implements.
 			var create_member_access_expression = (ast:TypeScript.AST) : Type => { // 32
 
-				var type = new TypeScript.Api.Reflect.Type();
+				var type = new TypeScript.Api.Type();
 
 				type.name = Type.qualifyName(ast);
 
@@ -132,7 +132,7 @@ module TypeScript.Api.Reflect
 			// called on non namespaced extends or implements.
 			var create_named_type = (namedDeclaraion:TypeScript.NamedDeclaration) : Type => {
 
-				var type = new TypeScript.Api.Reflect.Type();
+				var type = new TypeScript.Api.Type();
 
 				type.name = Type.qualifyName(namedDeclaraion);
 
@@ -142,7 +142,7 @@ module TypeScript.Api.Reflect
 			// called when referencing variables, return types.
 			var create_type = (typeRef:TypeScript.TypeReference) : Type => 
 			{
-				var type = new TypeScript.Api.Reflect.Type();
+				var type = new TypeScript.Api.Type();
 
 				type.name       = Type.qualifyName(typeRef);
 
@@ -174,7 +174,7 @@ module TypeScript.Api.Reflect
 			// called when referencing generic types.
 			var create_generic_type = (genericType:TypeScript.GenericType) : Type =>
 			{
-				var type = new TypeScript.Api.Reflect.Type();
+				var type = new TypeScript.Api.Type();
 
 				type.name    = Type.qualifyName(genericType);
 
@@ -188,7 +188,7 @@ module TypeScript.Api.Reflect
 				return type;
 			};
 
-			var type:TypeScript.Api.Reflect.Type = null;
+			var type:TypeScript.Api.Type = null;
 
 			switch(ast.nodeType)
 			{

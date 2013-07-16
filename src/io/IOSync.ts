@@ -14,19 +14,19 @@
 /// <reference path="Buffer.ts" />
 /// <reference path="IOFile.ts" />
 
-module TypeScript.Api.IO 
+module TypeScript.Api 
 {	
 	var _fs = require('fs');
 	
 	export class IOSync implements IIO 
 	{
-		public readFile (path : string, callback : { ( iofile : TypeScript.Api.IO.IOFile ) : void; }): void 
+		public readFile (path : string, callback : { ( iofile : TypeScript.Api.IOFile ) : void; }): void 
 		{
 			try 
 			{
 				var data = _fs.readFileSync(path);
 				
-				callback( new TypeScript.Api.IO.IOFile (path, TypeScript.Api.IO.Buffer.process(data), [], false) );  
+				callback( new TypeScript.Api.IOFile (path, TypeScript.Api.Buffer.process(data), [], false) );  
 			} 
 			catch(exception) 
 			{
@@ -34,9 +34,9 @@ module TypeScript.Api.IO
 					
 				var message = "could not resolve source unit " + path + ".";
 				    
-				var error   = new TypeScript.Api.IO.IOFileError(text, message);				
+				var error   = new TypeScript.Api.IOFileError(text, message);				
 				
-				callback( new TypeScript.Api.IO.IOFile (path, null, [error], false) );  
+				callback( new TypeScript.Api.IOFile (path, null, [error], false) );  
 			}
 		}		
 	}

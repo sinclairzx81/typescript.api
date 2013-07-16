@@ -11,7 +11,7 @@
 // limitations under the License.
 
 
-module TypeScript.Api.Reflect 
+module TypeScript.Api 
 {	
     export class ReflectedType {
         

@@ -13,15 +13,15 @@
 /// <reference path="../decl/typescript.d.ts" />
 /// <reference path="../writers/TextWriter.ts" />
 
-module TypeScript.Api.Loggers
+module TypeScript.Api
 {
 	export class BufferedLogger implements TypeScript.ILogger 
 	{
-		private writer : TypeScript.Api.Writers.TextWriter;
+		private writer : TypeScript.Api.TextWriter;
 		
 		constructor() 
 		{
-			this.writer = new TypeScript.Api.Writers.TextWriter;
+			this.writer = new TypeScript.Api.TextWriter;
 		}
 		
 		public information() : boolean 

@@ -22,16 +22,16 @@
 /// <reference path="Variable.ts" />
 /// <reference path="Type.ts" />
 
-module TypeScript.Api.Reflect  {
+module TypeScript.Api  {
 
     // TypeResolver: Resolves Reflect.
 	export class TypeResolver {
         
-        private static resolve_type(module_scope_stack:TypeScript.Api.Reflect.Module[],  type:TypeScript.Api.Reflect.Type) : void {
+        private static resolve_type(module_scope_stack:TypeScript.Api.Module[],  type:TypeScript.Api.Type) : void {
             
             if(type.resolved) return;
 
-            var associate = (type:TypeScript.Api.Reflect.Type, reflected_type:TypeScript.Api.Reflect.ReflectedType) => {
+            var associate = (type:TypeScript.Api.Type, reflected_type:TypeScript.Api.ReflectedType) => {
                 
                 type.scope = reflected_type.scope.slice(0);
                 
@@ -134,17 +134,17 @@ module TypeScript.Api.Reflect  {
 
 
         // resolves types accessible in the reflected types local scope.
-        private static resolve_local_scope(scripts:TypeScript.Api.Reflect.Script[]) : void {
+        private static resolve_local_scope(scripts:TypeScript.Api.Script[]) : void {
             
             var module_stack = [];
 
-            var _resolve_local_scope = (reflected_type : TypeScript.Api.Reflect.ReflectedType) => {
+            var _resolve_local_scope = (reflected_type : TypeScript.Api.ReflectedType) => {
                 
                 if(reflected_type == null) return;
 
                 if(reflected_type.identifier == 'script') {
                 
-                    var __script = <TypeScript.Api.Reflect.Module>reflected_type;
+                    var __script = <TypeScript.Api.Module>reflected_type;
 
                      module_stack.push(__script);
 
@@ -165,7 +165,7 @@ module TypeScript.Api.Reflect  {
             
                 if(reflected_type.identifier == 'module') {
                 
-                    var _module = <TypeScript.Api.Reflect.Module>reflected_type;
+                    var _module = <TypeScript.Api.Module>reflected_type;
 
                     module_stack.push(_module);
 
@@ -184,7 +184,7 @@ module TypeScript.Api.Reflect  {
 
                 if(reflected_type.identifier == 'class') {
 
-                    var _class = <TypeScript.Api.Reflect.Class>reflected_type;
+                    var _class = <TypeScript.Api.Class>reflected_type;
 
                     _class.implements.forEach ((_type ) => { TypeResolver.resolve_type(module_stack, _type); });
 
@@ -197,7 +197,7 @@ module TypeScript.Api.Reflect  {
 
                 if(reflected_type.identifier == 'interface') {
             
-                    var _interface = <TypeScript.Api.Reflect.Interface>reflected_type;
+                    var _interface = <TypeScript.Api.Interface>reflected_type;
 
                     _interface.extends.forEach    ((_type ) => { TypeResolver.resolve_type(module_stack, _type); });
                 
@@ -209,7 +209,7 @@ module TypeScript.Api.Reflect  {
 
                 if(reflected_type.identifier == 'method') {
             
-                    var _method = <TypeScript.Api.Reflect.Method>reflected_type;
+                    var _method = <TypeScript.Api.Method>reflected_type;
 
                     TypeResolver.resolve_type(module_stack, _method.returns);
 
@@ -218,14 +218,14 @@ module TypeScript.Api.Reflect  {
                      
                 if(reflected_type.identifier == 'variable') {
             
-                    var _variable = <TypeScript.Api.Reflect.Variable>reflected_type;
+                    var _variable = <TypeScript.Api.Variable>reflected_type;
 
                     TypeResolver.resolve_type(module_stack, _variable.type);
                 }
 
                 if(reflected_type.identifier == 'parameter') {
             
-                     var _parameter = <TypeScript.Api.Reflect.Parameter>reflected_type;
+                     var _parameter = <TypeScript.Api.Parameter>reflected_type;
 
                     if(_parameter.type.name == "Function") {
                     
@@ -246,17 +246,17 @@ module TypeScript.Api.Reflect  {
         }
         
         // resolves types accessible in the reflected types global scope.
-        private static resolve_global_scope(scripts:TypeScript.Api.Reflect.Script[]) : void {
+        private static resolve_global_scope(scripts:TypeScript.Api.Script[]) : void {
             
             var module_stack = [];
 
-            var _gather_global_scope = (reflected_type : TypeScript.Api.Reflect.ReflectedType) => {
+            var _gather_global_scope = (reflected_type : TypeScript.Api.ReflectedType) => {
                 
                 if(reflected_type == null) return;
 
                 if(reflected_type.identifier == 'script') {
                     
-                    var _script = <TypeScript.Api.Reflect.Module>reflected_type;
+                    var _script = <TypeScript.Api.Module>reflected_type;
 
                      module_stack.push(_script);
 
@@ -267,7 +267,7 @@ module TypeScript.Api.Reflect  {
                 
                 if(reflected_type.identifier == 'module') {
                 
-                    var _module = <TypeScript.Api.Reflect.Module>reflected_type;
+                    var _module = <TypeScript.Api.Module>reflected_type;
 
                     module_stack.push(_module);
 
@@ -275,13 +275,13 @@ module TypeScript.Api.Reflect  {
                 }
             };
 
-            var _resolve_global_scope = (reflected_type : TypeScript.Api.Reflect.ReflectedType) => {
+            var _resolve_global_scope = (reflected_type : TypeScript.Api.ReflectedType) => {
                 
                 if(reflected_type == null) return;
 
                 if(reflected_type.identifier == 'script') {
                 
-                    var __script = <TypeScript.Api.Reflect.Module>reflected_type;
+                    var __script = <TypeScript.Api.Module>reflected_type;
 
                     __script.modules.forEach    ((_reflected_type) => { _resolve_global_scope(_reflected_type); }); 
 
@@ -298,7 +298,7 @@ module TypeScript.Api.Reflect  {
             
                 if(reflected_type.identifier == 'module') {
                 
-                    var _module = <TypeScript.Api.Reflect.Module>reflected_type;
+                    var _module = <TypeScript.Api.Module>reflected_type;
 
                     _module.modules.forEach    ((_reflected_type) => { _resolve_global_scope(_reflected_type); }); 
 
@@ -313,7 +313,7 @@ module TypeScript.Api.Reflect  {
 
                 if(reflected_type.identifier == 'class') {
 
-                    var _class = <TypeScript.Api.Reflect.Class>reflected_type;
+                    var _class = <TypeScript.Api.Class>reflected_type;
 
                     _class.implements.forEach ((_type ) => { TypeResolver.resolve_type(module_stack, _type); });
 
@@ -326,7 +326,7 @@ module TypeScript.Api.Reflect  {
 
                 if(reflected_type.identifier == 'interface') {
             
-                    var _interface = <TypeScript.Api.Reflect.Interface>reflected_type;
+                    var _interface = <TypeScript.Api.Interface>reflected_type;
 
                     _interface.extends.forEach    ((_type ) => { TypeResolver.resolve_type(module_stack, _type); });
                 
@@ -338,7 +338,7 @@ module TypeScript.Api.Reflect  {
 
                 if(reflected_type.identifier == 'method') {
             
-                    var _method = <TypeScript.Api.Reflect.Method>reflected_type;
+                    var _method = <TypeScript.Api.Method>reflected_type;
 
                     TypeResolver.resolve_type(module_stack, _method.returns);
 
@@ -347,14 +347,14 @@ module TypeScript.Api.Reflect  {
                      
                 if(reflected_type.identifier == 'variable') {
             
-                    var _variable = <TypeScript.Api.Reflect.Variable>reflected_type;
+                    var _variable = <TypeScript.Api.Variable>reflected_type;
 
                     TypeResolver.resolve_type(module_stack, _variable.type);
                 }
 
                 if(reflected_type.identifier == 'parameter') {
                     
-                    var _parameter = <TypeScript.Api.Reflect.Parameter>reflected_type;
+                    var _parameter = <TypeScript.Api.Parameter>reflected_type;
 
                     if(_parameter.type.name == "Function") {
                     
@@ -385,7 +385,7 @@ module TypeScript.Api.Reflect  {
         // into this reflection. This is required
         // for code whose types reference types
         // spanning multiple source (script) units. 
-        public static resolve(scripts:TypeScript.Api.Reflect.Script[]) : void {
+        public static resolve(scripts:TypeScript.Api.Script[]) : void {
             
             TypeResolver.resolve_local_scope  (scripts);
 

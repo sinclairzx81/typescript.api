@@ -18,10 +18,10 @@
 /// <reference path="Method.ts" />
 /// <reference path="Variable.ts" />
 
-module TypeScript.Api.Reflect 
+module TypeScript.Api 
 {
-	export class Module extends ReflectedType
-	{
+	export class Module extends TypeScript.Api.ReflectedType {
+
 		public imports    : Import    [];
 
 		public modules    : Module    [];
@@ -55,7 +55,7 @@ module TypeScript.Api.Reflect
             this.isExported = false;
 		}
 
-		private static load_imports(result:TypeScript.Api.Reflect.Module, ast:TypeScript.ModuleDeclaration) : void 
+		private static load_imports(result:TypeScript.Api.Module, ast:TypeScript.ModuleDeclaration) : void 
 		{
 			for(var n in ast.members.members) 
 			{
@@ -63,14 +63,14 @@ module TypeScript.Api.Reflect
 
 				if(member.nodeType == TypeScript.NodeType.ImportDeclaration)
 				{
-					var obj = TypeScript.Api.Reflect.Import.create(<TypeScript.ImportDeclaration>member);
+					var obj = TypeScript.Api.Import.create(<TypeScript.ImportDeclaration>member);
 
 					result.imports.push(obj);
 				}
 			}
 		}
 
-		private static load_modules(result:TypeScript.Api.Reflect.Module, ast:TypeScript.ModuleDeclaration) : void 
+		private static load_modules(result:TypeScript.Api.Module, ast:TypeScript.ModuleDeclaration) : void 
 		{
 			for(var n in ast.members.members) 
 			{
@@ -78,14 +78,14 @@ module TypeScript.Api.Reflect
 
 				if(member.nodeType == TypeScript.NodeType.ModuleDeclaration)
 				{
-					var obj = TypeScript.Api.Reflect.Module.create(<TypeScript.ModuleDeclaration>member);
+					var obj = TypeScript.Api.Module.create(<TypeScript.ModuleDeclaration>member);
 
 					result.modules.push(obj);
 				}
 			}
 		}
 
-		private static load_interfaces(result:TypeScript.Api.Reflect.Module, ast:TypeScript.ModuleDeclaration) : void 
+		private static load_interfaces(result:TypeScript.Api.Module, ast:TypeScript.ModuleDeclaration) : void 
 		{
 			for(var n in ast.members.members) 
 			{
@@ -93,14 +93,14 @@ module TypeScript.Api.Reflect
 
 				if(member.nodeType == TypeScript.NodeType.InterfaceDeclaration)
 				{
-					var obj = TypeScript.Api.Reflect.Interface.create(<TypeScript.InterfaceDeclaration>member);
+					var obj = TypeScript.Api.Interface.create(<TypeScript.InterfaceDeclaration>member);
 
 					result.interfaces.push(obj);
 				}
 			}
 		}
 
-		private static load_classes(result:TypeScript.Api.Reflect.Module, ast:TypeScript.ModuleDeclaration) : void 
+		private static load_classes(result:TypeScript.Api.Module, ast:TypeScript.ModuleDeclaration) : void 
 		{
 			for(var n in ast.members.members) 
 			{
@@ -108,14 +108,14 @@ module TypeScript.Api.Reflect
 
 				if(member.nodeType == TypeScript.NodeType.ClassDeclaration)
 				{
-					var obj = TypeScript.Api.Reflect.Class.create(<TypeScript.ClassDeclaration>member);
+					var obj = TypeScript.Api.Class.create(<TypeScript.ClassDeclaration>member);
 
 					result.classes.push(obj);
 				}
 			}
 		}
 
-		private static load_methods(result:TypeScript.Api.Reflect.Module, ast:TypeScript.ModuleDeclaration) : void 
+		private static load_methods(result:TypeScript.Api.Module, ast:TypeScript.ModuleDeclaration) : void 
 		{
 			for(var n in ast.members.members) 
 			{
@@ -123,14 +123,14 @@ module TypeScript.Api.Reflect
 
 				if(member.nodeType == TypeScript.NodeType.FunctionDeclaration)
 				{
-					var obj = TypeScript.Api.Reflect.Method.create(<TypeScript.FunctionDeclaration>member);
+					var obj = TypeScript.Api.Method.create(<TypeScript.FunctionDeclaration>member);
 
 					result.methods.push(obj);
 				}
 			}
 		}
 
-		private static load_variables(result:TypeScript.Api.Reflect.Module, ast:TypeScript.ModuleDeclaration) : void 
+		private static load_variables(result:TypeScript.Api.Module, ast:TypeScript.ModuleDeclaration) : void 
 		{
 			for(var n in ast.members.members) 
 			{
@@ -146,7 +146,7 @@ module TypeScript.Api.Reflect
 						{
 							for(var m in statement.declaration.declarators.members) 
 							{
-								var obj = TypeScript.Api.Reflect.Variable.create(statement.declaration.declarators.members[m])
+								var obj = TypeScript.Api.Variable.create(statement.declaration.declarators.members[m])
 
 								result.variables.push(obj);
 							}
@@ -158,7 +158,7 @@ module TypeScript.Api.Reflect
 
 		public static create (ast:TypeScript.ModuleDeclaration) : Module
 		{
-			var result     = new Module();
+			var result     = new TypeScript.Api.Module();
 
 			result.name    = ast.prettyName;
             

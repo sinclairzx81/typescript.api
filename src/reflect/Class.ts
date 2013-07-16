@@ -16,10 +16,10 @@
 /// <reference path="Variable.ts" />
 /// <reference path="Type.ts" />
 
-module TypeScript.Api.Reflect 
+module TypeScript.Api 
 {	
-	export class Class extends ReflectedType
-	{
+	export class Class extends TypeScript.Api.ReflectedType {
+
 		public methods    : Method     [];
 
 		public variables  : Variable   [];
@@ -31,6 +31,8 @@ module TypeScript.Api.Reflect
 		public implements : Type       [];
 
         public isExported : boolean;
+
+        public comments   : string    [];
 
 		constructor() 
 		{
@@ -46,11 +48,23 @@ module TypeScript.Api.Reflect
 
 			this.parameters = [];
 
+            this.comments   = [];
+
             this.isExported = false;
 		}
 
 
-		private static load_parameters(result:TypeScript.Api.Reflect.Class, ast: TypeScript.ClassDeclaration): void {
+		private static load_comments(result:TypeScript.Api.Class, ast:TypeScript.ClassDeclaration) : void 
+		{
+			var comments = ast.getDocComments();
+
+			for(var n in comments) 
+			{
+				result.comments.push(comments[n].content);
+			}
+		}
+
+		private static load_parameters(result:TypeScript.Api.Class, ast: TypeScript.ClassDeclaration): void {
 
 			if(ast.typeParameters) 
 			{
@@ -64,7 +78,7 @@ module TypeScript.Api.Reflect
 			}
 		}
 
-		private static load_extends (result:TypeScript.Api.Reflect.Class, ast:TypeScript.ClassDeclaration):void {
+		private static load_extends (result:TypeScript.Api.Class, ast:TypeScript.ClassDeclaration):void {
 
 			if (ast.extendsList) 
 			{
@@ -72,7 +86,7 @@ module TypeScript.Api.Reflect
 				{
 					for(var n in ast.extendsList.members) 
 					{ 
-						var obj = TypeScript.Api.Reflect.Type.create( ast.extendsList.members[n] );
+						var obj = TypeScript.Api.Type.create( ast.extendsList.members[n] );
 
 						result.extends.push( obj );
 					}
@@ -80,7 +94,7 @@ module TypeScript.Api.Reflect
 			}            
 		}
 
-		private static load_implements(result:TypeScript.Api.Reflect.Class, ast:TypeScript.ClassDeclaration): void {
+		private static load_implements(result:TypeScript.Api.Class, ast:TypeScript.ClassDeclaration): void {
 
 			if (ast.implementsList) 
 			{
@@ -88,7 +102,7 @@ module TypeScript.Api.Reflect
 				{
 					for(var n in ast.implementsList.members) 
 					{   
-						var obj = TypeScript.Api.Reflect.Type.create( ast.implementsList.members[n] );
+						var obj = TypeScript.Api.Type.create( ast.implementsList.members[n] );
 
 						result.implements.push( obj );
 					}
@@ -96,7 +110,7 @@ module TypeScript.Api.Reflect
 			}
 		}
 
-		private static load_methods(result:TypeScript.Api.Reflect.Class, ast:TypeScript.ClassDeclaration) : void {
+		private static load_methods(result:TypeScript.Api.Class, ast:TypeScript.ClassDeclaration) : void {
 
 			for(var n in ast.members.members) {
 
@@ -104,7 +118,7 @@ module TypeScript.Api.Reflect
 
 				if(member.nodeType == TypeScript.NodeType.FunctionDeclaration) {
 
-					var obj = TypeScript.Api.Reflect.Method.create(member);
+					var obj = TypeScript.Api.Method.create(member);
 
 					result.methods.push(obj);
 				}
@@ -112,7 +126,7 @@ module TypeScript.Api.Reflect
 
 		}
 
-		private static load_variables(result:TypeScript.Api.Reflect.Class, ast:TypeScript.ClassDeclaration) : void {
+		private static load_variables(result:TypeScript.Api.Class, ast:TypeScript.ClassDeclaration) : void {
 
 			for(var n in ast.members.members) {
 
@@ -120,7 +134,7 @@ module TypeScript.Api.Reflect
 
 				if(member.nodeType == TypeScript.NodeType.VariableDeclarator) {
 
-					var obj = TypeScript.Api.Reflect.Variable.create(member);
+					var obj = TypeScript.Api.Variable.create(member);
 
 					result.variables.push(obj);
 				}
@@ -129,9 +143,11 @@ module TypeScript.Api.Reflect
 
 		public static create(ast:TypeScript.ClassDeclaration) : Class 
 		{ 
-			var result     = new Class();
+			var result     = new TypeScript.Api.Class();
 
 			result.name    = ast.name.text;
+
+            
 
             var hasFlag = (val : number, flag: number) :boolean  => 
             {
@@ -144,6 +160,8 @@ module TypeScript.Api.Reflect
                 
                 result.isExported = true;
             }
+
+            Class.load_comments   (result, ast);
 
 			Class.load_parameters (result, ast);
 

@@ -15,13 +15,13 @@
 /// <reference path="IOFile.ts" />
 
 
-module TypeScript.Api.IO 
+module TypeScript.Api
 {	
 	var _fs = require('fs');
 	
-	export class IOAsync implements IIO 
+	export class IOAsync implements TypeScript.Api.IIO 
 	{
-		public readFile (path : string, callback: { (iofile : TypeScript.Api.IO.IOFile) : void; } ) : void 
+		public readFile (path : string, callback: { (iofile : TypeScript.Api.IOFile) : void; } ) : void 
 		{
 			_fs.readFile(path, (error, data) => 
 			{
@@ -31,13 +31,13 @@ module TypeScript.Api.IO
 					
 					var message = "could not resolve source unit " + path + ".";
 				    
-					var error   = new TypeScript.Api.IO.IOFileError(text, message);				
+					var error   = new TypeScript.Api.IOFileError(text, message);				
 				
-					callback( new TypeScript.Api.IO.IOFile (path, null, [ error ], false) );  
+					callback( new TypeScript.Api.IOFile (path, null, [ error ], false) );  
 				} 
 				else 
 				{
-					callback( new TypeScript.Api.IO.IOFile (path, TypeScript.Api.IO.Buffer.process(data), [], false) ); 
+					callback( new TypeScript.Api.IOFile (path, TypeScript.Api.Buffer.process(data), [], false) ); 
 				}
 			});			
 		}

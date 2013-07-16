@@ -16,10 +16,10 @@
 /// <reference path="Variable.ts" />
 /// <reference path="Type.ts" />
 
-module TypeScript.Api.Reflect 
+module TypeScript.Api 
 {
-	export class Interface extends ReflectedType
-	{
+	export class Interface extends TypeScript.Api.ReflectedType {
+
 		public methods    : Method    [];
 
 		public variables  : Variable  [];
@@ -29,6 +29,8 @@ module TypeScript.Api.Reflect
 		public extends    : Type      [];
 
         public isExported : boolean;
+
+        public comments   : string    [];
 
 		constructor () 
 		{
@@ -42,7 +44,19 @@ module TypeScript.Api.Reflect
 
 			this.parameters = [];
 
+            this.comments   = [];
+
             this.isExported = false;
+		}
+
+		private static load_comments(result:TypeScript.Api.Interface, ast:TypeScript.InterfaceDeclaration) : void 
+		{
+			var comments = ast.getDocComments();
+
+			for(var n in comments) 
+			{
+				result.comments.push(comments[n].content);
+			}
 		}
 
 		private static load_parameters(result:Interface, ast:TypeScript.InterfaceDeclaration): void 
@@ -67,7 +81,7 @@ module TypeScript.Api.Reflect
 				{
 					for(var n in ast.extendsList.members) 
 					{ 
-						var obj = TypeScript.Api.Reflect.Type.create( ast.extendsList.members[n] );
+						var obj = TypeScript.Api.Type.create( ast.extendsList.members[n] );
 
 						result.extends.push( obj );
 					}
@@ -75,7 +89,7 @@ module TypeScript.Api.Reflect
 			} 
 		}
 
-		private static load_methods(result:TypeScript.Api.Reflect.Interface, ast:TypeScript.InterfaceDeclaration) : void 
+		private static load_methods(result:TypeScript.Api.Interface, ast:TypeScript.InterfaceDeclaration) : void 
 		{
 			for(var n in ast.members.members) 
 			{
@@ -83,14 +97,14 @@ module TypeScript.Api.Reflect
 
 				if(member.nodeType == TypeScript.NodeType.FunctionDeclaration) 
 				{
-					var obj = TypeScript.Api.Reflect.Method.create(member);
+					var obj = TypeScript.Api.Method.create(member);
 
 					result.methods.push(obj);
 				}
 			}
 		}
 
-		private static load_variables(result:TypeScript.Api.Reflect.Interface, ast:TypeScript.InterfaceDeclaration) : void 
+		private static load_variables(result:TypeScript.Api.Interface, ast:TypeScript.InterfaceDeclaration) : void 
 		{
 			for(var n in ast.members.members) 
 			{
@@ -98,7 +112,7 @@ module TypeScript.Api.Reflect
 
 				if(member.nodeType == TypeScript.NodeType.VariableDeclarator)
 				{
-					var obj = TypeScript.Api.Reflect.Variable.create(member);
+					var obj = TypeScript.Api.Variable.create(member);
 
 					result.variables.push(obj);
 				}
@@ -108,7 +122,7 @@ module TypeScript.Api.Reflect
 
 		public static create(ast:TypeScript.InterfaceDeclaration): Interface 
 		{
-			var result     = new Interface();
+			var result     = new TypeScript.Api.Interface();
 
 			result.name    = ast.name.text;
 
@@ -123,6 +137,8 @@ module TypeScript.Api.Reflect
                 
                 result.isExported = true;
             }
+
+            Interface.load_comments   (result, ast);
 
 			Interface.load_parameters (result, ast);
 

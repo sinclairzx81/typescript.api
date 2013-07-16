@@ -14,10 +14,10 @@
 /// <reference path="ReflectedType.ts" />
 /// <reference path="Type.ts" />
 
-module TypeScript.Api.Reflect 
+module TypeScript.Api 
 {
-	export class Parameter extends ReflectedType
-	{
+	export class Parameter extends TypeScript.Api.ReflectedType {
+
 		public type		  : Type;
 
         public isOptional : boolean;
@@ -38,16 +38,16 @@ module TypeScript.Api.Reflect
 		{
 			if(!ast.typeExpr) 
 			{ 
-				result.type = new TypeScript.Api.Reflect.Type()
+				result.type = new TypeScript.Api.Type()
 
 				return;
 			} 
-			result.type = TypeScript.Api.Reflect.Type.create(ast.typeExpr); 
+			result.type = TypeScript.Api.Type.create(ast.typeExpr); 
 		}
 
 		public static create(ast:TypeScript.Parameter) : Parameter 
 		{
-			var result        = new Parameter();
+			var result        = new TypeScript.Api.Parameter();
 
 			result.name       = ast.id.text;
 

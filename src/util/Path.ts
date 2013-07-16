@@ -12,7 +12,7 @@
 
 /// <reference path="../decl/node.d.ts" />
 
-module TypeScript.Api.Util
+module TypeScript.Api
 {	
 	var _path = require("path");
 	

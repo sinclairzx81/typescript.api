@@ -12,11 +12,11 @@
 
 /// <reference path="IOFile.ts" />
 
-module TypeScript.Api.IO {
+module TypeScript.Api {
 
 	export interface IIO {
 	
-		readFile(filename:string, callback:{( iofile : TypeScript.Api.IO.IOFile) : void; }): void;
+		readFile(filename:string, callback:{( iofile : TypeScript.Api.IOFile) : void; }): void;
 		
 	}
 }

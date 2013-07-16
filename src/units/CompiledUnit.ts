@@ -15,9 +15,9 @@
 /// <reference path="Diagnostic.ts" />
 /// <reference path="Unit.ts" />
 
-module TypeScript.Api.Units 
+module TypeScript.Api 
 {
-	export class CompiledUnit extends Unit
+	export class CompiledUnit extends TypeScript.Api.Unit
 	{
 		public ast         : TypeScript.AST;
 
@@ -25,14 +25,14 @@ module TypeScript.Api.Units
 
         public references  : string [];
 
-        public script      : TypeScript.Api.Reflect.Script;
+        public script      : TypeScript.Api.Script;
 
 		constructor(path        : string, 
                     content     : string, 
-                    diagnostics : TypeScript.Api.Units.Diagnostic[], 
+                    diagnostics : TypeScript.Api.Diagnostic[], 
                     ast         : TypeScript.AST,
                     sourcemap   : string, 
-                    script      : TypeScript.Api.Reflect.Script,
+                    script      : TypeScript.Api.Script,
                     references  : string[]) 
 		{
 			super(path, content, diagnostics);

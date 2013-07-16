@@ -14,10 +14,10 @@
 /// <reference path="ReflectedType.ts" />
 /// <reference path="Type.ts" />
 
-module TypeScript.Api.Reflect 
+module TypeScript.Api 
 {
-	export class Variable extends ReflectedType
-	{
+	export class Variable extends TypeScript.Api.ReflectedType {
+
 		public type                    : Type;
 
         public isPublic                : boolean;
@@ -66,17 +66,17 @@ module TypeScript.Api.Reflect
 
 			if(!ast.typeExpr) 
 			{ 
-				result.type  = new TypeScript.Api.Reflect.Type();
+				result.type  = new TypeScript.Api.Type();
 
 				return;
 			}   
 
-			result.type = TypeScript.Api.Reflect.Type.create(ast.typeExpr);
+			result.type = TypeScript.Api.Type.create(ast.typeExpr);
 		}
 
 		public static create(ast:TypeScript.VariableDeclarator): Variable 
 		{
-			var result = new Variable();
+			var result  = new TypeScript.Api.Variable();
 
 			result.name = ast.id.text;
 

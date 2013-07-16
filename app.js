@@ -18,7 +18,7 @@ function print_unit(unit) {
 
     //console.log(unit.path);
 
-    console.log(unit.content);
+    //console.log(unit.content);
 
     //console.log(unit.references);
 
@@ -26,31 +26,37 @@ function print_unit(unit) {
 
     //console.log(unit.script);
 
-    //console.log(JSON.stringify(unit.script, null, ' '));
+    console.log(JSON.stringify(unit.script, null, ' '));
 }
+
+        //setInterval(function() {
 
 //typescript.resolve('e:/development/gold/appex/node_modules/appex/index.ts', function (resolved) {
 
- setInterval(function(){
+
+  
     typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
 
-        print_diagnostics(resolved);
-    
-        typescript.compile(resolved, function(compiled) {
+            //print_diagnostics(resolved);
+            
+            typescript.compile(resolved, function(compiled) {
         
-            if (!typescript.check(compiled)) {
+                if (!typescript.check(compiled)) {
 
-                print_diagnostics(compiled);
+                    print_diagnostics(compiled);
 
-                console.log('errors');
+                    console.log('errors');
 
-            } else {
+                } else {
 
-                for (var n in compiled) {
+                    for (var n in compiled) {
 
-                    print_unit(compiled[n]);
+                        print_unit(compiled[n]);
+                    }
                 }
-            }
-        });
+            });
+
+        
     });
-}, 3000);
+
+//}, 5000);

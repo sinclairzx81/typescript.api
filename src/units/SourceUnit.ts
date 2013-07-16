@@ -14,9 +14,9 @@
 /// <reference path="Diagnostic.ts" />
 /// <reference path="Unit.ts" />
 
-module TypeScript.Api.Units
+module TypeScript.Api
 {
-	export class SourceUnit extends Unit
+	export class SourceUnit extends TypeScript.Api.Unit
 	{	
 		public remote        : boolean;   // is this a remote source file...
 
@@ -26,6 +26,9 @@ module TypeScript.Api.Units
 
 		constructor(path:string, content:string, diagnostics:Diagnostic[], remote:boolean)
 		{ 
+            if(!content) content = '';
+
+
 			super(path, content, diagnostics);
 
 			this.remote = remote;
@@ -62,5 +65,24 @@ module TypeScript.Api.Units
 			}
 			return result;
 		}
+
+        public clone() : TypeScript.Api.SourceUnit {
+
+            
+            var diagnostics = [];
+
+            for(var i = 0; i < this.diagnostics.length; i++) {
+            
+                diagnostics.push(this.diagnostics[i].clone());
+            }
+
+            var clone = new TypeScript.Api.SourceUnit(this.path.toString(), this.content.toString(), diagnostics, this.remote)
+
+            clone.syntaxChecked = this.syntaxChecked;
+
+            clone.typeChecked   = this.typeChecked;
+
+            return clone;
+        }
 	}
 }
