@@ -1,7 +1,8 @@
 ﻿var typescript = require('./bin/index.js');
 
-function print_diagnostics(units)
-{
+
+function print_diagnostics(units) {
+
     for (var n in units) {
 
         for(var m in units[n].diagnostics)
@@ -60,16 +61,14 @@ function run_compilation(resolved) {
     });
 }
 
+//setInterval(function() {
 
+//    typescript.resolve('e:/development/gold/appex/node_modules/appex/index.ts', function (resolved) {
 
-setInterval(function() {
+//        run_compilation(resolved);
+//    })
 
-    typescript.resolve('c:/node/app12/program.ts', function (resolved) {
-
-        run_compilation(resolved);
-    })
-
-}, 2000);
+//}, 2000);
 
 //run_compilation('c:/node/app12/a.ts');
 

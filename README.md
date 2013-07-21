@@ -40,11 +40,11 @@ var program = require("./program.ts");
 
 ### methods
 
+* [register](#register)
 * [create](#create)
 * [resolve](#resolve)
 * [compile](#compile)
 * [check](#check)
-* [build](#build)
 * [run](#run)
 * [reset](#reset)
 * [sort](#sort)
@@ -161,9 +161,13 @@ The typescript.api accepts source units for compilation. A source unit consists 
 
 sourceUnit = {
 	path          : string,   // (public) the path of this source unit.
+
 	content       : string,   // (public) the typescript source of this unit.
+
 	remote        : boolean,  // (public) if this source file is loaded over http.
+
 	references    : Function  // (public) returns an array of references for this source unit.
+
 	diagnostics   : [object], // (public) compilation errors for this unit. 0 length if none.
 };
 
@@ -181,12 +185,19 @@ A compiled unit is the output from a [compilation](#compile). A compiled unit co
 ```javascript
 
 compiledUnit = {
+
 	path          : string,   // (public) the path of this unit.
+
 	content       : string,   // (public) the javascript source of this unit.
+
 	references    : string[], // (public) an array of references for this unit.
+
 	diagnostics   : [object], // (public) compilation errors for this unit. 0 length if none.
+
 	ast           : object,   // (public) AST for this unit.
+
 	sourcemap     : string,   // (public) The sourcemap for this unit.
+
 	reflection    : object,   // (public) The units reflected members.  
 };
 
@@ -194,11 +205,44 @@ compiledUnit = {
 
 ## methods
 
+
+<a name="register" />
+### typescript.register ()
+
+The register() method will register the typescript file extension with nodejs require(). When using this 
+method, the api will automatically JIT compile your typescript source code on first request and cache 
+for subsequent requests. 
+
+```javascript
+
+//---------------------------------
+// program.ts
+//---------------------------------
+
+export var message:string = 'hello world';
+
+//---------------------------------
+// app.js
+//---------------------------------
+
+require('typescript.api').register();
+
+var program = require('./program.ts');
+
+console.log(program.message); // hello world
+```
+
+
 <a name="resolve" />
 ### typescript.resolve (sources, callback)
 
-Will resolve source units by traversing each source files reference element. The result will be an 
-ordered (in order of dependancy) array of source units. 
+The typescript.api resolve function will resolve source units needed for compilation and return them
+in order of dependancy, it does this by scanning each files reference element. 
+
+special note: the resolve method will be unable to resolve source units if your code contains circular 
+references. for example, if file0.ts references file1.ts, and file1.ts references file0.ts, then this would
+be considered a circular reference. in these instances, the resolve() method will return the source units 
+found in order of discovery, and no additional dependency resolution will occur. 
 
 __arguments__
 
@@ -232,7 +276,7 @@ typescript.resolve(["program.ts"], function(resolved) {
 <a name="check" />
 ### typescript.check (units)
 
-Utility method to check if a source or compiled unit has errors.
+A utility method to check for errors in either resolved or compiled units.
 
 __arguments__
 
@@ -248,7 +292,7 @@ var typescript = require("typescript.api");
 
 typescript.resolve(["program.ts"], function(resolved) { 
 
-	if(typescript.check (resolved)) { // check here for reference errors.
+	if( typescript.check (resolved)) { // check here for reference errors.
 		
 		typescript.compile(resolved, function(compiled) {
 		
@@ -262,6 +306,7 @@ typescript.resolve(["program.ts"], function(resolved) {
 	}
 });
 ```
+
 <a name="create" />
 ### typescript.create ( filename, code )
 
@@ -295,10 +340,11 @@ typescript.compile([sourceUnit], function(compiled) {
 	
 });
 ```
+
 <a name="compile" />
 ### typescript.compile ( units, callback )
 
-Compiles source units. 
+compiles source units. 
 
 __arguments__
 
@@ -323,51 +369,15 @@ typescript.compile([sourceUnit], function(compiled) {
 	}
 });
 ```
-<a name="build" />
-### typescript.build ( sources, callback )
 
-A quick means of building a typescript source file(s) and producing the compiled
-source code as a string. 
-
-__arguments__
-
-* sources  - an array of input source filenames.
-* callback - a callback containing errors and the compiled source code and declaration.
-
-__example__
-
-The following will build the source file 'program.ts' and write the compiled
-code and declaration output to the console.
-
-```javascript	
-var typescript = require("typescript.api");	
-
-typescript.build_source(['program.ts'], function(errors, sourcecode, declaration) {
-	
-	if(errors) {
-
-		for(var n in errors) {
-
-			console.log( errors[n].toString() );
-		}
-	}
-	else {
-		
-		console.log(declaration);
-		
-		console.log(sourcecode);
-	    
-	}
-});
-```
 <a name="run" />
 ### typescript.run ( compiledUnits, sandbox, callback )
 
-Runs a compilation. 
+executes compiled units within a nodejs vm and returns a context containing exported members.
 
 __arguments__
 
-* compiledUnits - compiled source units.
+* compiledUnits - compiled source units - (obtained from a call to compile)
 * sandbox	    - A sandbox. pass null to inherit the current sandbox. code in executed in nodejs vm.
 * callback      - A callback that passes a context containing any exported variables and function.
 
@@ -393,7 +403,7 @@ typescript.compile([sourceUnit], function(compiled) {
 <a name="reset" />
 ### typescript.reset ()
 
-Resets the compiler. 
+Resets the compiler.
 
 ```javascript	
 var typescript = require("typescript.api");	
