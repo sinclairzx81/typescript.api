@@ -317,7 +317,35 @@ export function run (compiledUnits:TypeScript.Api.CompiledUnit[], sandbox:any, c
 {
 	try 
 	{
-		if(!sandbox) { sandbox = get_default_sandbox(); }
+		if(!sandbox) { 
+
+            sandbox = get_default_sandbox(); 
+
+            var _require = (path:string) => {
+
+                var primary_unit = compiledUnits[compiledUnits.length - 1];
+
+                if(path.indexOf('/') != -1) {
+
+                    var fullname = _path.resolve (primary_unit.path, './');
+
+                    var dirname  = _path.dirname(fullname);
+
+                    path = _path.resolve(dirname + '/' + path, './');
+                }
+
+                return require(path);
+            }
+
+            // snap in require override. ensure that
+            // relative module loading happens from the 
+            // primary ts unit, not the mainModule js
+            // or node_module/typescript.api
+            if(compiledUnits.length > 0) { 
+        
+                sandbox.require = _require;  
+            }      
+        }
 		
 		var sources = [];
 		

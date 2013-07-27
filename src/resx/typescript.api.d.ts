@@ -177,7 +177,4 @@ declare module typescript.api
     export function compile (sourceUnits: Array<typescript.api.SourceUnit>, callback : (compiledUnit:Array<typescript.api.CompiledUnit> )=> void) : void;
 
     export function run     (compiledUnits:Array<typescript.api.CompiledUnit>, sandbox:any, callback :{ (context:any): void; }) : void;
-
-    export function build   (filenames:string[], callback :(diagnostics:Array<typescript.api.Diagnostic>, source:string, declaration:string )=> void) : void;
-
 }
