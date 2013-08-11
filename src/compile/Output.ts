@@ -114,6 +114,8 @@ module TypeScript.Api {
 
         public get_reflection(path: string,ast: TypeScript.Script): TypeScript.Api.Script {
 
+            
+
             return TypeScript.Api.Script.create(path,ast);
         }
     }

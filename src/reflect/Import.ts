@@ -32,7 +32,7 @@ module TypeScript.Api {
 
             var result=new TypeScript.Api.Import();
 
-            result.name=ast.id.text;
+            result.name=ast.id.actualText;
 
             result.alias=ast.getAliasName(ast);
 

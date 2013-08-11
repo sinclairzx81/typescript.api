@@ -46,11 +46,7 @@ module TypeScript.Api {
 
             settings.removeComments=options.removeComments;
 
-            settings.disallowBool=true;
-
-            settings.outputOption='';
-
-            this.compiler=new typescript.TypeScriptCompiler(new TypeScript.Api.NullLogger(),settings,typescript.diagnosticMessages);
+            this.compiler=new typescript.TypeScriptCompiler(new TypeScript.Api.NullLogger(),settings);
 
             this.compiler.logger=new TypeScript.Api.NullLogger();
 

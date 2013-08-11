@@ -60,7 +60,7 @@ module TypeScript.Api {
 
         private static load_comments(result: TypeScript.Api.Class,ast: TypeScript.ClassDeclaration): void {
 
-            var comments=ast.getDocComments();
+            var comments=ast.docComments();
 
             for(var n in comments) {
 
@@ -122,7 +122,7 @@ module TypeScript.Api {
 
                 var member=ast.members.members[n];
 
-                if(member.nodeType==typescript.NodeType.FunctionDeclaration) {
+                if(member.nodeType()==typescript.NodeType.FunctionDeclaration) {
 
                     var obj=TypeScript.Api.Method.create(<TypeScript.FunctionDeclaration>member);
 
@@ -138,7 +138,7 @@ module TypeScript.Api {
 
                 var member=ast.members.members[n];
 
-                if(member.nodeType==typescript.NodeType.VariableDeclarator) {
+                if(member.nodeType()==typescript.NodeType.VariableDeclarator) {
 
                     var obj=TypeScript.Api.Variable.create(<TypeScript.VariableDeclarator>member);
 
@@ -151,7 +151,7 @@ module TypeScript.Api {
 
             var result=new TypeScript.Api.Class();
 
-            result.name=ast.name.text;
+            result.name=ast.name.actualText;
 
             var hasFlag=(val: number,flag: number): boolean  => {
 

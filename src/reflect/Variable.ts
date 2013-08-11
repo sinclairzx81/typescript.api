@@ -32,10 +32,6 @@ module TypeScript.Api {
 
         public isStatement: boolean;
 
-        public isExpression: boolean;
-
-        public isStatementOrExpression: boolean;
-
         public isExported: boolean;
 
         public isOptional: boolean;
@@ -58,7 +54,7 @@ module TypeScript.Api {
 
         private static load_comments(result: Variable,ast: TypeScript.VariableDeclarator): void {
 
-            var comments=ast.getDocComments();
+            var comments=ast.docComments();
 
             for(var n in comments) {
 
@@ -69,12 +65,12 @@ module TypeScript.Api {
         private static load_type(result: Variable,ast: TypeScript.VariableDeclarator): void {
 
             if(!ast.typeExpr) {
-
+               
                 result.type=new TypeScript.Api.Type();
 
                 return;
             }
-
+            
             result.type=TypeScript.Api.Type.create(ast.typeExpr);
         }
 
@@ -82,7 +78,7 @@ module TypeScript.Api {
 
             var result=new TypeScript.Api.Variable();
 
-            result.name=ast.id.text;
+            result.name=ast.id.actualText;
 
             var hasFlag=(val: number,flag: number): boolean  => {
 
@@ -107,18 +103,12 @@ module TypeScript.Api {
 
                 result.isOptional=true;
             }
-
+            
             result.isProperty=ast.isProperty();
 
             result.isStatic=ast.isStatic();
 
             result.isStatement=ast.isStatement();
-
-            result.isExpression=ast.isExpression();
-
-            result.isExported=ast.isExported();
-
-            result.isStatementOrExpression=ast.isStatementOrExpression();
 
             Variable.load_type(result,ast);
 

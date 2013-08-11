@@ -43,8 +43,6 @@ module TypeScript.Api {
 
         public isDeclaration: boolean;
 
-        public isExpression: boolean;
-
         public isGetAccessor: boolean;
 
         public isSetAccessor: boolean;
@@ -67,7 +65,7 @@ module TypeScript.Api {
 
         private static load_comments(result: TypeScript.Api.Method,ast: TypeScript.FunctionDeclaration): void {
 
-            var comments=ast.getDocComments();
+            var comments=ast.docComments();
 
             for(var n in comments) {
 
@@ -133,7 +131,7 @@ module TypeScript.Api {
 
             result.isDeclaration=ast.isDeclaration();
 
-            result.isExpression=ast.isExpression();
+            
 
             result.isGetAccessor=ast.isGetAccessor();
 

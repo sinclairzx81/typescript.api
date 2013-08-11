@@ -53,7 +53,7 @@ module TypeScript.Api {
 
             var result=new TypeScript.Api.Parameter();
 
-            result.name=ast.id.text;
+            result.name=ast.id.actualText;
 
             result.isOptional=ast.isOptional;
 

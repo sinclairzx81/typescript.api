@@ -51,7 +51,9 @@ module TypeScript.Api {
 
             var references=typescript.getReferencedFiles(unit.path,snapshot);
 
-            this.compiler.addSourceUnit(unit.path,snapshot,1 /*ByteOrderMark.Utf8*/,0,false,references);
+            //this.compiler.addSourceUnit(unit.path,snapshot,1 /*ByteOrderMark.Utf8*/,0,false,references);
+
+            this.compiler.addSourceUnit(unit.path, snapshot, 1, 0, false, unit.references());
         }
 
         public update_unit(unit: TypeScript.Api.SourceUnit): void {

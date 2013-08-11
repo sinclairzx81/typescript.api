@@ -65,7 +65,7 @@ module TypeScript.Api {
 
                 var member=ast.members.members[n];
 
-                if(member.nodeType==typescript.NodeType.ImportDeclaration) {
+                if(member.nodeType()==typescript.NodeType.ImportDeclaration) {
 
                     var obj=TypeScript.Api.Import.create(<TypeScript.ImportDeclaration>member);
 
@@ -80,7 +80,7 @@ module TypeScript.Api {
 
                 var member=ast.members.members[n];
 
-                if(member.nodeType==typescript.NodeType.ModuleDeclaration) {
+                if(member.nodeType()==typescript.NodeType.ModuleDeclaration) {
 
                     var obj=TypeScript.Api.Module.create(<TypeScript.ModuleDeclaration>member);
 
@@ -95,7 +95,7 @@ module TypeScript.Api {
 
                 var member=ast.members.members[n];
 
-                if(member.nodeType==typescript.NodeType.InterfaceDeclaration) {
+                if(member.nodeType()==typescript.NodeType.InterfaceDeclaration) {
 
                     var obj=TypeScript.Api.Interface.create(<TypeScript.InterfaceDeclaration>member);
 
@@ -110,7 +110,7 @@ module TypeScript.Api {
 
                 var member=ast.members.members[n];
 
-                if(member.nodeType==typescript.NodeType.ClassDeclaration) {
+                if(member.nodeType()==typescript.NodeType.ClassDeclaration) {
 
                     var obj=TypeScript.Api.Class.create(<TypeScript.ClassDeclaration>member);
 
@@ -125,7 +125,7 @@ module TypeScript.Api {
 
                 var member=ast.members.members[n];
 
-                if(member.nodeType==typescript.NodeType.FunctionDeclaration) {
+                if(member.nodeType()==typescript.NodeType.FunctionDeclaration) {
 
                     var obj=TypeScript.Api.Method.create(<TypeScript.FunctionDeclaration>member);
 
@@ -140,7 +140,7 @@ module TypeScript.Api {
 
                 var member=ast.members.members[n];
 
-                if(member.nodeType==typescript.NodeType.VariableStatement) {
+                if(member.nodeType()==typescript.NodeType.VariableStatement) {
 
                     var statement=<TypeScript.VariableStatement>member;
 

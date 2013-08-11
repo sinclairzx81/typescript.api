@@ -209,12 +209,13 @@ module.exports.reset=(compilerOptions?: ICompilerOptions): void => {
                     break;
             }
         }
+        if(compilerOptions.removeComments!=null) {
+
+            options.removeComments=compilerOptions.removeComments;
+        }
     }
 
-    if(compilerOptions.removeComments!=null) {
 
-        options.removeComments=compilerOptions.removeComments;
-    }
 
     options.logger=new TypeScript.Api.NullLogger();
 

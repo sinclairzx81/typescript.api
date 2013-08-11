@@ -1,86 +1,86 @@
 ﻿var typescript = require('./bin/index.js');
 
-//function print_diagnostics(units) {
+function print_diagnostics(units) {
 
-//    for (var n in units) {
+    for (var n in units) {
 
-//        for(var m in units[n].diagnostics)
-//        {
-//            console.log(units[n].diagnostics[m].toString());
+        for(var m in units[n].diagnostics)
+        {
+            console.log(units[n].diagnostics[m].toString());
 
-//        }
-//    }
-//}
+        }
+    }
+}
 
-//function print_unit(unit) {
+function print_unit(unit) {
 
-//    //console.log('------------------------')
+    //console.log('------------------------')
 
-//    //console.log(unit.path);
+    //console.log(unit.path);
 
-//    console.log(unit.content);
+    //console.log(unit.content);
 
-//    //console.log(unit.references);
+    //console.log(unit.references);
 
-//    //console.log(unit.sourcemap);
+    //console.log(unit.sourcemap);
 
-//    //console.log(unit.script);
+    //console.log(unit.script);
 
-//    //console.log(JSON.stringify(unit.script, null, ' '));
-//}
+    console.log(JSON.stringify(unit.script, null, ' '));
+}
 
-//var count = 0;
+var count = 0;
 
-//function run_compilation(resolved) {
+function run_compilation(resolved) {
 
-//    print_diagnostics(resolved);
+    print_diagnostics(resolved);
             
-//    typescript.compile(resolved, function(compiled) {
+    typescript.compile(resolved, function(compiled) {
                 
-//        if (!typescript.check(compiled)) {
+        if (!typescript.check(compiled)) {
 
-//            print_diagnostics(compiled);
+            print_diagnostics(compiled);
 
-//            console.log('errors');
+            console.log('errors');
 
-//        } else {
+        } else {
             
 
-//            for (var n in compiled) {
+            for (var n in compiled) {
 
-//                print_unit(compiled[n]);
+                print_unit(compiled[n]);
 
-//            }
+            }
 
-//            typescript.run(compiled, null, function(context){
+            //typescript.run(compiled, null, function(context){
 
                 
-//            });
+            //});
 
-//            console.log(count);
+            console.log(count);
 
-//            count++;
+            count++;
 
-//           // run_compilation(resolved)
-//        }
-//    });
-//}
+           // run_compilation(resolved)
+        }
+    });
+}
 
-//setInterval(function() {
+setInterval(function() {
 
-//    //typescript.resolve('e:/development/gold/appex/node_modules/appex/index.ts', function (resolved) {
+   // typescript.resolve('e:/development/gold/appex/node_modules/appex/index.ts', function (resolved) {
 
-//     typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
+    typescript.resolve('c:/input/typescript/program.ts', function (resolved) {
 
-//        //console.log(resolved)
+        //console.log(resolved)
         
-//        run_compilation(resolved);
-//    })
+        run_compilation(resolved);
+    })
 
-//}, 500);
+}, 2500);
 
-//////run_compilation('c:/node/app12/a.ts');
+////run_compilation('c:/node/app12/a.ts');
 
-//////run_compilation('c:/input/typescript/program.ts');
+////run_compilation('c:/input/typescript/program.ts');
 
-//////});
+////});

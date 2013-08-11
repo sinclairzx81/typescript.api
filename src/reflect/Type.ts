@@ -44,7 +44,7 @@ module TypeScript.Api {
         }
 
         private static qualifyName(ast: TypeScript.AST): string {
-
+            
             var result=[];
 
             // 10 : TypeScript.NodeType.GenericType 
@@ -56,12 +56,15 @@ module TypeScript.Api {
             // 32 : TypeScript.NodeType.MemberAccessExpression (as per iteration)
 
             var walk=(ast: TypeScript.AST) => {
-                switch(ast.nodeType) {
+
+                
+                switch(ast.nodeType()) {
+
                     case typescript.NodeType.Name:
 
                         var name=<TypeScript.Identifier>ast;
 
-                        result.push(name.text);
+                        result.push(name.text());
 
                         break;
 
@@ -89,7 +92,8 @@ module TypeScript.Api {
 
                         var expression=<TypeScript.BinaryExpression>generic_type.name;
 
-                        switch(expression.nodeType) {
+                        switch(expression.nodeType()) {
+
                             case typescript.NodeType.Name:
 
                                 walk(expression);
@@ -131,7 +135,7 @@ module TypeScript.Api {
             }
 
 			// called on non namespaced extends or implements.
-			var create_named_type=(namedDeclaraion: TypeScript.NamedDeclaration): Type => {
+			var create_named_type=(namedDeclaraion: TypeScript.AST): Type => {
 
                 var type=new TypeScript.Api.Type();
 
@@ -149,7 +153,7 @@ module TypeScript.Api {
 
                 type.arrayCount=typeRef.arrayCount;
 
-                if(typeRef.term.nodeType==typescript.NodeType.GenericType) {
+                if(typeRef.term.nodeType()==typescript.NodeType.GenericType) {
 
                     var genericType=<TypeScript.GenericType>typeRef.term;
 
@@ -161,7 +165,7 @@ module TypeScript.Api {
                     }
                 }
 
-                if(typeRef.term.nodeType==typescript.NodeType.FunctionDeclaration) {
+                if(typeRef.term.nodeType()==typescript.NodeType.FunctionDeclaration) {
 
                     type.name="Function";
 
@@ -174,6 +178,7 @@ module TypeScript.Api {
 
             // called when referencing generic types.
             var create_generic_type=(genericType: TypeScript.GenericType): Type => {
+
                 var type=new TypeScript.Api.Type();
 
                 type.name=Type.qualifyName(genericType);
@@ -190,11 +195,11 @@ module TypeScript.Api {
 
             var type: TypeScript.Api.Type=null;
 
-            switch(ast.nodeType) {
+            switch(ast.nodeType()) {
 
                 case typescript.NodeType.Name:
 
-                    type=create_named_type(<TypeScript.NamedDeclaration>ast);
+                    type=create_named_type(<TypeScript.AST>ast);
 
                     break;
 

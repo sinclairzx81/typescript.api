@@ -56,8 +56,8 @@ module TypeScript.Api {
 
                 var member=ast.moduleElements.members[n];
 
-                if(member.nodeType==typescript.NodeType.ModuleDeclaration) {
-
+                if(member.nodeType()==typescript.NodeType.ModuleDeclaration) {
+                    
                     var obj=TypeScript.Api.Module.create(<TypeScript.ModuleDeclaration>member);
 
                     result.modules.push(obj);
@@ -71,7 +71,7 @@ module TypeScript.Api {
 
                 var member=ast.moduleElements.members[n];
 
-                if(member.nodeType==typescript.NodeType.InterfaceDeclaration) {
+                if(member.nodeType()==typescript.NodeType.InterfaceDeclaration) {
 
                     var obj=TypeScript.Api.Interface.create(<TypeScript.InterfaceDeclaration>member);
 
@@ -86,7 +86,7 @@ module TypeScript.Api {
 
                 var member=ast.moduleElements.members[n];
 
-                if(member.nodeType==typescript.NodeType.ClassDeclaration) {
+                if(member.nodeType()==typescript.NodeType.ClassDeclaration) {
 
                     var obj=TypeScript.Api.Class.create(<TypeScript.ClassDeclaration>member);
 
@@ -101,7 +101,7 @@ module TypeScript.Api {
 
                 var member=ast.moduleElements.members[n];
 
-                if(member.nodeType==typescript.NodeType.FunctionDeclaration) {
+                if(member.nodeType()==typescript.NodeType.FunctionDeclaration) {
 
                     var obj=TypeScript.Api.Method.create(<TypeScript.FunctionDeclaration>member);
 
@@ -116,7 +116,7 @@ module TypeScript.Api {
 
                 var member=ast.moduleElements.members[n];
 
-                if(member.nodeType==typescript.NodeType.VariableStatement) {
+                if(member.nodeType()==typescript.NodeType.VariableStatement) {
 
                     var statement=<TypeScript.VariableStatement>member;
 
@@ -177,7 +177,7 @@ module TypeScript.Api {
             };
 
             script.modules.forEach((module) => {
-
+                
                 qualify_module_names(module);
 
             });
@@ -188,7 +188,7 @@ module TypeScript.Api {
             var result=new TypeScript.Api.Script();
 
             result.name=name;
-
+            
             Script.load_modules(result,ast);
 
             Script.load_interfaces(result,ast);
@@ -200,6 +200,8 @@ module TypeScript.Api {
             Script.load_variables(result,ast);
 
             Script.load_scope(result);
+
+            
 
             return result;
         }
