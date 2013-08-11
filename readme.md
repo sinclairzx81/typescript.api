@@ -82,6 +82,7 @@ tsapi.resolve(['./program.ts'], function(resolved) {
 	else {
 	
 		tsapi.compile(resolved, function(compiled) {
+
 			if(!tsapi.check(compiled)) {
 
 				show_diagnostics (compiled);
