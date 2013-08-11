@@ -153,24 +153,20 @@ declare module typescript.api
         public references   : string[];
     }
 
-    export var allowRemote 			: boolean; 
+    interface ICompilerOptions {
 
-    export var debug       		    : boolean;
+        languageVersion: string;
 
-    export var languageVersion      : string;
+        moduleGenTarget: string;
 
-    export var moduleTarget         : string;
+        removeComments: boolean;
+    }
 
-    export var generateDeclarations : boolean;
-
-    export var generateSourceMaps   : boolean;
-
+    export function reset    (options?:ICompilerOptions) : void;
 
     export function register ()     : void;
 
     export function check    (units : Array<typescript.api.Unit>) : boolean;
-
-    export function reset    () : void;
 
     export function create   (path:string, content:string) : typescript.api.SourceUnit  
 

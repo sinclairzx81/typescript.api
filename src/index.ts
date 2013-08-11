@@ -121,7 +121,7 @@ module.exports.resolve=(filename: string,callback: (resolved: TypeScript.Api.Sou
 
         param=[filename]
 
-}
+    }
 
     if(Object.prototype.toString.call(filename)==='[object Array]') {
 
@@ -130,8 +130,8 @@ module.exports.resolve=(filename: string,callback: (resolved: TypeScript.Api.Sou
 
     if(!param) {
     
-throw Error('resolve() filename must be of string or array of string.')
-}
+        throw Error('resolve() filename must be of string or array of string.')
+    }
 
 
     var io=new TypeScript.Api.IOAsync();
@@ -219,6 +219,15 @@ module.exports.reset=(compilerOptions?: ICompilerOptions): void => {
     options.logger=new TypeScript.Api.NullLogger();
 
     compiler=new TypeScript.Api.Compiler(options);
+}
+
+//--------------------------------------------------
+// create()
+//--------------------------------------------------
+
+module.exports.create=(path: string,content: string): TypeScript.Api.SourceUnit => {
+
+    return new TypeScript.Api.SourceUnit(path,content,[],false);
 }
 
 //--------------------------------------------------

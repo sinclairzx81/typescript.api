@@ -30,10 +30,9 @@ var program = require("./program.ts");
 ### overview
 
 * [manual compilation](#manual_compilation)
-* [compiler options](#options)
 * [declarations](#declarations)
 
-### objects
+### units
 
 * [source unit](#source_unit)
 * [compiled unit](#compiled_unit)
@@ -59,62 +58,44 @@ sources array (resolved) are then checked prior to being sent to the compiler fo
 the compilation is checked again for problems prior to being run.
 
 ```javascript
-var typescript = require("typescript.api");
+var tsapi = require("typescript.api");
 
 // show diagnostic errors.
 function show_diagnostics (units) {
 
 	for(var n in units) {
-	
+
 		for(var m in units[n].diagnostics) {
-		
+
 			console.log( units[n].diagnostics[m].toString() );
 		}
 	}
 }
 
-typescript.resolve(['./program.ts'], function(resolved) {
-	
-	if(!typescript.check(resolved)) {
-	
+tsapi.resolve(['./program.ts'], function(resolved) {
+
+	if(!tsapi.check(resolved)) {
+
 		show_diagnostics(resolved);
+
 	}
 	else {
-		
-		typescript.compile(resolved, function(compiled) {
-			
-			if(!typescript.check(compiled)) {
-			
+	
+		tsapi.compile(resolved, function(compiled) {
+			if(!tsapi.check(compiled)) {
+
 				show_diagnostics (compiled);
 			}
 			else
 			{			
-				typescript.run(compiled, null, function(context) {
-				
+				tsapi.run(compiled, null, function(context) {
+
 					 // exports are available on the context...
 				});
 			}
 		});
 	}
 });
-```
-
-<a name="options" />
-### compiler options
-
-The following are options available on the typescript compiler.
-
-```javascript
-var typescript = require("typescript.api");
-
-// enables remote resolution of source files over http. false by default.
-typescript.allowRemote     = false;         
-
-// the javascript language version to target. EcmaScript3 | EcmaScript5
-typescript.languageVersion = "EcmaScript5"; 
-
-// CommonJS or AMD module profiles, Synchronous | Asynchronous. Synchronous is the default.
-typescript.moduleTarget    = "Synchronous"; 
 ```
 
 <a name="declarations" />
@@ -150,7 +131,7 @@ For a full definition of this api, see  [typescript.api.d.ts](https://github.com
 
 For other additional declarations, see the [definitely typed](https://github.com/borisyankov/DefinitelyTyped) project.
 
-## objects
+## units
 
 <a name="source_unit" />
 ### source unit
@@ -160,6 +141,7 @@ The typescript.api accepts source units for compilation. A source unit consists 
 ```javascript
 
 sourceUnit = {
+
 	path          : string,   // (public) the path of this source unit.
 
 	content       : string,   // (public) the typescript source of this unit.
@@ -234,7 +216,7 @@ console.log(program.message); // hello world
 
 
 <a name="resolve" />
-### typescript.resolve (sources, callback)
+### resolve (sources, callback)
 
 The typescript.api resolve function will resolve source units needed for compilation and return them
 in order of dependancy, it does this by scanning each files reference element. 
@@ -255,9 +237,9 @@ The following will resolve 'program.ts' and log each referenced source file to
 the console.
 
 ```javascript
-var typescript = require("typescript.api");
+var tsapi = require("typescript.api");
 
-typescript.resolve(["program.ts"], function(resolved) { 
+tsapi.resolve(["program.ts"], function(resolved) { 
 
 	for(var n in resolved) {
 
@@ -274,7 +256,7 @@ typescript.resolve(["program.ts"], function(resolved) {
 });
 ```
 <a name="check" />
-### typescript.check (units)
+### check (units)
 
 A utility method to check for errors in either resolved or compiled units.
 
@@ -288,17 +270,17 @@ __example__
 The following example will check if both a resolve() and compile() is successful.
 
 ```javascript
-var typescript = require("typescript.api");
+var tsapi = require("typescript.api");
 
-typescript.resolve(["program.ts"], function(resolved) { 
+tsapi.resolve(["program.ts"], function(resolved) { 
 
-	if( typescript.check (resolved)) { // check here for reference errors.
+	if( tsapi.check (resolved)) { // check here for reference errors.
 		
-		typescript.compile(resolved, function(compiled) {
+		tsapi.compile(resolved, function(compiled) {
 		
-			if( typescript.check (compiled) ) { // check here for syntax and type errors.
+			if( tsapi.check (compiled) ) { // check here for syntax and type errors.
 			
-				typescript.run(compiled, null, function(context) {
+				tsapi.run(compiled, null, function(context) {
 					
 				});
 			}
@@ -308,7 +290,7 @@ typescript.resolve(["program.ts"], function(resolved) {
 ```
 
 <a name="create" />
-### typescript.create ( filename, code )
+### create ( filename, code )
 
 Creates a source unit from a string. 
 
@@ -327,22 +309,22 @@ The following will create a unit. and send to the compiler for compilation.
 The compilation is then run.
 
 ```javascript
-var typescript = require("typescript.api");
+var tsapi = require("typescript.api");
 
-var sourceUnit = typescript.create("temp.ts", "export var message = 'hello world'");
+var sourceUnit = tsapi.create("temp.ts", "export var message = 'hello world'");
 
-typescript.compile([sourceUnit], function(compiled) {
+tsapi.compile([sourceUnit], function(compiled) {
 
-	typescript.run(compiled, null, function(context) { 
+	tsapi.run(compiled, null, function(context) { 
 		
 		console.log(context.message); // outputs hello world
-	});
-	
-});
+	})
+})
+
 ```
 
 <a name="compile" />
-### typescript.compile ( units, callback )
+### compile ( units, callback )
 
 compiles source units. 
 
@@ -357,11 +339,12 @@ The following will first create and compile a unit, and compiled source is
 written to the console.
 
 ```javascript
-var typescript = require("typescript.api");
 
-var sourceUnit = typescript.create("temp.ts", "var value:number = 123;");
+var tsapi = require("typescript.api");
 
-typescript.compile([sourceUnit], function(compiled) {
+var sourceUnit = tsapi.create("temp.ts", "var value:number = 123;");
+
+tsapi.compile([sourceUnit], function(compiled) {
 
 	for(var n in compiled) {
 	
@@ -371,7 +354,7 @@ typescript.compile([sourceUnit], function(compiled) {
 ```
 
 <a name="run" />
-### typescript.run ( compiledUnits, sandbox, callback )
+### run ( compiledUnits, sandbox, callback )
 
 executes compiled units within a nodejs vm and returns a context containing exported members.
 
@@ -386,33 +369,50 @@ __example__
 The following will first create and compile a unit, then send it off
 for compilation.
 
-```javascript	
-var typescript = require("typescript.api");	
+```javascript
 
-var sourceUnit = typescript.create("temp.ts", "export var value:number = 123;");
+var tsapi = require("typescript.api");	
 
-typescript.compile([sourceUnit], function(compiled) {
+var sourceUnit = tsapi.create("temp.ts", "export var value:number = 123")
 
-	typescript.run(compiled, null, function(context) { 
+tsapi.compile([sourceUnit], function(compiled) {
+
+	tsapi.run(compiled, null, function(context) { 
 	
-		console.log(context.value); // outputs 123
-		
-	});
-});
+		console.log(context.value) // outputs 123
+
+	})
+})
 ```
 <a name="reset" />
-### typescript.reset ()
+### reset (options)
 
-Resets the compiler.
+Resets the compiler.  
 
 ```javascript	
-var typescript = require("typescript.api");	
 
-typescript.reset();
+var tsapi = require("typescript.api")
+
+tsapi.reset()
+```
+
+Additionally, It is possible to specify reset with the following options.
+
+```javascript
+
+tsapi.reset({
+
+    languageVersion : "EcmaScript5", // EcmaScript5 | EcmaScript3
+
+    moduleGenTarget : "Synchronous", // Synchronous | ASynchronous
+
+    removeComments  : true
+})
+
 ```
 
 <a name="sort" />
-### typescript.sort ( units )
+### sort ( units )
 
 Will attempt to sort source units in order of dependency. If cyclic referencing
 occurs, the sort will return the units in order in which they are received.
