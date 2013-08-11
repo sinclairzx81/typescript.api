@@ -400,6 +400,8 @@ Additionally, It is possible to specify reset with the following options.
 
 ```javascript
 
+var tsapi = require("typescript.api")
+
 tsapi.reset({
 
     languageVersion : "EcmaScript5", // EcmaScript5 | EcmaScript3
@@ -441,25 +443,22 @@ function shuffle(o) {
     return o;
 };
 
-var units = [
-    typescript.create("a.ts", ""),
+var tsapi = require("typescript.api")
 
-    typescript.create("b.ts", "/// <reference path='a.ts' />"),
-    
-    typescript.create("c.ts", "/// <reference path='a.ts' />"),
-    
-    typescript.create("d.ts", "/// <reference path='b.ts' />"),
-    
-    typescript.create("e.ts", "/// <reference path='b.ts' />\n/// <reference path='c.ts' />\n"),
-    
-    typescript.create("f.ts", "/// <reference path='c.ts' />"),
+var units = [
+    tsapi.create("a.ts", ""),
+    tsapi.create("b.ts", "/// <reference path='a.ts' />"),
+    tsapi.create("c.ts", "/// <reference path='a.ts' />"),
+    tsapi.create("d.ts", "/// <reference path='b.ts' />"),
+    tsapi.create("e.ts", "/// <reference path='b.ts' />\n/// <reference path='c.ts' />\n"),
+    tsapi.create("f.ts", "/// <reference path='c.ts' />"),
 ];
 
 // shuffle
 units = shuffle(units);
 
 // sort
-units = typescript.sort(units);
+units = tsapi.sort(units);
 
 // display
 for (var n in units)  {
