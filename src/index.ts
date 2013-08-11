@@ -88,94 +88,151 @@ limitations under the License.
 // api
 //--------------------------------------------------
 
-module.exports     = typescript
+module.exports=typescript
 
-module.exports.Api = TypeScript.Api;
+module.exports.Api=TypeScript.Api;
 
 //--------------------------------------------------
 // check()
 //--------------------------------------------------
 
-module.exports.check = (units:TypeScript.Api.Unit[]) : boolean => {
+module.exports.check=(units: TypeScript.Api.Unit[]): boolean => {
 
     for(var n in units) {
 
-		if(units[n].hasError()) {
+        if(units[n].hasError()) {
 
-			return false;
-		}
-	}
-	
-	return true;    
+            return false;
+        }
+    }
+
+    return true;
 }
 
 //--------------------------------------------------
 // resolve()
 //--------------------------------------------------
 
-module.exports.resolve = (filename:string, callback:(resolved:TypeScript.Api.SourceUnit[])=> void) : void => {
+module.exports.resolve=(filename: string,callback: (resolved: TypeScript.Api.SourceUnit[]) => void): void => {
 
-    var param:any = null;
+    var param: any=null;
 
-    if((typeof filename) === 'string') {
-    
-        param = [filename]
+    if((typeof filename)==='string') {
 
-    }
+        param=[filename]
 
-    if( Object.prototype.toString.call( filename ) === '[object Array]') {
-    
-        param = filename;
+}
+
+    if(Object.prototype.toString.call(filename)==='[object Array]') {
+
+        param=filename;
     }
 
     if(!param) {
     
-        throw Error('resolve() filename must be of string or array of string.')
-    }
-    
+throw Error('resolve() filename must be of string or array of string.')
+}
 
-	var io       = new TypeScript.Api.IOAsync(); 
-	
-	var resolver = new TypeScript.Api.Resolver( io );
-	
-	resolver.resolve(param, callback);
+
+    var io=new TypeScript.Api.IOAsync();
+
+    var resolver=new TypeScript.Api.Resolver(io);
+
+    resolver.resolve(param,callback);
 }
 
 //--------------------------------------------------
 // reset()
 //--------------------------------------------------
 
-var compiler = null;
+var compiler=null;
 
-module.exports.reset = () : void => {
+interface ICompilerOptions {
 
-    var options = new TypeScript.Api.CompilerOptions();
+    languageVersion: string;
 
-    options.moduleGenTarget          = typescript.ModuleGenTarget.Synchronous;
+    moduleGenTarget: string;
 
-    options.generateDeclarationFiles = true;
+    removeComments: boolean;
+}
 
-    options.mapSourceFiles           = true;
+module.exports.reset=(compilerOptions?: ICompilerOptions): void => {
 
-    options.languageVersion          = typescript.LanguageVersion.EcmaScript5;
+    var options=new TypeScript.Api.CompilerOptions();
 
-    options.logger                   = new TypeScript.Api.NullLogger();
+    if(compilerOptions) {
 
-	compiler                         = new TypeScript.Api.Compiler( options );   
+        if(compilerOptions.languageVersion) {
+
+            switch(compilerOptions.languageVersion) {
+
+                case "EcmaScript5":
+
+                    options.languageVersion=typescript.LanguageVersion.EcmaScript5;
+
+                    break;
+
+                case "EcmaScript3":
+
+                    options.languageVersion=typescript.LanguageVersion.EcmaScript3;
+
+                    break;
+
+                default:
+
+                    options.languageVersion=typescript.LanguageVersion.EcmaScript5;
+
+                    break;
+            }
+        }
+
+        if(compilerOptions.moduleGenTarget) {
+
+            switch(compilerOptions.moduleGenTarget) {
+
+                case "Synchronous":
+
+                    options.moduleGenTarget=typescript.ModuleGenTarget.Synchronous;
+
+                    break;
+
+                case "Asynchronous":
+
+                    options.moduleGenTarget=typescript.ModuleGenTarget.Asynchronous;
+
+                    break;
+
+                default:
+
+                    options.moduleGenTarget=typescript.ModuleGenTarget.Synchronous;
+
+                    break;
+            }
+        }
+    }
+
+    if(compilerOptions.removeComments!=null) {
+
+        options.removeComments=compilerOptions.removeComments;
+    }
+
+    options.logger=new TypeScript.Api.NullLogger();
+
+    compiler=new TypeScript.Api.Compiler(options);
 }
 
 //--------------------------------------------------
 // compile()
 //--------------------------------------------------
 
-module.exports.compile = (resolved:TypeScript.Api.SourceUnit[], callback:(compiled:TypeScript.Api.CompiledUnit[])=> void) : void => {
+module.exports.compile=(resolved: TypeScript.Api.SourceUnit[],callback: (compiled: TypeScript.Api.CompiledUnit[]) => void): void => {
 
     if(!compiler) {
 
         module.exports.reset();
     }
 
-    compiler.compile(resolved, (compiledUnits)=> {
+    compiler.compile(resolved,(compiledUnits) => {
 
         callback(compiledUnits);
     });
@@ -185,8 +242,8 @@ module.exports.compile = (resolved:TypeScript.Api.SourceUnit[], callback:(compil
 // sort()
 //--------------------------------------------------
 
-module.exports.sort = (sourceUnits: TypeScript.Api.SourceUnit[]) : any[] => {
-    
+module.exports.sort=(sourceUnits: TypeScript.Api.SourceUnit[]): any[]=> {
+
     return TypeScript.Api.Topology.sort(sourceUnits);
 }
 
@@ -194,144 +251,143 @@ module.exports.sort = (sourceUnits: TypeScript.Api.SourceUnit[]) : any[] => {
 // run()
 //--------------------------------------------------
 
-module.exports.run = (compiledUnits:TypeScript.Api.CompiledUnit[], sandbox:any, callback : (context:any) => void) : void => {
+module.exports.run=(compiledUnits: TypeScript.Api.CompiledUnit[],sandbox: any,callback: (context: any) => void): void => {
 
-    var get_default_sandbox = () : any => {
+    var get_default_sandbox=(): any => {
 
-	    var sandbox:any = {};
-	
-	    if (!sandbox) {
-	
-		    sandbox = {};
-		
-		    for (var n in global) {
-		
-			    sandbox[n] = global[n];
-			
-		    }
-	    }
-	
-	    sandbox.require    = require;
-	
-	    sandbox.process    = process;
-	
-	    sandbox.console    = console;
-	
-	    sandbox.global     = global;
+        var sandbox: any={};
 
-        sandbox.__dirname  = node.path.dirname(process.mainModule.filename);
+        if(!sandbox) {
 
-        sandbox.__filename = node.path.join(sandbox.__dirname, "typescript-compilation.js");
-	
-	    sandbox.exports  = {};
-	
-	    return sandbox;
+            sandbox={};
+
+            for(var n in global) {
+
+                sandbox[n]=global[n];
+
+            }
+        }
+
+        sandbox.require=require;
+
+        sandbox.process=process;
+
+        sandbox.console=console;
+
+        sandbox.global=global;
+
+        sandbox.__dirname=node.path.dirname(process.mainModule.filename);
+
+        sandbox.__filename=node.path.join(sandbox.__dirname,"typescript-compilation.js");
+
+        sandbox.exports={};
+
+        return sandbox;
     }
 
-	try {
+    try {
 
-		if(!sandbox) { 
+        if(!sandbox) {
 
-            sandbox = get_default_sandbox(); 
+            sandbox=get_default_sandbox();
 
-            var _require = (path:string) => {
+            var _require=(path: string) => {
 
-                var primary_unit = compiledUnits[compiledUnits.length - 1];
+                var primary_unit=compiledUnits[compiledUnits.length-1];
 
-                if(path.indexOf('/') != -1) {
+                if(path.indexOf('/')!=-1) {
 
-                    var fullname = node.path.resolve (primary_unit.path, './');
+                    var fullname=node.path.resolve(primary_unit.path,'./');
 
-                    var dirname  = node.path.dirname(fullname);
+                    var dirname=node.path.dirname(fullname);
 
-                    path = node.path.resolve(dirname + '/' + path, './');
+                    path=node.path.resolve(dirname+'/'+path,'./');
                 }
 
                 return require(path);
             }
 
-            if(compiledUnits.length > 0) { 
-        
-                sandbox.require = _require;  
-            }      
+    if(compiledUnits.length>0) {
+
+                sandbox.require=_require;
+            }
         }
-		
-		var sources = [];
-		
-		for(var n in compiledUnits) 
-		{
-			sources.push(compiledUnits[n].content);
-		}
-		
-		var script = node.vm.createScript( sources.join('') , "typescript-compilation.js" );
-		
-		script.runInNewContext( sandbox );
-		
-		callback( sandbox.exports );
-		
-	} catch(e) {
-		
-		callback( null );
-		
-		console.log(e);
-	}
+
+        var sources=[];
+
+        for(var n in compiledUnits) {
+            sources.push(compiledUnits[n].content);
+        }
+
+        var script=node.vm.createScript(sources.join(''),"typescript-compilation.js");
+
+        script.runInNewContext(sandbox);
+
+        callback(sandbox.exports);
+
+    } catch(e) {
+
+        callback(null);
+
+        console.log(e);
+    }
 }
 
 //--------------------------------------------------
 // register()
 //--------------------------------------------------
 
-module.exports.register = () => {
+module.exports.register=() => {
 
-	require.extensions['.ts'] = function(_module) {
+    require.extensions['.ts']=function(_module) {
 
-        var output_diagnostics = (units:TypeScript.Api.Unit[]) => {
+        var output_diagnostics=(units: TypeScript.Api.Unit[]) => {
 
-	        for(var n in units) {
+            for(var n in units) {
 
-		        for(var m in units[n].diagnostics) {
+                for(var m in units[n].diagnostics) {
 
-			        console.log(node.path.basename(units[n].path) + ':' + units[n].diagnostics[m].toString());
-		        }
-	        }        
+                    console.log(node.path.basename(units[n].path)+':'+units[n].diagnostics[m].toString());
+                }
+            }
         };
-		
-		var io          = new TypeScript.Api.IOSync();
-		
-		var logger      = new TypeScript.Api.BufferedLogger();
-		
-		var resolver    = new TypeScript.Api.Resolver( io );
-		
-		var diagnostics = [];
-		
+
+        var io=new TypeScript.Api.IOSync();
+
+        var logger=new TypeScript.Api.BufferedLogger();
+
+        var resolver=new TypeScript.Api.Resolver(io);
+
+        var diagnostics=[];
+
         if(!compiler) {
-        
+
             module.exports.reset();
         }
 
-		resolver.resolve([_module.filename], (sourceUnits:TypeScript.Api.SourceUnit[]) => {
-			
+        resolver.resolve([_module.filename],(sourceUnits: TypeScript.Api.SourceUnit[]) => {
+
             if(module.exports.check(sourceUnits)) {
-				
-				compiler.compile( sourceUnits, ( compiledUnits : TypeScript.Api.CompiledUnit[] ) =>  {
-					
-                    if( module.exports.check(compiledUnits) ) {
 
-						module.exports.run(compiledUnits, null, function(context) {
+                compiler.compile(sourceUnits,(compiledUnits: TypeScript.Api.CompiledUnit[]) => {
 
-							_module.exports = context;
-						});
-					}
-					else {
+                    if(module.exports.check(compiledUnits)) {
 
-						output_diagnostics(compiledUnits);
-					}
-				});
-			} 
-			else {
+                        module.exports.run(compiledUnits,null,function(context) {
 
-				output_diagnostics(sourceUnits);
-			}
-		});
-	}
+                            _module.exports=context;
+                        });
+                    }
+                    else {
+
+                        output_diagnostics(compiledUnits);
+                    }
+                });
+            }
+            else {
+
+                output_diagnostics(sourceUnits)
+            }
+        });
+    }
 }

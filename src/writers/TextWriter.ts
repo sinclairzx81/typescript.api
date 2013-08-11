@@ -16,44 +16,44 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export class TextWriter implements ITextWriter {
+    export class TextWriter implements ITextWriter {
 
-		public buffer : string[];
+        public buffer: string[];
 
-		public temp   : string;
-		
-		constructor() {
+        public temp: string;
 
-			this.buffer = [];
+        constructor() {
 
-			this.temp = "";
-		}
+            this.buffer=[];
 
-		public Write(text:string) : void {
+            this.temp="";
+        }
 
-			this.temp += text;
-		}
+        public Write(text: string): void {
 
-		public WriteLine(text) : void {
+            this.temp+=text;
+        }
 
-			this.buffer.push(this.temp + text);
-			
-			this.temp = "";
-		}
+        public WriteLine(text): void {
 
-		public Close() : void {
+            this.buffer.push(this.temp+text);
 
-			if (this.temp.length > 0) {
-                 
-				this.buffer.push(this.temp);
-			}
+            this.temp="";
+        }
 
-			this.temp = "";
-		}
-		
-		public toString() : string {
+        public Close(): void {
 
-			return this.buffer.join('\n');
-		}
-	}	
+            if(this.temp.length>0) {
+
+                this.buffer.push(this.temp);
+            }
+
+            this.temp="";
+        }
+
+        public toString(): string {
+
+            return this.buffer.join('\n');
+        }
+    }
 }

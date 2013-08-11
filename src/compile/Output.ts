@@ -22,100 +22,99 @@ module TypeScript.Api {
     // when the calls to the compiler are made to
     // emit, they end up here.
 
-	export class Output {
-		
-        public files   : string[];
+    export class Output {
 
-        public mapper  : any [];
+        public files: string[];
 
-		constructor() 
-		{
-			this.files   = [];
+        public mapper: any[];
 
-            this.mapper  = [];
-		}
+        constructor() {
+            this.files=[];
 
-        public javascript_filenames() : string[] {
+            this.mapper=[];
+        }
 
-            var result = [];
+        public javascript_filenames(): string[] {
+
+            var result=[];
 
             for(var n in this.mapper) {
-            
+
                 result.push(n);
             }
             return result;
         }
 
-        public writeFile(fileName: string, contents: string, writeByteOrderMark: boolean) : void {
-            
-			this.files[fileName] = contents;
+        public writeFile(fileName: string,contents: string,writeByteOrderMark: boolean): void {
 
-			return this.files[fileName];
+            this.files[fileName]=contents;
+
+            return this.files[fileName];
         }
 
-		public directoryExists(path: string): boolean {
+        public directoryExists(path: string): boolean {
 
-			return true;
-		}
+            return true;
+        }
 
-		public fileExists(path: string): boolean {
+        public fileExists(path: string): boolean {
 
-			return true;
-		}
+            return true;
+        }
 
-		public resolvePath(path: string): string {
+        public resolvePath(path: string): string {
 
-			return '/';
-		}
+            return '/';
+        }
 
-        public get_content(path:string) : string {
-        
-            path = path.replace(/\\/g, '/').replace(/.ts$/, '.js');
+        public get_content(path: string): string {
+
+            path=path.replace(/\\/g,'/').replace(/.ts$/,'.js');
 
             for(var filename in this.files) {
 
-                if(filename.replace(/\\/g, '/') == path) {
+                if(filename.replace(/\\/g,'/')==path) {
 
                     return this.files[filename];
                 }
             }
-                                  
+
             return null;
         }
 
-        public get_declararion (path:string) : string {
-        
-            path = path.replace(/\\/g, '/').replace(/.ts$/, '.d.ts');
+        public get_declararion(path: string): string {
+
+            path=path.replace(/\\/g,'/').replace(/.ts$/,'.d.ts');
 
             for(var filename in this.files) {
 
-                if(filename.replace(/\\/g, '/') == path) {
+                if(filename.replace(/\\/g,'/')==path) {
 
                     return this.files[filename];
                 }
             }
-                                   
-            return null;            
+
+            return null;
         }
 
-        public get_source_map (path:string) : string {
-        
-            path = path.replace(/\\/g, '/').replace(/.ts$/, '.js.map');
+        public get_source_map(path: string): string {
+
+            path=path.replace(/\\/g,'/').replace(/.ts$/,'.js.map');
 
             for(var filename in this.files) {
 
-                if(filename.replace(/\\/g, '/') == path) {
+                if(filename.replace(/\\/g,'/')==path) {
 
                     return this.files[filename];
                 }
             }
-                              
-            return null;           
+
+            return null;
         }
 
-        public get_reflection(path:string, ast:TypeScript.Script) : TypeScript.Api.Script {
+        public get_reflection(path: string,ast: TypeScript.Script): TypeScript.Api.Script {
 
-            return TypeScript.Api.Script.create(path, ast);
+            return TypeScript.Api.Script.create(path,ast);
         }
-	}
+    }
 }

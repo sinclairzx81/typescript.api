@@ -24,173 +24,173 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export class Module extends TypeScript.Api.ReflectedType {
+    export class Module extends TypeScript.Api.ReflectedType {
 
-		public imports    : Import    [];
+        public imports: Import[];
 
-		public modules    : Module    [];
+        public modules: Module[];
 
-		public interfaces : Interface [];
+        public interfaces: Interface[];
 
-		public classes    : Class     [];
+        public classes: Class[];
 
-		public methods    : Method    [];
+        public methods: Method[];
 
-		public variables  : Variable  [];
+        public variables: Variable[];
 
-        public isExported : boolean;
+        public isExported: boolean;
 
-		constructor () {
+        constructor() {
 
             super('module');
 
-			this.imports    = [];
+            this.imports=[];
 
-			this.modules    = [];
+            this.modules=[];
 
-			this.interfaces = [];
+            this.interfaces=[];
 
-			this.classes    = [];
+            this.classes=[];
 
-			this.methods    = [];
+            this.methods=[];
 
-			this.variables  = [];
+            this.variables=[];
 
-            this.isExported = false;
-		}
+            this.isExported=false;
+        }
 
-		private static load_imports(result:TypeScript.Api.Module, ast:TypeScript.ModuleDeclaration) : void {
+        private static load_imports(result: TypeScript.Api.Module,ast: TypeScript.ModuleDeclaration): void {
 
-			for(var n in ast.members.members) {
+            for(var n in ast.members.members) {
 
-				var member = ast.members.members[n];
+                var member=ast.members.members[n];
 
-				if(member.nodeType == typescript.NodeType.ImportDeclaration) {
+                if(member.nodeType==typescript.NodeType.ImportDeclaration) {
 
-					var obj = TypeScript.Api.Import.create(<TypeScript.ImportDeclaration>member);
+                    var obj=TypeScript.Api.Import.create(<TypeScript.ImportDeclaration>member);
 
-					result.imports.push(obj);
-				}
-			}
-		}
+                    result.imports.push(obj);
+                }
+            }
+        }
 
-		private static load_modules(result:TypeScript.Api.Module, ast:TypeScript.ModuleDeclaration) : void {
+        private static load_modules(result: TypeScript.Api.Module,ast: TypeScript.ModuleDeclaration): void {
 
-			for(var n in ast.members.members) {
+            for(var n in ast.members.members) {
 
-				var member = ast.members.members[n];
+                var member=ast.members.members[n];
 
-				if(member.nodeType == typescript.NodeType.ModuleDeclaration) {
+                if(member.nodeType==typescript.NodeType.ModuleDeclaration) {
 
-					var obj = TypeScript.Api.Module.create(<TypeScript.ModuleDeclaration>member);
+                    var obj=TypeScript.Api.Module.create(<TypeScript.ModuleDeclaration>member);
 
-					result.modules.push(obj);
-				}
-			}
-		}
+                    result.modules.push(obj);
+                }
+            }
+        }
 
-		private static load_interfaces(result:TypeScript.Api.Module, ast:TypeScript.ModuleDeclaration) : void {
+        private static load_interfaces(result: TypeScript.Api.Module,ast: TypeScript.ModuleDeclaration): void {
 
-			for(var n in ast.members.members) {
+            for(var n in ast.members.members) {
 
-				var member = ast.members.members[n];
+                var member=ast.members.members[n];
 
-				if(member.nodeType == typescript.NodeType.InterfaceDeclaration) {
+                if(member.nodeType==typescript.NodeType.InterfaceDeclaration) {
 
-					var obj = TypeScript.Api.Interface.create(<TypeScript.InterfaceDeclaration>member);
+                    var obj=TypeScript.Api.Interface.create(<TypeScript.InterfaceDeclaration>member);
 
-					result.interfaces.push(obj);
-				}
-			}
-		}
+                    result.interfaces.push(obj);
+                }
+            }
+        }
 
-		private static load_classes(result:TypeScript.Api.Module, ast:TypeScript.ModuleDeclaration) : void {
+        private static load_classes(result: TypeScript.Api.Module,ast: TypeScript.ModuleDeclaration): void {
 
-			for(var n in ast.members.members) {
+            for(var n in ast.members.members) {
 
-				var member = ast.members.members[n];
+                var member=ast.members.members[n];
 
-				if(member.nodeType == typescript.NodeType.ClassDeclaration) {
+                if(member.nodeType==typescript.NodeType.ClassDeclaration) {
 
-					var obj = TypeScript.Api.Class.create(<TypeScript.ClassDeclaration>member);
+                    var obj=TypeScript.Api.Class.create(<TypeScript.ClassDeclaration>member);
 
-					result.classes.push(obj);
-				}
-			}
-		}
+                    result.classes.push(obj);
+                }
+            }
+        }
 
-		private static load_methods(result:TypeScript.Api.Module, ast:TypeScript.ModuleDeclaration) : void {
+        private static load_methods(result: TypeScript.Api.Module,ast: TypeScript.ModuleDeclaration): void {
 
-			for(var n in ast.members.members) {
+            for(var n in ast.members.members) {
 
-				var member = ast.members.members[n];
+                var member=ast.members.members[n];
 
-				if(member.nodeType == typescript.NodeType.FunctionDeclaration) {
+                if(member.nodeType==typescript.NodeType.FunctionDeclaration) {
 
-					var obj = TypeScript.Api.Method.create(<TypeScript.FunctionDeclaration>member);
+                    var obj=TypeScript.Api.Method.create(<TypeScript.FunctionDeclaration>member);
 
-					result.methods.push(obj);
-				}
-			}
-		}
+                    result.methods.push(obj);
+                }
+            }
+        }
 
-		private static load_variables(result:TypeScript.Api.Module, ast:TypeScript.ModuleDeclaration) : void {
+        private static load_variables(result: TypeScript.Api.Module,ast: TypeScript.ModuleDeclaration): void {
 
-			for(var n in ast.members.members) {
+            for(var n in ast.members.members) {
 
-				var member = ast.members.members[n];
+                var member=ast.members.members[n];
 
-				if(member.nodeType == typescript.NodeType.VariableStatement) {
+                if(member.nodeType==typescript.NodeType.VariableStatement) {
 
-					var statement = <TypeScript.VariableStatement>member;
+                    var statement=<TypeScript.VariableStatement>member;
 
-					if(statement.declaration) {
+                    if(statement.declaration) {
 
-						if(statement.declaration.declarators) {
+                        if(statement.declaration.declarators) {
 
-							for(var m in statement.declaration.declarators.members) {
-                                
-								var obj = TypeScript.Api.Variable.create(<TypeScript.VariableDeclarator> statement.declaration.declarators.members[m])
+                            for(var m in statement.declaration.declarators.members) {
+
+                                var obj=TypeScript.Api.Variable.create(<TypeScript.VariableDeclarator> statement.declaration.declarators.members[m])
 
 								result.variables.push(obj);
-							}
-						}
-					}
-				}
-			}
-		}
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-		public static create (ast:TypeScript.ModuleDeclaration) : TypeScript.Api.Module {
+        public static create(ast: TypeScript.ModuleDeclaration): TypeScript.Api.Module {
 
-			var result     = new TypeScript.Api.Module();
+            var result=new TypeScript.Api.Module();
 
-			result.name    = ast.prettyName;
-            
-            var hasFlag = (val : number, flag: number) :boolean  => {
+            result.name=ast.prettyName;
 
-                return (val & flag) !== 0;
+            var hasFlag=(val: number,flag: number): boolean  => {
+
+                return (val&flag)!==0;
             };
-            
-            var flags      = ast.getModuleFlags();
 
-            if(hasFlag(flags, typescript.ModuleFlags.Exported)) {
-                
-                result.isExported = true;
+            var flags=ast.getModuleFlags();
+
+            if(hasFlag(flags,typescript.ModuleFlags.Exported)) {
+
+                result.isExported=true;
             }
 
-			Module.load_imports    (result, ast);
+            Module.load_imports(result,ast);
 
-			Module.load_modules    (result, ast);
+            Module.load_modules(result,ast);
 
-			Module.load_interfaces (result, ast);
+            Module.load_interfaces(result,ast);
 
-			Module.load_classes    (result, ast);
+            Module.load_classes(result,ast);
 
-			Module.load_methods    (result, ast);
+            Module.load_methods(result,ast);
 
-			Module.load_variables  (result, ast);
+            Module.load_variables(result,ast);
 
-			return result;
-		}
-	}
+            return result;
+        }
+    }
 }

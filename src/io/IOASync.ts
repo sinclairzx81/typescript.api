@@ -20,28 +20,28 @@ limitations under the License.
 /// <reference path="IOFile.ts" />
 
 module TypeScript.Api {
-    	
+
     export class IOAsync implements TypeScript.Api.IIO {
 
-		public readFile (path:string, callback: { (iofile : TypeScript.Api.IOFile) : void; } ) : void {
+        public readFile(path: string,callback: { (iofile: TypeScript.Api.IOFile): void; }): void {
 
-			node.fs.readFile(path, (error, data) => {
+            node.fs.readFile(path,(error,data) => {
 
-				if (error) {
+                if(error) {
 
-					var text    = "could not resolve source unit.";
-					
-					var message = "could not resolve source unit " + path + ".";
-				    
-					var error   = new TypeScript.Api.IOFileError(text, message);				
-				
-					callback( new TypeScript.Api.IOFile (path, null, [ error ], false) );  
-				} 
-				else {
+                    var text="could not resolve source unit.";
 
-					callback( new TypeScript.Api.IOFile (path, TypeScript.Api.Buffer.process(data), [], false) ); 
-				}
-			});			
-		}
-	}
+                    var message="could not resolve source unit "+path+".";
+
+                    var error=new TypeScript.Api.IOFileError(text,message);
+
+                    callback(new TypeScript.Api.IOFile(path,null,[error],false));
+                }
+                else {
+
+                    callback(new TypeScript.Api.IOFile(path,TypeScript.Api.Buffer.process(data),[],false));
+                }
+            });
+        }
+    }
 }

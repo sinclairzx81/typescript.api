@@ -20,111 +20,111 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export class Variable extends TypeScript.Api.ReflectedType {
+    export class Variable extends TypeScript.Api.ReflectedType {
 
-		public type                    : Type;
+        public type: Type;
 
-        public isPublic                : boolean;
+        public isPublic: boolean;
 
-		public isProperty              : boolean;
+        public isProperty: boolean;
 
-		public isStatic                : boolean;
+        public isStatic: boolean;
 
-		public isStatement             : boolean;
+        public isStatement: boolean;
 
-		public isExpression            : boolean;
+        public isExpression: boolean;
 
-		public isStatementOrExpression : boolean;
+        public isStatementOrExpression: boolean;
 
-		public isExported              : boolean;
+        public isExported: boolean;
 
-        public isOptional              : boolean;
+        public isOptional: boolean;
 
-		public comments                : string[];
+        public comments: string[];
 
-		constructor() {
+        constructor() {
 
             super('variable');
-            
-			this.comments   = [];
 
-            this.isExported = false;
+            this.comments=[];
 
-            this.isPublic   = false;
+            this.isExported=false;
 
-            this.isOptional = false;
+            this.isPublic=false;
 
-		}
+            this.isOptional=false;
 
-		private static load_comments(result:Variable, ast:TypeScript.VariableDeclarator) : void {
+        }
 
-			var comments = ast.getDocComments();
+        private static load_comments(result: Variable,ast: TypeScript.VariableDeclarator): void {
 
-			for(var n in comments) {
+            var comments=ast.getDocComments();
 
-				result.comments.push(comments[n].content);
-			}
-		}
+            for(var n in comments) {
 
-		private static load_type (result:Variable, ast:TypeScript.VariableDeclarator) : void {
+                result.comments.push(comments[n].content);
+            }
+        }
 
-			if(!ast.typeExpr) {
+        private static load_type(result: Variable,ast: TypeScript.VariableDeclarator): void {
 
-				result.type  = new TypeScript.Api.Type();
+            if(!ast.typeExpr) {
 
-				return;
-			}   
+                result.type=new TypeScript.Api.Type();
 
-			result.type = TypeScript.Api.Type.create(ast.typeExpr);
-		}
+                return;
+            }
 
-		public static create(ast:TypeScript.VariableDeclarator): TypeScript.Api.Variable {
+            result.type=TypeScript.Api.Type.create(ast.typeExpr);
+        }
 
-			var result  = new TypeScript.Api.Variable();
+        public static create(ast: TypeScript.VariableDeclarator): TypeScript.Api.Variable {
 
-			result.name = ast.id.text;
+            var result=new TypeScript.Api.Variable();
 
-            var hasFlag = (val : number, flag: number) :boolean  => {
+            result.name=ast.id.text;
 
-                return (val & flag) !== 0;
+            var hasFlag=(val: number,flag: number): boolean  => {
+
+                return (val&flag)!==0;
             };
-            
-            var flags = ast.getVarFlags();
 
-            if(hasFlag(flags, typescript.VariableFlags.Public)) {
-                
-                result.isPublic = true;
+            var flags=ast.getVarFlags();
+
+            if(hasFlag(flags,typescript.VariableFlags.Public)) {
+
+                result.isPublic=true;
             }
 
-            if(hasFlag(flags, typescript.VariableFlags.Exported)) {
+            if(hasFlag(flags,typescript.VariableFlags.Exported)) {
 
-                result.isExported = true;
-            }
-            
-            var ast_flags = ast.id.getFlags();
-
-            if(hasFlag(ast_flags, typescript.ASTFlags.OptionalName)) {
-
-                result.isOptional = true;
+                result.isExported=true;
             }
 
-			result.isProperty              = ast.isProperty();
+            var ast_flags=ast.id.getFlags();
 
-			result.isStatic                = ast.isStatic();
+            if(hasFlag(ast_flags,typescript.ASTFlags.OptionalName)) {
 
-			result.isStatement             = ast.isStatement();
+                result.isOptional=true;
+            }
 
-			result.isExpression            = ast.isExpression();
+            result.isProperty=ast.isProperty();
 
-			result.isExported              = ast.isExported();
+            result.isStatic=ast.isStatic();
 
-			result.isStatementOrExpression = ast.isStatementOrExpression();
+            result.isStatement=ast.isStatement();
 
-			Variable.load_type(result, ast);
+            result.isExpression=ast.isExpression();
 
-			Variable.load_comments(result, ast);
+            result.isExported=ast.isExported();
 
-			return result;
-		}  
-	}
+            result.isStatementOrExpression=ast.isStatementOrExpression();
+
+            Variable.load_type(result,ast);
+
+            Variable.load_comments(result,ast);
+
+            return result;
+        }
+    }
 }

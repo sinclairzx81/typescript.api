@@ -19,48 +19,48 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export class BufferedLogger implements TypeScript.ILogger {
+    export class BufferedLogger implements TypeScript.ILogger {
 
-		private writer : TypeScript.Api.TextWriter;
-		
-		constructor() {
+        private writer: TypeScript.Api.TextWriter;
 
-			this.writer = new TypeScript.Api.TextWriter;
-		}
-		
-		public information() : boolean {
-             
-			return false; 
-		}
-		
-		public debug() : boolean {
+        constructor() {
 
-			return false; 
-		}
-		
-		public warning() : boolean {
+            this.writer=new TypeScript.Api.TextWriter;
+        }
 
-			return false; 
-		}
-		
-		public error()  : boolean {
-             
-			return false; 
-		}
-		
-		public fatal(): boolean {
+        public information(): boolean {
 
-			return false; 
-		}
-		
-		public log(s: string): void {
+            return false;
+        }
 
-			this.writer.WriteLine(s);
-		}
-		
-		public toString() : string {
+        public debug(): boolean {
 
-			return this.writer.toString();
-		}
-	}
+            return false;
+        }
+
+        public warning(): boolean {
+
+            return false;
+        }
+
+        public error(): boolean {
+
+            return false;
+        }
+
+        public fatal(): boolean {
+
+            return false;
+        }
+
+        public log(s: string): void {
+
+            this.writer.WriteLine(s);
+        }
+
+        public toString(): string {
+
+            return this.writer.toString();
+        }
+    }
 }

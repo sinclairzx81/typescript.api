@@ -19,74 +19,67 @@ limitations under the License.
 /// <reference path="../io/IOFile.ts" />
 /// <reference path="Topology.ts" />
 
-module TypeScript.Api {	
+module TypeScript.Api {
 
-	export class LoadParameter {
+    export class LoadParameter {
 
-		public parent_filename  : string;
+        public parent_filename: string;
 
-		public filename         : string;
+        public filename: string;
 
-		constructor(parent_filename:string, filename:string) {
+        constructor(parent_filename: string,filename: string) {
 
-			this.parent_filename = parent_filename;
+            this.parent_filename=parent_filename;
 
-			this.filename        = TypeScript.Api.Path.relativeToAbsolute(parent_filename, filename); 
-		} 
-	} 
+            this.filename=TypeScript.Api.Path.relativeToAbsolute(parent_filename,filename);
+        }
+    }
 
-	export class Resolver 
-	{
-		private pending     : TypeScript.Api.LoadParameter  [];
+    export class Resolver {
+        private pending: TypeScript.Api.LoadParameter[];
 
-		private closed      : TypeScript.Api.LoadParameter  [];
+        private closed: TypeScript.Api.LoadParameter[];
 
-		private units       : TypeScript.Api.SourceUnit [];
+        private units: TypeScript.Api.SourceUnit[];
 
-		constructor( public io : TypeScript.Api.IIO ) {
+        constructor(public io: TypeScript.Api.IIO) {
 
-			this.pending      = [];
+            this.pending=[];
 
-			this.closed  	  = [];
+            this.closed=[];
 
-			this.units        = [];
-		}
+            this.units=[];
+        }
 
-		public resolve(sources:string[], callback: {( units:TypeScript.Api.SourceUnit[] ): void; }) : void {
+        public resolve(sources: string[],callback: { (units: TypeScript.Api.SourceUnit[]): void; }): void {
 
-			for(var n in sources)  
-			{
-				var parameter = new TypeScript.Api.LoadParameter( process.mainModule.filename, sources[n] );
+            for(var n in sources) {
+                var parameter=new TypeScript.Api.LoadParameter(process.mainModule.filename,sources[n]);
 
-				this.pending.push(parameter);
-			}
+                this.pending.push(parameter);
+            }
 
-			this.load ( callback );
-		}	
+            this.load(callback);
+        }
 
-		private load (callback: {( unit : TypeScript.Api.SourceUnit[]): void; }) : void  
-		{
-			var parameter = this.pending.pop();
+        private load(callback: { (unit: TypeScript.Api.SourceUnit[]): void; }): void {
+            var parameter=this.pending.pop();
 
-			if( !this.visited(parameter) )  
-			{
-				this.closed.push(parameter);
+            if(!this.visited(parameter)) {
+                this.closed.push(parameter);
 
-                var parent_filename = parameter.parent_filename;
+                var parent_filename=parameter.parent_filename;
 
-				this.io.readFile(parameter.filename, (iofile : TypeScript.Api.IOFile) =>  
-				{		
+                this.io.readFile(parameter.filename,(iofile: TypeScript.Api.IOFile) => {
                     // create unit from iofile.
-                    		
-                    var unit = new TypeScript.Api.SourceUnit(iofile.path, iofile.content, [], iofile.remote );
 
-                    if(iofile.errors.length > 0)
-                    {
-                        for(var n in iofile.errors) 
-                        {
-                            var error = iofile.errors[n];
+                    var unit=new TypeScript.Api.SourceUnit(iofile.path,iofile.content,[],iofile.remote);
 
-                            var diagnostic = new TypeScript.Api.Diagnostic("resolve", parent_filename, error.text, error.message);
+                    if(iofile.errors.length>0) {
+                        for(var n in iofile.errors) {
+                            var error=iofile.errors[n];
+
+                            var diagnostic=new TypeScript.Api.Diagnostic("resolve",parent_filename,error.text,error.message);
 
                             unit.diagnostics.push(diagnostic);
                         }
@@ -94,58 +87,50 @@ module TypeScript.Api {
 
                     // if no errors..
 
-					if(unit.diagnostics.length == 0)  
-					{
-						for(var n in unit.references() )  
-						{
-							var parameter = new TypeScript.Api.LoadParameter( unit.path, unit.references() [n] );
+                    if(unit.diagnostics.length==0) {
+                        for(var n in unit.references()) {
+                            var parameter=new TypeScript.Api.LoadParameter(unit.path,unit.references()[n]);
 
-							this.pending.push( parameter );
-						}
-					}
+                            this.pending.push(parameter);
+                        }
+                    }
 
                     // convert path to forward slashes
 
-                    unit.path = TypeScript.Api.Path.toForwardSlashes(unit.path);
+                    unit.path=TypeScript.Api.Path.toForwardSlashes(unit.path);
 
                     // push unit on resolved.
-                    
-					this.units.push(unit);
 
-					this.next(callback);
+                    this.units.push(unit);
 
-				});
-			} 
-			else 
-			{
-				this.next(callback);
-			}			
-		}
+                    this.next(callback);
 
-		private next (callback) : void 
-		{ 
-			if(this.pending.length > 0) 
-			{
-				this.load ( callback );
+                });
+            }
+            else {
+                this.next(callback);
+            }
+        }
 
-				return;
-			} 
+        private next(callback): void {
+            if(this.pending.length>0) {
+                this.load(callback);
 
-			this.units = TypeScript.Api.Topology.sort(this.units);
+                return;
+            }
 
-			callback( this.units );
-		}
+            this.units=TypeScript.Api.Topology.sort(this.units);
 
-		private visited (parameter : TypeScript.Api.LoadParameter) : boolean 
-		{
-			for(var n in this.closed) 
-			{
-				if(this.closed[n].filename == parameter.filename) 
-				{
-					return true;
-				}
-			}
-			return false;
-		}		
-	}
+            callback(this.units);
+        }
+
+        private visited(parameter: TypeScript.Api.LoadParameter): boolean {
+            for(var n in this.closed) {
+                if(this.closed[n].filename==parameter.filename) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
 }

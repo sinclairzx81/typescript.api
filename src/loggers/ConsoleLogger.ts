@@ -18,36 +18,36 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export class ConsoleLogger implements TypeScript.ILogger {
+    export class ConsoleLogger implements TypeScript.ILogger {
 
-		public information() : boolean {
-             
-			return false; 
-		}
-		
-		public debug() : boolean {
+        public information(): boolean {
 
-			return false; 
-		}
-		
-		public warning() : boolean {
+            return false;
+        }
 
-			return false; 
-		}
-		
-		public error()  : boolean {
-             
-			return false; 
-		}
-		
-		public fatal(): boolean {
+        public debug(): boolean {
 
-			return false; 
-		}
-		
-		public log(s: string): void {
+            return false;
+        }
 
-			console.log(s);
-		}
-	}
+        public warning(): boolean {
+
+            return false;
+        }
+
+        public error(): boolean {
+
+            return false;
+        }
+
+        public fatal(): boolean {
+
+            return false;
+        }
+
+        public log(s: string): void {
+
+            console.log(s);
+        }
+    }
 }

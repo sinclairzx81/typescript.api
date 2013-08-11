@@ -27,26 +27,26 @@ module TypeScript.Api {
     // compilation.
 
     export class Input {
-    
+
         public units: TypeScript.Api.SourceUnit[];
 
         constructor() {
-        
-            this.units = [];
+
+            this.units=[];
 
         }
 
         /** compares two source units to 
         *   see if they match.
-        */ 
-        private same (a:TypeScript.Api.SourceUnit, b:TypeScript.Api.SourceUnit) : boolean {
-        
-            if(a.content.length == b.content.length) {
+        */
+        private same(a: TypeScript.Api.SourceUnit,b: TypeScript.Api.SourceUnit): boolean {
 
-			    if(a.content == b.content) {
+            if(a.content.length==b.content.length) {
 
-				    return true;
-			    }
+                if(a.content==b.content) {
+
+                    return true;
+                }
             }
 
             return false;
@@ -55,12 +55,12 @@ module TypeScript.Api {
         /** fetches a local source unit
         *   based on the the path.
         */
-        public fetch(path:string) : TypeScript.Api.SourceUnit {
-        
-            for(var i = 0; i < this.units.length; i++) {
-                
-                if(this.units[i].path == path) {
-                
+        public fetch(path: string): TypeScript.Api.SourceUnit {
+
+            for(var i=0;i<this.units.length;i++) {
+
+                if(this.units[i].path==path) {
+
                     return this.units[i];
                 }
             }
@@ -74,49 +74,46 @@ module TypeScript.Api {
         *   and deletes, and flags them on state ready for
         *   processing.
         */
-        public merge(units:TypeScript.Api.SourceUnit[]) : void {
+        public merge(units: TypeScript.Api.SourceUnit[]): void {
 
             // compute delete state.
             this.units.map((local) => {
 
-                for(var i = 0; i < units.length; i++) {
+                for(var i=0;i<units.length;i++) {
 
-                    if(units[i].path == local.path) {
+                    if(units[i].path==local.path) {
 
                         return;
                     }
                 }
 
-                local.state = 'deleted'
+                local.state='deleted'
 
                 return false;
-            }); 
+            });
 
             // scan for additions and updates.
-            for(var i = 0; i < units.length; i++) {
-                
-                var local = this.fetch(units[i].path) 
-                
-                if(local) 
-                {    
-                    if(!this.same(local, units[i])) { 
+            for(var i=0;i<units.length;i++) {
 
-                        local.state   = 'updated';
+                var local=this.fetch(units[i].path)
 
-                        local.content = units[i].content;
+                if(local) {
+                    if(!this.same(local,units[i])) {
 
-                        local.path    = units[i].path;
+                        local.state='updated';
 
-                        local.remote  = units[i].remote;
+                        local.content=units[i].content;
+
+                        local.path=units[i].path;
+
+                        local.remote=units[i].remote;
                     }
-                    else
-                    {
-                        local.state = 'same';
-                    }                
-                } 
-                else
-                {
-                    units[i].state = 'added';
+                    else {
+                        local.state='same';
+                    }
+                }
+                else {
+                    units[i].state='added';
 
                     this.units.push(units[i]);
                 }
@@ -124,16 +121,16 @@ module TypeScript.Api {
 
             // remove and sort deleted units.
 
-            var sorted = [];
+            var sorted=[];
 
             for(var n in units) {
-            
+
                 for(var m in this.units) {
-                
-                    if(this.units[m].path == units[n].path) {
-                        
-                        if(this.units[m].state != 'deleted') {
-                        
+
+                    if(this.units[m].path==units[n].path) {
+
+                        if(this.units[m].state!='deleted') {
+
                             sorted.push(this.units[m]);
                         }
 
@@ -142,7 +139,7 @@ module TypeScript.Api {
                 }
             }
 
-            this.units = sorted;
+            this.units=sorted;
         }
     }
 }

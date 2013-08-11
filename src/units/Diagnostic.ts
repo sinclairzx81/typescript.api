@@ -14,71 +14,63 @@ limitations under the License.
 
 --------------------------------------------------------------------------*/
 
-module TypeScript.Api 
-{
-	export class Diagnostic
-	{
-		public line_index:number;
+module TypeScript.Api {
+    export class Diagnostic {
+        public line_index: number;
 
-		public char_index:number;
+        public char_index: number;
 
-		constructor(public type : string,
+        constructor(public type: string,
 
-					public path : string,
+            public path: string,
 
-					public text : string,
+            public text: string,
 
-					public message : string) 
-		{
-			this.line_index = 0;
+            public message: string) {
+            this.line_index=0;
 
-			this.char_index = 0;
-		}		
+            this.char_index=0;
+        }
 
-		public computeLineInfo(content:string, start:number) : void 
-		{
-			for(var i = 0; i < start; i++) 
-			{
-				var ch = content[i];
+        public computeLineInfo(content: string,start: number): void {
+            for(var i=0;i<start;i++) {
+                var ch=content[i];
 
-				if(ch == '\r\n') 
-				{
-					this.line_index += 1;
-					
-					this.char_index =  0;
-					
-					i += 1;
-				}
-				
-				if(ch == '\n') 
-				{
-					this.line_index += 1;
-					
-					this.char_index =  0;
-				}
+                if(ch=='\r\n') {
+                    this.line_index+=1;
 
-				this.char_index += 1;
-			}
-		}
+                    this.char_index=0;
 
-		public toString() : string 
-		{
-			return this.path + " [" + (this.line_index + 1).toString() + ":" +  (this.char_index + 1).toString() + "] " + this.message;
-		}
+                    i+=1;
+                }
 
-        public clone() : TypeScript.Api.Diagnostic {
-        
-            var clone = new TypeScript.Api.Diagnostic(this.type.toString(), 
-                                                      this.path.toString(), 
-                                                      this.text.toString(), 
-                                                      this.message.toString());
+                if(ch=='\n') {
+                    this.line_index+=1;
 
-            clone.char_index = this.char_index;
+                    this.char_index=0;
+                }
 
-            clone.line_index = this.line_index;
+                this.char_index+=1;
+            }
+        }
+
+        public toString(): string {
+            return this.path+" ["+(this.line_index+1).toString()+":"+(this.char_index+1).toString()+"] "+this.message;
+        }
+
+        public clone(): TypeScript.Api.Diagnostic {
+
+            var clone=new TypeScript.Api.Diagnostic(this.type.toString(),
+                this.path.toString(),
+                this.text.toString(),
+                this.message.toString());
+
+            clone.char_index=this.char_index;
+
+            clone.line_index=this.line_index;
 
             return clone;
 
         }
-	}
+    }
 }

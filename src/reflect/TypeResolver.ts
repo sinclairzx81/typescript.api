@@ -26,96 +26,96 @@ limitations under the License.
 /// <reference path="Variable.ts" />
 /// <reference path="Type.ts" />
 
-module TypeScript.Api  {
+module TypeScript.Api {
 
     // TypeResolver: Resolves Reflect.
-	export class TypeResolver {
-        
-        private static resolve_type(module_scope_stack:TypeScript.Api.Module[],  type:TypeScript.Api.Type) : void {
-            
+    export class TypeResolver {
+
+        private static resolve_type(module_scope_stack: TypeScript.Api.Module[],type: TypeScript.Api.Type): void {
+
             if(type.resolved) return;
 
-            var associate = (type:TypeScript.Api.Type, reflected_type:TypeScript.Api.ReflectedType) => {
-                
-                type.scope = reflected_type.scope.slice(0);
-                
-                if(type.name.indexOf('.') !== -1) {
-                    
-                    var tokens = type.name.split('.');
-                    
-                    type.name  = tokens[tokens.length - 1];
+            var associate=(type: TypeScript.Api.Type,reflected_type: TypeScript.Api.ReflectedType) => {
+
+                type.scope=reflected_type.scope.slice(0);
+
+                if(type.name.indexOf('.')!==-1) {
+
+                    var tokens=type.name.split('.');
+
+                    type.name=tokens[tokens.length-1];
                 }
-                
-                type.resolved = true;
+
+                type.resolved=true;
 
                 // generic type arguments in this scope also need resolving.
-                type.arguments.forEach((_type) => { TypeResolver.resolve_type(module_scope_stack, _type); });
+                type.arguments.forEach((_type) => { TypeResolver.resolve_type(module_scope_stack,_type); });
             };
-            
+
             // does a backwards traversal on this assumed type scope.
-            var match_scope = (scope:string[], type_scope:string[]) : boolean => {
-                 
-                 var idx0 = scope.length      - 1;
+            var match_scope=(scope: string[],type_scope: string[]): boolean => {
 
-                 var idx1 = type_scope.length - 1;
-                 
-                 // meaning the type is a top level scope.
-                 if(idx1 < 0) return true; 
+                var idx0=scope.length-1;
 
-                 do{
+                var idx1=type_scope.length-1;
 
-                    var a = scope     [idx0];
+                // meaning the type is a top level scope.
+                if(idx1<0) return true;
 
-                    var b = type_scope[idx1]; 
-                    
-                    if(a != b) return false;
+                do {
 
-                     idx0 = idx0 - 1;
+                    var a=scope[idx0];
 
-                     idx1 = idx1 - 1;
-                    
-                 } while(idx0 > 0 && idx1 > 0);
+                    var b=type_scope[idx1];
 
-                 return true;
+                    if(a!=b) return false;
+
+                    idx0=idx0-1;
+
+                    idx1=idx1-1;
+
+                } while(idx0>0&&idx1>0);
+
+                return true;
             }
 
             // precompute assumed type name and scope.
-            var tokens     = type.name.split('.');
+            var tokens=type.name.split('.');
 
-            var type_name  = type.name;
+            var type_name=type.name;
 
-            var type_scope = [];
+            var type_scope=[];
 
-            if(tokens.length > 1) {
+            if(tokens.length>1) {
 
-                type_name  = tokens.pop();
+                type_name=tokens.pop();
 
-                type_scope = tokens;
+                type_scope=tokens;
             }
-            
+
             // scan through the module_scope looking for types.
-            for(var i = module_scope_stack.length - 1; i >= 0; i--) {
-                
-                var module = module_scope_stack[i];
-                    
+            for(var i=module_scope_stack.length-1;i>=0;i--) {
+
+                var module=module_scope_stack[i];
+
                 //var module_scope = module.scope.slice(0); module_scope.push(module.name);
 
-                var module_scope = [];
+                var module_scope=[];
 
                 for(var n in module.scope) {
-                
+
                     module_scope.push(module.scope[n]);
                 }
 
                 module_scope.push(module.name);
-                
-                if(match_scope(module_scope, type_scope)) {
-                        
+
+                if(match_scope(module_scope,type_scope)) {
+
                     for(var n in module.classes) {
 
-                        if(module.classes[n].name == type_name) {
+                        if(module.classes[n].name==type_name) {
 
-                            associate(type, module.classes[n]); 
+                            associate(type,module.classes[n]);
 
                             return;
                         }
@@ -123,9 +123,9 @@ module TypeScript.Api  {
 
                     for(var n in module.interfaces) {
 
-                        if(module.interfaces[n].name == type_name) {
+                        if(module.interfaces[n].name==type_name) {
 
-                            associate(type, module.interfaces[n]); 
+                            associate(type,module.interfaces[n]);
 
                             return;
                         }
@@ -138,262 +138,262 @@ module TypeScript.Api  {
 
 
         // resolves types accessible in the reflected types local scope.
-        private static resolve_local_scope(scripts:TypeScript.Api.Script[]) : void {
-            
-            var module_stack = [];
+        private static resolve_local_scope(scripts: TypeScript.Api.Script[]): void {
 
-            var _resolve_local_scope = (reflected_type : TypeScript.Api.ReflectedType) => {
-                
-                if(reflected_type == null) return;
+            var module_stack=[];
 
-                if(reflected_type.identifier == 'script') {
-                
-                    var __script = <TypeScript.Api.Module>reflected_type;
+            var _resolve_local_scope=(reflected_type: TypeScript.Api.ReflectedType) => {
 
-                     module_stack.push(__script);
+                if(reflected_type==null) return;
 
-                    __script.modules.forEach    ((_reflected_type) => { _resolve_local_scope(_reflected_type); }); 
+                if(reflected_type.identifier=='script') {
 
-                    __script.classes.forEach    ((_reflected_type) => { _resolve_local_scope(_reflected_type); }); 
+                    var __script=<TypeScript.Api.Module>reflected_type;
 
-                    __script.interfaces.forEach ((_reflected_type) => { _resolve_local_scope(_reflected_type); }); 
-                
-                    __script.methods.forEach    ((_reflected_type) => { _resolve_local_scope(_reflected_type); }); 
+                    module_stack.push(__script);
 
-                    __script.variables.forEach  ((_reflected_type) => { _resolve_local_scope(_reflected_type); }); 
+                    __script.modules.forEach((_reflected_type) => { _resolve_local_scope(_reflected_type); });
+
+                    __script.classes.forEach((_reflected_type) => { _resolve_local_scope(_reflected_type); });
+
+                    __script.interfaces.forEach((_reflected_type) => { _resolve_local_scope(_reflected_type); });
+
+                    __script.methods.forEach((_reflected_type) => { _resolve_local_scope(_reflected_type); });
+
+                    __script.variables.forEach((_reflected_type) => { _resolve_local_scope(_reflected_type); });
 
                     module_stack.pop();
 
                     return;
                 }
-            
-                if(reflected_type.identifier == 'module') {
-                
-                    var _module = <TypeScript.Api.Module>reflected_type;
+
+                if(reflected_type.identifier=='module') {
+
+                    var _module=<TypeScript.Api.Module>reflected_type;
 
                     module_stack.push(_module);
 
-                    _module.modules.forEach    ((_reflected_type) => { _resolve_local_scope(_reflected_type); }); 
+                    _module.modules.forEach((_reflected_type) => { _resolve_local_scope(_reflected_type); });
 
-                    _module.classes.forEach    ((_reflected_type) => { _resolve_local_scope(_reflected_type); }); 
+                    _module.classes.forEach((_reflected_type) => { _resolve_local_scope(_reflected_type); });
 
-                    _module.interfaces.forEach ((_reflected_type) => { _resolve_local_scope(_reflected_type); }); 
-                
-                    _module.methods.forEach    ((_reflected_type) => { _resolve_local_scope(_reflected_type); }); 
+                    _module.interfaces.forEach((_reflected_type) => { _resolve_local_scope(_reflected_type); });
 
-                    _module.variables.forEach  ((_reflected_type) => { _resolve_local_scope(_reflected_type); }); 
+                    _module.methods.forEach((_reflected_type) => { _resolve_local_scope(_reflected_type); });
+
+                    _module.variables.forEach((_reflected_type) => { _resolve_local_scope(_reflected_type); });
 
                     module_stack.pop();
                 }
 
-                if(reflected_type.identifier == 'class') {
+                if(reflected_type.identifier=='class') {
 
-                    var _class = <TypeScript.Api.Class>reflected_type;
+                    var _class=<TypeScript.Api.Class>reflected_type;
 
-                    _class.implements.forEach ((_type ) => { TypeResolver.resolve_type(module_stack, _type); });
+                    _class.implements.forEach((_type) => { TypeResolver.resolve_type(module_stack,_type); });
 
-                    _class.extends.forEach    ((_type ) => { TypeResolver.resolve_type(module_stack, _type); });
-                
-                    _class.methods.forEach    ((_reflected_type) => { _resolve_local_scope(_reflected_type); }); 
+                    _class.extends.forEach((_type) => { TypeResolver.resolve_type(module_stack,_type); });
 
-                    _class.variables.forEach  ((_reflected_type) => { _resolve_local_scope(_reflected_type); }); 
+                    _class.methods.forEach((_reflected_type) => { _resolve_local_scope(_reflected_type); });
+
+                    _class.variables.forEach((_reflected_type) => { _resolve_local_scope(_reflected_type); });
                 }
 
-                if(reflected_type.identifier == 'interface') {
-            
-                    var _interface = <TypeScript.Api.Interface>reflected_type;
+                if(reflected_type.identifier=='interface') {
 
-                    _interface.extends.forEach    ((_type ) => { TypeResolver.resolve_type(module_stack, _type); });
-                
-                    _interface.methods.forEach    ((_reflected_type) => { _resolve_local_scope(_reflected_type); }); 
+                    var _interface=<TypeScript.Api.Interface>reflected_type;
 
-                    _interface.variables.forEach  ((_reflected_type) => { _resolve_local_scope(_reflected_type); }); 
-                
+                    _interface.extends.forEach((_type) => { TypeResolver.resolve_type(module_stack,_type); });
+
+                    _interface.methods.forEach((_reflected_type) => { _resolve_local_scope(_reflected_type); });
+
+                    _interface.variables.forEach((_reflected_type) => { _resolve_local_scope(_reflected_type); });
+
                 }
 
-                if(reflected_type.identifier == 'method') {
-            
-                    var _method = <TypeScript.Api.Method>reflected_type;
+                if(reflected_type.identifier=='method') {
 
-                    TypeResolver.resolve_type(module_stack, _method.returns);
+                    var _method=<TypeScript.Api.Method>reflected_type;
+
+                    TypeResolver.resolve_type(module_stack,_method.returns);
 
                     _method.parameters.forEach((_reflected_type) => { _resolve_local_scope(_reflected_type); });
-                }   
-                     
-                if(reflected_type.identifier == 'variable') {
-            
-                    var _variable = <TypeScript.Api.Variable>reflected_type;
-
-                    TypeResolver.resolve_type(module_stack, _variable.type);
                 }
 
-                if(reflected_type.identifier == 'parameter') {
-            
-                     var _parameter = <TypeScript.Api.Parameter>reflected_type;
+                if(reflected_type.identifier=='variable') {
 
-                    if(_parameter.type.name == "Function") {
-                    
+                    var _variable=<TypeScript.Api.Variable>reflected_type;
+
+                    TypeResolver.resolve_type(module_stack,_variable.type);
+                }
+
+                if(reflected_type.identifier=='parameter') {
+
+                    var _parameter=<TypeScript.Api.Parameter>reflected_type;
+
+                    if(_parameter.type.name=="Function") {
+
                         _resolve_local_scope(_parameter.type.signature);
                     }
                     else {
-                    
-                        TypeResolver.resolve_type(module_stack, _parameter.type);    
-                    }                
-                } 
+
+                        TypeResolver.resolve_type(module_stack,_parameter.type);
+                    }
+                }
             };
-            
+
             scripts.forEach((script) => {
-            
+
                 _resolve_local_scope(script);
-            
+
             });
         }
-        
+
         // resolves types accessible in the reflected types global scope.
-        private static resolve_global_scope(scripts:TypeScript.Api.Script[]) : void {
-            
-            var module_stack = [];
+        private static resolve_global_scope(scripts: TypeScript.Api.Script[]): void {
 
-            var _gather_global_scope = (reflected_type : TypeScript.Api.ReflectedType) => {
-                
-                if(reflected_type == null) return;
+            var module_stack=[];
 
-                if(reflected_type.identifier == 'script') {
-                    
-                    var _script = <TypeScript.Api.Module>reflected_type;
+            var _gather_global_scope=(reflected_type: TypeScript.Api.ReflectedType) => {
 
-                     module_stack.push(_script);
+                if(reflected_type==null) return;
 
-                    _script.modules.forEach ((_reflected_type) => { _gather_global_scope(_reflected_type); });
+                if(reflected_type.identifier=='script') {
+
+                    var _script=<TypeScript.Api.Module>reflected_type;
+
+                    module_stack.push(_script);
+
+                    _script.modules.forEach((_reflected_type) => { _gather_global_scope(_reflected_type); });
 
                     return;
                 }
-                
-                if(reflected_type.identifier == 'module') {
-                
-                    var _module = <TypeScript.Api.Module>reflected_type;
+
+                if(reflected_type.identifier=='module') {
+
+                    var _module=<TypeScript.Api.Module>reflected_type;
 
                     module_stack.push(_module);
 
-                    _module.modules.forEach    ((_reflected_type) => { _gather_global_scope(_reflected_type); }); 
+                    _module.modules.forEach((_reflected_type) => { _gather_global_scope(_reflected_type); });
                 }
             };
 
-            var _resolve_global_scope = (reflected_type : TypeScript.Api.ReflectedType) => {
-                
-                if(reflected_type == null) return;
+            var _resolve_global_scope=(reflected_type: TypeScript.Api.ReflectedType) => {
 
-                if(reflected_type.identifier == 'script') {
-                
-                    var __script = <TypeScript.Api.Module>reflected_type;
+                if(reflected_type==null) return;
 
-                    __script.modules.forEach    ((_reflected_type) => { _resolve_global_scope(_reflected_type); }); 
+                if(reflected_type.identifier=='script') {
 
-                    __script.classes.forEach    ((_reflected_type) => { _resolve_global_scope(_reflected_type); }); 
+                    var __script=<TypeScript.Api.Module>reflected_type;
 
-                    __script.interfaces.forEach ((_reflected_type) => { _resolve_global_scope(_reflected_type); }); 
-                
-                    __script.methods.forEach    ((_reflected_type) => { _resolve_global_scope(_reflected_type); }); 
+                    __script.modules.forEach((_reflected_type) => { _resolve_global_scope(_reflected_type); });
 
-                    __script.variables.forEach  ((_reflected_type) => { _resolve_global_scope(_reflected_type); }); 
+                    __script.classes.forEach((_reflected_type) => { _resolve_global_scope(_reflected_type); });
+
+                    __script.interfaces.forEach((_reflected_type) => { _resolve_global_scope(_reflected_type); });
+
+                    __script.methods.forEach((_reflected_type) => { _resolve_global_scope(_reflected_type); });
+
+                    __script.variables.forEach((_reflected_type) => { _resolve_global_scope(_reflected_type); });
 
                     return;
                 }
-            
-                if(reflected_type.identifier == 'module') {
-                
-                    var _module = <TypeScript.Api.Module>reflected_type;
 
-                    _module.modules.forEach    ((_reflected_type) => { _resolve_global_scope(_reflected_type); }); 
+                if(reflected_type.identifier=='module') {
 
-                    _module.classes.forEach    ((_reflected_type) => { _resolve_global_scope(_reflected_type); }); 
+                    var _module=<TypeScript.Api.Module>reflected_type;
 
-                    _module.interfaces.forEach ((_reflected_type) => { _resolve_global_scope(_reflected_type); }); 
-                
-                    _module.methods.forEach    ((_reflected_type) => { _resolve_global_scope(_reflected_type); }); 
+                    _module.modules.forEach((_reflected_type) => { _resolve_global_scope(_reflected_type); });
 
-                    _module.variables.forEach  ((_reflected_type) => { _resolve_global_scope(_reflected_type); }); 
+                    _module.classes.forEach((_reflected_type) => { _resolve_global_scope(_reflected_type); });
+
+                    _module.interfaces.forEach((_reflected_type) => { _resolve_global_scope(_reflected_type); });
+
+                    _module.methods.forEach((_reflected_type) => { _resolve_global_scope(_reflected_type); });
+
+                    _module.variables.forEach((_reflected_type) => { _resolve_global_scope(_reflected_type); });
                 }
 
-                if(reflected_type.identifier == 'class') {
+                if(reflected_type.identifier=='class') {
 
-                    var _class = <TypeScript.Api.Class>reflected_type;
+                    var _class=<TypeScript.Api.Class>reflected_type;
 
-                    _class.implements.forEach ((_type ) => { TypeResolver.resolve_type(module_stack, _type); });
+                    _class.implements.forEach((_type) => { TypeResolver.resolve_type(module_stack,_type); });
 
-                    _class.extends.forEach    ((_type ) => { TypeResolver.resolve_type(module_stack, _type); });
-                
-                    _class.methods.forEach    ((_reflected_type) => { _resolve_global_scope(_reflected_type); }); 
+                    _class.extends.forEach((_type) => { TypeResolver.resolve_type(module_stack,_type); });
 
-                    _class.variables.forEach  ((_reflected_type) => { _resolve_global_scope(_reflected_type); }); 
+                    _class.methods.forEach((_reflected_type) => { _resolve_global_scope(_reflected_type); });
+
+                    _class.variables.forEach((_reflected_type) => { _resolve_global_scope(_reflected_type); });
                 }
 
-                if(reflected_type.identifier == 'interface') {
-            
-                    var _interface = <TypeScript.Api.Interface>reflected_type;
+                if(reflected_type.identifier=='interface') {
 
-                    _interface.extends.forEach    ((_type ) => { TypeResolver.resolve_type(module_stack, _type); });
-                
-                    _interface.methods.forEach    ((_reflected_type) => { _resolve_global_scope(_reflected_type); }); 
+                    var _interface=<TypeScript.Api.Interface>reflected_type;
 
-                    _interface.variables.forEach  ((_reflected_type) => { _resolve_global_scope(_reflected_type); }); 
-                
+                    _interface.extends.forEach((_type) => { TypeResolver.resolve_type(module_stack,_type); });
+
+                    _interface.methods.forEach((_reflected_type) => { _resolve_global_scope(_reflected_type); });
+
+                    _interface.variables.forEach((_reflected_type) => { _resolve_global_scope(_reflected_type); });
+
                 }
 
-                if(reflected_type.identifier == 'method') {
-            
-                    var _method = <TypeScript.Api.Method>reflected_type;
+                if(reflected_type.identifier=='method') {
 
-                    TypeResolver.resolve_type(module_stack, _method.returns);
+                    var _method=<TypeScript.Api.Method>reflected_type;
+
+                    TypeResolver.resolve_type(module_stack,_method.returns);
 
                     _method.parameters.forEach((_reflected_type) => { _resolve_global_scope(_reflected_type); });
-                }   
-                     
-                if(reflected_type.identifier == 'variable') {
-            
-                    var _variable = <TypeScript.Api.Variable>reflected_type;
-
-                    TypeResolver.resolve_type(module_stack, _variable.type);
                 }
 
-                if(reflected_type.identifier == 'parameter') {
-                    
-                    var _parameter = <TypeScript.Api.Parameter>reflected_type;
+                if(reflected_type.identifier=='variable') {
 
-                    if(_parameter.type.name == "Function") {
-                    
+                    var _variable=<TypeScript.Api.Variable>reflected_type;
+
+                    TypeResolver.resolve_type(module_stack,_variable.type);
+                }
+
+                if(reflected_type.identifier=='parameter') {
+
+                    var _parameter=<TypeScript.Api.Parameter>reflected_type;
+
+                    if(_parameter.type.name=="Function") {
+
                         _resolve_global_scope(_parameter.type.signature);
                     }
                     else {
-                    
-                        TypeResolver.resolve_type(module_stack, _parameter.type);    
-                    }           
-                } 
+
+                        TypeResolver.resolve_type(module_stack,_parameter.type);
+                    }
+                }
             };
-            
+
             // gather the global scope.
             scripts.forEach((script) => {
-                
+
                 _gather_global_scope(script);
             });
 
             // resolve..
             scripts.forEach((script) => {
-                
+
                 _resolve_global_scope(script)
             });
 
-        }        
-        
+        }
+
         // resolves type references for scripts loaded 
         // into this reflection. This is required
         // for code whose types reference types
         // spanning multiple source (script) units. 
-        public static resolve(scripts:TypeScript.Api.Script[]) : void {
-            
-            TypeResolver.resolve_local_scope  (scripts);
+        public static resolve(scripts: TypeScript.Api.Script[]): void {
 
-            TypeResolver.resolve_global_scope (scripts);
+            TypeResolver.resolve_local_scope(scripts);
+
+            TypeResolver.resolve_global_scope(scripts);
         }
-	}
+    }
 }

@@ -20,208 +20,204 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export class Type extends TypeScript.Api.ReflectedType {
+    export class Type extends TypeScript.Api.ReflectedType {
 
-		public arguments  : Type[];
-        
-        public signature  : TypeScript.Api.Method;
+        public arguments: Type[];
 
-		public arrayCount : number;
+        public signature: TypeScript.Api.Method;
 
-        public resolved   : boolean; // a flag indicating if this type was resolved to another reflected type.
+        public arrayCount: number;
 
-		constructor() {
+        public resolved: boolean; // a flag indicating if this type was resolved to another reflected type.
+
+        constructor() {
 
             super('type');
 
-			this.name       = "any";
-            
-			this.arguments  = [];
+            this.name="any";
 
-			this.arrayCount = 0;
+            this.arguments=[];
 
-            this.resolved   = false;
-		}
+            this.arrayCount=0;
 
-		private static qualifyName(ast:TypeScript.AST) : string {
+            this.resolved=false;
+        }
 
-			var result = [];
+        private static qualifyName(ast: TypeScript.AST): string {
 
-			// 10 : TypeScript.NodeType.GenericType 
+            var result=[];
 
-			// 11 : TypeScript.NodeType.TypeRef
+            // 10 : TypeScript.NodeType.GenericType 
 
-			// 20 : TypeScript.NodeType.Name
+            // 11 : TypeScript.NodeType.TypeRef
 
-			// 32 : TypeScript.NodeType.MemberAccessExpression (as per iteration)
+            // 20 : TypeScript.NodeType.Name
 
-			var walk = (ast:TypeScript.AST) =>
-			{
-				switch(ast.nodeType)
-				{
-					case typescript.NodeType.Name:
+            // 32 : TypeScript.NodeType.MemberAccessExpression (as per iteration)
 
-						var name = <TypeScript.Identifier>ast;
+            var walk=(ast: TypeScript.AST) => {
+                switch(ast.nodeType) {
+                    case typescript.NodeType.Name:
 
-						result.push(name.text);
+                        var name=<TypeScript.Identifier>ast;
 
-						break;
+                        result.push(name.text);
 
-					case typescript.NodeType.MemberAccessExpression:
+                        break;
 
-						var expression = <TypeScript.BinaryExpression>ast;
+                    case typescript.NodeType.MemberAccessExpression:
 
-						walk(expression.operand1);
+                        var expression=<TypeScript.BinaryExpression>ast;
 
-						walk(expression.operand2);
+                        walk(expression.operand1);
 
-						break;
+                        walk(expression.operand2);
 
-					case typescript.NodeType.TypeRef:
+                        break;
 
-						var type_reference = <TypeScript.TypeReference>ast;
+                    case typescript.NodeType.TypeRef:
 
-						walk(type_reference.term);
+                        var type_reference=<TypeScript.TypeReference>ast;
 
-						break;
+                        walk(type_reference.term);
 
-					case typescript.NodeType.GenericType:
+                        break;
 
-						var generic_type = <TypeScript.GenericType>ast;
+                    case typescript.NodeType.GenericType:
 
-						var expression = <TypeScript.BinaryExpression>generic_type.name;
+                        var generic_type=<TypeScript.GenericType>ast;
 
-						switch(expression.nodeType)
-						{
-							case typescript.NodeType.Name:
+                        var expression=<TypeScript.BinaryExpression>generic_type.name;
 
-								walk(expression);
+                        switch(expression.nodeType) {
+                            case typescript.NodeType.Name:
 
-								break;
+                                walk(expression);
 
-							case typescript.NodeType.MemberAccessExpression:
+                                break;
 
-								walk(expression);
+                            case typescript.NodeType.MemberAccessExpression:
 
-								break;
-						}
+                                walk(expression);
 
-						break;
+                                break;
+                        }
 
-					default:
+                        break;
 
-						result.push("any");
+                    default:
 
-						break;
-				}
-			};
+                        result.push("any");
 
-			walk(ast);
+                        break;
+                }
+            };
 
-			return result.join('.');		
-		}
+            walk(ast);
 
-		public static create (ast:TypeScript.AST) : Type {
+            return result.join('.');
+        }
 
-			// called on namespaced extends or implements.
-			var create_member_access_expression = (ast:TypeScript.AST) : Type => { // 32
+        public static create(ast: TypeScript.AST): Type {
 
-				var type = new TypeScript.Api.Type();
+            // called on namespaced extends or implements.
+            var create_member_access_expression=(ast: TypeScript.AST): Type => { // 32
 
-				type.name = Type.qualifyName(ast);
+                var type=new TypeScript.Api.Type();
 
-				return type;
-			}  
+                type.name=Type.qualifyName(ast);
+
+                return type;
+            }
 
 			// called on non namespaced extends or implements.
-			var create_named_type = (namedDeclaraion:TypeScript.NamedDeclaration) : Type => {
+			var create_named_type=(namedDeclaraion: TypeScript.NamedDeclaration): Type => {
 
-				var type = new TypeScript.Api.Type();
+                var type=new TypeScript.Api.Type();
 
-				type.name = Type.qualifyName(namedDeclaraion);
+                type.name=Type.qualifyName(namedDeclaraion);
 
-				return type;
-			}
+                return type;
+            }
 
 			// called when referencing variables, return types.
-			var create_type = (typeRef:TypeScript.TypeReference) : Type => {
+			var create_type=(typeRef: TypeScript.TypeReference): Type => {
 
-				var type = new TypeScript.Api.Type();
+                var type=new TypeScript.Api.Type();
 
-				type.name       = Type.qualifyName(typeRef);
+                type.name=Type.qualifyName(typeRef);
 
-				type.arrayCount = typeRef.arrayCount;
+                type.arrayCount=typeRef.arrayCount;
 
-				if(typeRef.term.nodeType == typescript.NodeType.GenericType) {
+                if(typeRef.term.nodeType==typescript.NodeType.GenericType) {
 
-					var genericType = <TypeScript.GenericType>typeRef.term;
+                    var genericType=<TypeScript.GenericType>typeRef.term;
 
-					for(var n in genericType.typeArguments.members) {
+                    for(var n in genericType.typeArguments.members) {
 
-						var typeRef = <TypeScript.TypeReference>genericType.typeArguments.members[n];
+                        var typeRef=<TypeScript.TypeReference>genericType.typeArguments.members[n];
 
-						type.arguments.push( create_type( typeRef ) );
-					}
-				}
+                        type.arguments.push(create_type(typeRef));
+                    }
+                }
 
-                if(typeRef.term.nodeType == typescript.NodeType.FunctionDeclaration) {
-                    
-                    type.name      = "Function";
+                if(typeRef.term.nodeType==typescript.NodeType.FunctionDeclaration) {
 
-                    type.signature = Method.create(<TypeScript.FunctionDeclaration> typeRef.term);
+                    type.name="Function";
+
+                    type.signature=Method.create(<TypeScript.FunctionDeclaration> typeRef.term);
 
                 }
 
-				return type;
-			};
+                return type;
+            };
 
-			// called when referencing generic types.
-			var create_generic_type = (genericType:TypeScript.GenericType) : Type =>
-			{
-				var type = new TypeScript.Api.Type();
+            // called when referencing generic types.
+            var create_generic_type=(genericType: TypeScript.GenericType): Type => {
+                var type=new TypeScript.Api.Type();
 
-				type.name    = Type.qualifyName(genericType);
+                type.name=Type.qualifyName(genericType);
 
-				for(var n in genericType.typeArguments.members) {
+                for(var n in genericType.typeArguments.members) {
 
-					var typeRef = <TypeScript.TypeReference>genericType.typeArguments.members[n];
+                    var typeRef=<TypeScript.TypeReference>genericType.typeArguments.members[n];
 
-					type.arguments.push( create_type( typeRef ) );
-				}
+                    type.arguments.push(create_type(typeRef));
+                }
 
-				return type;
-			};
+                return type;
+            };
 
-			var type:TypeScript.Api.Type = null;
+            var type: TypeScript.Api.Type=null;
 
-			switch(ast.nodeType) {
+            switch(ast.nodeType) {
 
-				case typescript.NodeType.Name:
+                case typescript.NodeType.Name:
 
-					type = create_named_type(<TypeScript.NamedDeclaration>ast);
+                    type=create_named_type(<TypeScript.NamedDeclaration>ast);
 
-					break;
+                    break;
 
-				case typescript.NodeType.GenericType:
+                case typescript.NodeType.GenericType:
 
-					type = create_generic_type(<TypeScript.GenericType>ast);
+                    type=create_generic_type(<TypeScript.GenericType>ast);
 
-					break;
+                    break;
 
-				case typescript.NodeType.TypeRef:
+                case typescript.NodeType.TypeRef:
 
-					type = create_type(<TypeScript.TypeReference>ast);
+                    type=create_type(<TypeScript.TypeReference>ast);
 
-					break;
+                    break;
 
-				case typescript.NodeType.MemberAccessExpression:
+                case typescript.NodeType.MemberAccessExpression:
 
-					type = create_member_access_expression(ast); // unsure of the NodeType.
+                    type=create_member_access_expression(ast); // unsure of the NodeType.
 
-					break;
-			}
+                    break;
+            }
 
-			return type;
-		}
-	}
+            return type;
+        }
+    }
 }

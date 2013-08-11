@@ -21,100 +21,100 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export class IORemoteAsync implements IIO {
+    export class IORemoteAsync implements IIO {
 
-		public readFile(path : string, callback : { ( iofile : TypeScript.Api.IOFile ) : void; }): void {
+        public readFile(path: string,callback: { (iofile: TypeScript.Api.IOFile): void; }): void {
 
-			if(this.isUrl(path)) {
+            if(this.isUrl(path)) {
 
-				this.readFileFromHttp(path, callback);
-				
-				return;
-			}
-			
-			this.readFileFromDisk(path, callback);
-		}
-		
-		private readFileFromDisk(path : string, callback : {(iofile : TypeScript.Api.IOFile) : void; }) : void {
+                this.readFileFromHttp(path,callback);
 
-			node.fs.readFile(path, (error, data) => {
+                return;
+            }
 
-				if (error) {
+            this.readFileFromDisk(path,callback);
+        }
 
-					var text    = "could not resolve source unit.";
-					
-					var message = "could not resolve source unit " + path + ".";
-				    
-					var error   = new TypeScript.Api.IOFileError(text, message);				
-				
-					callback( new TypeScript.Api.IOFile (path, null, [error], false) ); 
-				} 
-				else {
+        private readFileFromDisk(path: string,callback: { (iofile: TypeScript.Api.IOFile): void; }): void {
 
-					callback( new TypeScript.Api.IOFile(path, TypeScript.Api.Buffer.process (data), [], false) ); 
-				}
-			});			
-		}
-		
-		private readFileFromHttp(path : string, callback:{( iofile : TypeScript.Api.IOFile ) : void; }) : void {
+            node.fs.readFile(path,(error,data) => {
 
-			var url      = node.url.parse(path);
-			
-			var protocol = node.http;
-			
-			var options  = { host : url.host, port : url.port, path : url.path, method : 'GET' };
-			
-			if( this.isHTTPS ( path ) ) {
+                if(error) {
 
-				protocol 	 = node.https;
-				
-				options.port = 443;
-			}
-			
-			var request = protocol.request(options, (response) => {
+                    var text="could not resolve source unit.";
 
-				var data = [];
-				
-				response.on('data', (chunk) => {
-                     
-					data.push(chunk); 
-				});
-				
-				response.on('end', () => { 
+                    var message="could not resolve source unit "+path+".";
 
-					callback( new TypeScript.Api.IOFile (path, TypeScript.Api.Buffer.process( data.join('') ), [], true) );  
-				});
-			});
-			
-			request.on('error', (error) => {
+                    var error=new TypeScript.Api.IOFileError(text,message);
 
-				var text = "could not resolve source unit.";
-				
-				var message = "could not resolve source unit " + path + ".";
-			
-				var error   = new TypeScript.Api.IOFileError(text, message);				
-				
-				callback( new TypeScript.Api.IOFile (path, null, [error], true) ); 
-			});
-			
-			request.end();  
-		}
-		
-		private isHTTPS (path:string) : boolean {
+                    callback(new TypeScript.Api.IOFile(path,null,[error],false));
+                }
+                else {
 
-			if(path.indexOf('https://') == 0) {
+                    callback(new TypeScript.Api.IOFile(path,TypeScript.Api.Buffer.process(data),[],false));
+                }
+            });
+        }
 
-				return true;
-			}
-			
-			return false;
-		}
-		
-		private isUrl (path:string) : boolean {
+        private readFileFromHttp(path: string,callback: { (iofile: TypeScript.Api.IOFile): void; }): void {
 
-			var regex = new RegExp("^(http[s]?:\\/\\/(www\\.)?|ftp[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_\+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?");
-			
-			return regex.test(path);
-		}		
-	}
+            var url=node.url.parse(path);
+
+            var protocol=node.http;
+
+            var options={ host: url.host,port: url.port,path: url.path,method: 'GET' };
+
+            if(this.isHTTPS(path)) {
+
+                protocol=node.https;
+
+                options.port=443;
+            }
+
+            var request=protocol.request(options,(response) => {
+
+                var data=[];
+
+                response.on('data',(chunk) => {
+
+                    data.push(chunk);
+                });
+
+                response.on('end',() => {
+
+                    callback(new TypeScript.Api.IOFile(path,TypeScript.Api.Buffer.process(data.join('')),[],true));
+                });
+            });
+
+            request.on('error',(error) => {
+
+                var text="could not resolve source unit.";
+
+                var message="could not resolve source unit "+path+".";
+
+                var error=new TypeScript.Api.IOFileError(text,message);
+
+                callback(new TypeScript.Api.IOFile(path,null,[error],true));
+            });
+
+            request.end();
+        }
+
+        private isHTTPS(path: string): boolean {
+
+            if(path.indexOf('https://')==0) {
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private isUrl(path: string): boolean {
+
+            var regex=new RegExp("^(http[s]?:\\/\\/(www\\.)?|ftp[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_\+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?");
+
+            return regex.test(path);
+        }
+    }
 }

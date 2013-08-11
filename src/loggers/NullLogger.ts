@@ -18,36 +18,36 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export class NullLogger implements TypeScript.ILogger {
+    export class NullLogger implements TypeScript.ILogger {
 
-		public information() : boolean {
-             
-			return false; 
-		}
-		
-		public debug() : boolean {
+        public information(): boolean {
 
-			return false; 
-		}
-		
-		public warning() : boolean {
+            return false;
+        }
 
-			return false; 
-		}
-		
-		public error()  : boolean {
+        public debug(): boolean {
 
-			return false; 
-		}
-		
-		public fatal(): boolean {
+            return false;
+        }
 
-			return false; 
-		}
-		
-		public log(s: string): void {
+        public warning(): boolean {
 
-			// nothing doing..
-		}
-	}
+            return false;
+        }
+
+        public error(): boolean {
+
+            return false;
+        }
+
+        public fatal(): boolean {
+
+            return false;
+        }
+
+        public log(s: string): void {
+
+            // nothing doing..
+        }
+    }
 }	

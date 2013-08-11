@@ -20,65 +20,65 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export class SourceUnit extends TypeScript.Api.Unit {
+    export class SourceUnit extends TypeScript.Api.Unit {
 
-		public remote        : boolean;   // is this a remote source file...
+        public remote: boolean;   // is this a remote source file...
 
-        public state         : string;
+        public state: string;
 
-		constructor(path:string, content:string, diagnostics:Diagnostic[], remote:boolean) {
+        constructor(path: string,content: string,diagnostics: Diagnostic[],remote: boolean) {
 
-            if(!content) content = '';
+            if(!content) content='';
 
-            this.state  = 'default';
+            this.state='default';
 
-			this.remote = remote;
+            this.remote=remote;
 
-			super(path, content, diagnostics);
-		}
+            super(path,content,diagnostics);
+        }
 
-		public references() : string [] {
+        public references(): string[] {
 
-			var result : string[] = [];
+            var result: string[]=[];
 
-			if(this.content) {
+            if(this.content) {
 
-				var lines : string[] = this.content.split('\r\n');
+                var lines: string[]=this.content.split('\r\n');
 
-				if (lines.length === 1) {
+                if(lines.length===1) {
 
-					lines = this.content.split('\n');
-				}
+                    lines=this.content.split('\n');
+                }
 
-				for(var n in lines) {
+                for(var n in lines) {
 
-					var reference_pattern = /^(\/\/\/\s*<reference\s+path=)('|")(.+?)\2\s*(static=('|")(.+?)\2\s*)*\/>/gim;
+                    var reference_pattern=/^(\/\/\/\s*<reference\s+path=)('|")(.+?)\2\s*(static=('|")(.+?)\2\s*)*\/>/gim;
 
-					var match = reference_pattern.exec(lines[n]);
+                    var match=reference_pattern.exec(lines[n]);
 
-					if(match) {
+                    if(match) {
 
-						result.unshift( match[3] );
-					}
-				}
-			}
-			return result;
-		}
+                        result.unshift(match[3]);
+                    }
+                }
+            }
+            return result;
+        }
 
-        public clone() : TypeScript.Api.SourceUnit {
+        public clone(): TypeScript.Api.SourceUnit {
 
-            var diagnostics = [];
+            var diagnostics=[];
 
-            for(var i = 0; i < this.diagnostics.length; i++) {
-            
+            for(var i=0;i<this.diagnostics.length;i++) {
+
                 diagnostics.push(this.diagnostics[i].clone());
             }
 
-            var clone = new TypeScript.Api.SourceUnit(this.path.toString(), this.content.toString(), diagnostics, this.remote);
+            var clone=new TypeScript.Api.SourceUnit(this.path.toString(),this.content.toString(),diagnostics,this.remote);
 
-            clone.state = this.state.toString();
+            clone.state=this.state.toString();
 
             return clone;
         }
-	}
+    }
 }

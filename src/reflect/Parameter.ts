@@ -20,58 +20,58 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export class Parameter extends TypeScript.Api.ReflectedType {
+    export class Parameter extends TypeScript.Api.ReflectedType {
 
-		public type		  : Type;
+        public type: Type;
 
-        public isOptional : boolean;
+        public isOptional: boolean;
 
-        public isPublic   : boolean;
+        public isPublic: boolean;
 
         constructor() {
-        
+
             super('parameter');
 
-            this.isOptional = false;
+            this.isOptional=false;
 
-            this.isPublic   = false;
+            this.isPublic=false;
 
         }
 
-		private static load_type(result:Parameter, ast:TypeScript.Parameter) : void {
+        private static load_type(result: Parameter,ast: TypeScript.Parameter): void {
 
-			if(!ast.typeExpr) {
-                 
-				result.type = new TypeScript.Api.Type()
+            if(!ast.typeExpr) {
+
+                result.type=new TypeScript.Api.Type()
 
 				return;
-			} 
-			result.type = TypeScript.Api.Type.create(ast.typeExpr); 
-		}
+            }
+            result.type=TypeScript.Api.Type.create(ast.typeExpr);
+        }
 
-		public static create(ast:TypeScript.Parameter) : TypeScript.Api.Parameter {
+        public static create(ast: TypeScript.Parameter): TypeScript.Api.Parameter {
 
-			var result        = new TypeScript.Api.Parameter();
+            var result=new TypeScript.Api.Parameter();
 
-			result.name       = ast.id.text;
+            result.name=ast.id.text;
 
-            result.isOptional = ast.isOptional;
+            result.isOptional=ast.isOptional;
 
-            var hasFlag = (val : number, flag: number) :boolean  => {
+            var hasFlag=(val: number,flag: number): boolean  => {
 
-                return (val & flag) !== 0;
+                return (val&flag)!==0;
             };
 
-            var flags = ast.getVarFlags();
+            var flags=ast.getVarFlags();
 
-            if(hasFlag(flags, typescript.VariableFlags.Public)) {
-                
-                result.isPublic = true;
+            if(hasFlag(flags,typescript.VariableFlags.Public)) {
+
+                result.isPublic=true;
             }
 
-			TypeScript.Api.Parameter.load_type(result, ast);
+            TypeScript.Api.Parameter.load_type(result,ast);
 
-			return result;
-		}   
-	}
+            return result;
+        }
+    }
 }

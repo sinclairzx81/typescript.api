@@ -19,24 +19,24 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export class Import extends TypeScript.Api.ReflectedType {
+    export class Import extends TypeScript.Api.ReflectedType {
 
-		public alias      : string;
+        public alias: string;
 
         constructor() {
-        
+
             super('import');
         }
 
-		public static create(ast:TypeScript.ImportDeclaration) : TypeScript.Api.Import {
+        public static create(ast: TypeScript.ImportDeclaration): TypeScript.Api.Import {
 
-			var result     = new TypeScript.Api.Import();
+            var result=new TypeScript.Api.Import();
 
-			result.name    = ast.id.text;
+            result.name=ast.id.text;
 
-			result.alias   = ast.getAliasName(ast);
+            result.alias=ast.getAliasName(ast);
 
-			return result;
-		}
-	}
+            return result;
+        }
+    }
 }

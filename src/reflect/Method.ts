@@ -21,134 +21,133 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export class Method extends TypeScript.Api.ReflectedType {
+    export class Method extends TypeScript.Api.ReflectedType {
 
-		public parameters      : Parameter[];
+        public parameters: Parameter[];
 
-		public returns         : Type;
+        public returns: Type;
 
-        public isExported      : boolean;
+        public isExported: boolean;
 
-        public isPublic        : boolean;
-        
-		public isStatic        : boolean;
+        public isPublic: boolean;
 
-		public isAccessor      : boolean; 
+        public isStatic: boolean;
 
-		public isSignature     : boolean;
+        public isAccessor: boolean;
 
-		public isConstructor   : boolean;
+        public isSignature: boolean;
 
-		public isCallMember    : boolean;
+        public isConstructor: boolean;
 
-		public isDeclaration   : boolean;
+        public isCallMember: boolean;
 
-		public isExpression    : boolean;
+        public isDeclaration: boolean;
 
-		public isGetAccessor   : boolean;
+        public isExpression: boolean;
 
-		public isSetAccessor   : boolean;
+        public isGetAccessor: boolean;
 
-		public isIndexer       : boolean;
+        public isSetAccessor: boolean;
 
-		public comments        : string [];
+        public isIndexer: boolean;
 
-		constructor () 
-		{
+        public comments: string[];
+
+        constructor() {
             super('method');
 
-			this.parameters = [];
+            this.parameters=[];
 
-			this.comments   = [];
+            this.comments=[];
 
-            this.isPublic   = false;
+            this.isPublic=false;
 
-            this.isExported = false;
-		}
+            this.isExported=false;
+        }
 
-		private static load_comments(result:TypeScript.Api.Method, ast:TypeScript.FunctionDeclaration) : void {
+        private static load_comments(result: TypeScript.Api.Method,ast: TypeScript.FunctionDeclaration): void {
 
-			var comments = ast.getDocComments();
+            var comments=ast.getDocComments();
 
-			for(var n in comments) {
+            for(var n in comments) {
 
-				result.comments.push(comments[n].content);
-			}
-		}
+                result.comments.push(comments[n].content);
+            }
+        }
 
-		private static load_returns(result:TypeScript.Api.Method, ast:TypeScript.FunctionDeclaration) : void {
+        private static load_returns(result: TypeScript.Api.Method,ast: TypeScript.FunctionDeclaration): void {
 
-			if(ast.returnTypeAnnotation) {
+            if(ast.returnTypeAnnotation) {
 
-				var type_reference = <TypeScript.TypeReference>ast.returnTypeAnnotation;
+                var type_reference=<TypeScript.TypeReference>ast.returnTypeAnnotation;
 
-				result.returns = TypeScript.Api.Type.create( type_reference );	
+                result.returns=TypeScript.Api.Type.create(type_reference);
 
-				return;
-			}
-			result.returns = new TypeScript.Api.Type();            
-		}
+                return;
+            }
+            result.returns=new TypeScript.Api.Type();
+        }
 
-		public static load_parameters(result:TypeScript.Api.Method, ast:TypeScript.FunctionDeclaration) : void {
+        public static load_parameters(result: TypeScript.Api.Method,ast: TypeScript.FunctionDeclaration): void {
 
-			for(var n in ast.arguments.members) {
+            for(var n in ast.arguments.members) {
 
-				var argument = <TypeScript.Parameter>ast.arguments.members[n];
-                
-				var parameter = TypeScript.Api.Parameter.create(argument);
+                var argument=<TypeScript.Parameter>ast.arguments.members[n];
 
-				result.parameters.push(parameter);
-			}
-		}
+                var parameter=TypeScript.Api.Parameter.create(argument);
 
-		public static create(ast:TypeScript.FunctionDeclaration) : TypeScript.Api.Method {
+                result.parameters.push(parameter);
+            }
+        }
 
-			var result           = new TypeScript.Api.Method();
+        public static create(ast: TypeScript.FunctionDeclaration): TypeScript.Api.Method {
 
-			result.name          = ast.isConstructor ? "constructor" : ast.getNameText();
+            var result=new TypeScript.Api.Method();
 
-            var hasFlag = (val : number, flag: number) :boolean  => {
+            result.name=ast.isConstructor?"constructor":ast.getNameText();
 
-                return (val & flag) !== 0;
+            var hasFlag=(val: number,flag: number): boolean  => {
+
+                return (val&flag)!==0;
             };
 
-            var flags = ast.getFunctionFlags();
+            var flags=ast.getFunctionFlags();
 
-            if(hasFlag(flags, typescript.FunctionFlags.Public)) {
-                
-                result.isPublic = true;
+            if(hasFlag(flags,typescript.FunctionFlags.Public)) {
+
+                result.isPublic=true;
             }
 
-            if(hasFlag(flags, typescript.FunctionFlags.Exported)) {
-                
-                result.isExported = true;
+            if(hasFlag(flags,typescript.FunctionFlags.Exported)) {
+
+                result.isExported=true;
             }
-            
-			result.isConstructor = ast.isConstructor;
 
-			result.isStatic      = ast.isStatic();
+            result.isConstructor=ast.isConstructor;
 
-			result.isSignature   = ast.isSignature();
+            result.isStatic=ast.isStatic();
 
-			result.isCallMember  = ast.isCallMember();
+            result.isSignature=ast.isSignature();
 
-			result.isDeclaration = ast.isDeclaration();
+            result.isCallMember=ast.isCallMember();
 
-			result.isExpression  = ast.isExpression();
+            result.isDeclaration=ast.isDeclaration();
 
-			result.isGetAccessor = ast.isGetAccessor();
+            result.isExpression=ast.isExpression();
 
-			result.isSetAccessor = ast.isSetAccessor();
+            result.isGetAccessor=ast.isGetAccessor();
 
-			result.isIndexer     = ast.isIndexerMember();
+            result.isSetAccessor=ast.isSetAccessor();
 
-			Method.load_comments   (result, ast);
+            result.isIndexer=ast.isIndexerMember();
 
-			Method.load_returns    (result, ast);
+            Method.load_comments(result,ast);
 
-			Method.load_parameters (result, ast);
+            Method.load_returns(result,ast);
 
-			return result;
-		}
-	}
+            Method.load_parameters(result,ast);
+
+            return result;
+        }
+    }
 }

@@ -21,26 +21,24 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export class IOSync implements IIO 
-	{
-		public readFile (path : string, callback : { ( iofile : TypeScript.Api.IOFile ) : void; }): void 
-		{
-			try {
+    export class IOSync implements IIO {
+        public readFile(path: string,callback: { (iofile: TypeScript.Api.IOFile): void; }): void {
+            try {
 
-				var data = node.fs.readFileSync(path);
-				
-				callback( new TypeScript.Api.IOFile (path, TypeScript.Api.Buffer.process(data), [], false) );  
-			} 
-			catch(exception) {
+                var data=node.fs.readFileSync(path);
 
-				var text    = "could not resolve source unit.";
-					
-				var message = "could not resolve source unit " + path + ".";
-				    
-				var error   = new TypeScript.Api.IOFileError(text, message);				
-				
-				callback( new TypeScript.Api.IOFile (path, null, [error], false) );  
-			}
-		}		
-	}
+                callback(new TypeScript.Api.IOFile(path,TypeScript.Api.Buffer.process(data),[],false));
+            }
+            catch(exception) {
+
+                var text="could not resolve source unit.";
+
+                var message="could not resolve source unit "+path+".";
+
+                var error=new TypeScript.Api.IOFileError(text,message);
+
+                callback(new TypeScript.Api.IOFile(path,null,[error],false));
+            }
+        }
+    }
 }

@@ -22,162 +22,162 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export class Class extends TypeScript.Api.ReflectedType {
+    export class Class extends TypeScript.Api.ReflectedType {
 
-		public methods    : Method     [];
+        public methods: Method[];
 
-		public variables  : Variable   [];
+        public variables: Variable[];
 
-		public parameters : string     [];
+        public parameters: string[];
 
-		public extends    : Type       [];
+        public extends: Type[];
 
-		public implements : Type       [];
+        public implements: Type[];
 
-        public isExported : boolean;
+        public isExported: boolean;
 
-        public comments   : string    [];
+        public comments: string[];
 
-		constructor() {
+        constructor() {
 
             super('class')
 
-			this.methods    = [];
+			this.methods=[];
 
-			this.variables  = [];
+            this.variables=[];
 
-			this.extends    = [];
+            this.extends=[];
 
-			this.implements = [];
+            this.implements=[];
 
-			this.parameters = [];
+            this.parameters=[];
 
-            this.comments   = [];
+            this.comments=[];
 
-            this.isExported = false;
-		}
+            this.isExported=false;
+        }
 
 
-		private static load_comments(result:TypeScript.Api.Class, ast:TypeScript.ClassDeclaration) : void {
+        private static load_comments(result: TypeScript.Api.Class,ast: TypeScript.ClassDeclaration): void {
 
-			var comments = ast.getDocComments();
+            var comments=ast.getDocComments();
 
-			for(var n in comments) {
+            for(var n in comments) {
 
-				result.comments.push(comments[n].content);
-			}
-		}
+                result.comments.push(comments[n].content);
+            }
+        }
 
-		private static load_parameters(result:TypeScript.Api.Class, ast: TypeScript.ClassDeclaration): void {
+        private static load_parameters(result: TypeScript.Api.Class,ast: TypeScript.ClassDeclaration): void {
 
-			if(ast.typeParameters) {
+            if(ast.typeParameters) {
 
-				if (ast.typeParameters.members) {
+                if(ast.typeParameters.members) {
 
-					for(var n in ast.typeParameters.members) {
-                         
-                        var parameter = <any>ast.typeParameters.members[n];
+                    for(var n in ast.typeParameters.members) {
 
-						result.parameters.push(parameter.name.text);
-					}
-				}
-			}
-		}
+                        var parameter=<any>ast.typeParameters.members[n];
 
-		private static load_extends (result:TypeScript.Api.Class, ast:TypeScript.ClassDeclaration):void {
+                        result.parameters.push(parameter.name.text);
+                    }
+                }
+            }
+        }
 
-			if (ast.extendsList) {
+        private static load_extends(result: TypeScript.Api.Class,ast: TypeScript.ClassDeclaration): void {
 
-				if (ast.extendsList.members) {
+            if(ast.extendsList) {
 
-					for(var n in ast.extendsList.members) {
-                         
-						var obj = TypeScript.Api.Type.create( ast.extendsList.members[n] );
+                if(ast.extendsList.members) {
 
-						result.extends.push( obj );
-					}
-				}
-			}            
-		}
+                    for(var n in ast.extendsList.members) {
 
-		private static load_implements(result:TypeScript.Api.Class, ast:TypeScript.ClassDeclaration): void {
+                        var obj=TypeScript.Api.Type.create(ast.extendsList.members[n]);
 
-			if (ast.implementsList) {
+                        result.extends.push(obj);
+                    }
+                }
+            }
+        }
 
-				if (ast.implementsList.members) {
+        private static load_implements(result: TypeScript.Api.Class,ast: TypeScript.ClassDeclaration): void {
 
-					for(var n in ast.implementsList.members) {
-                           
-						var obj = TypeScript.Api.Type.create( ast.implementsList.members[n] );
+            if(ast.implementsList) {
 
-						result.implements.push( obj );
-					}
-				}
-			}
-		}
+                if(ast.implementsList.members) {
 
-		private static load_methods(result:TypeScript.Api.Class, ast:TypeScript.ClassDeclaration) : void {
+                    for(var n in ast.implementsList.members) {
 
-			for(var n in ast.members.members) {
+                        var obj=TypeScript.Api.Type.create(ast.implementsList.members[n]);
 
-				var member = ast.members.members[n];
+                        result.implements.push(obj);
+                    }
+                }
+            }
+        }
 
-				if(member.nodeType == typescript.NodeType.FunctionDeclaration) {
+        private static load_methods(result: TypeScript.Api.Class,ast: TypeScript.ClassDeclaration): void {
 
-					var obj = TypeScript.Api.Method.create(<TypeScript.FunctionDeclaration>member);
+            for(var n in ast.members.members) {
 
-					result.methods.push(obj);
-				}
-			}
+                var member=ast.members.members[n];
 
-		}
+                if(member.nodeType==typescript.NodeType.FunctionDeclaration) {
 
-		private static load_variables(result:TypeScript.Api.Class, ast:TypeScript.ClassDeclaration) : void {
+                    var obj=TypeScript.Api.Method.create(<TypeScript.FunctionDeclaration>member);
 
-			for(var n in ast.members.members) {
-
-				var member = ast.members.members[n];
-
-				if(member.nodeType == typescript.NodeType.VariableDeclarator) {
-
-					var obj = TypeScript.Api.Variable.create(<TypeScript.VariableDeclarator>member);
-
-					result.variables.push(obj);
-				}
-			}
-		}
-
-		public static create(ast:TypeScript.ClassDeclaration) : TypeScript.Api.Class {
-             
-			var result     = new TypeScript.Api.Class();
-
-			result.name    = ast.name.text;
-
-            var hasFlag = (val : number, flag: number) :boolean  => {
-
-                return (val & flag) !== 0;
-            };
-            
-            var flags = ast.getVarFlags();
-
-            if(hasFlag(flags, typescript.VariableFlags.Exported)) {
-                
-                result.isExported = true;
+                    result.methods.push(obj);
+                }
             }
 
-            Class.load_comments   (result, ast);
+        }
 
-			Class.load_parameters (result, ast);
+        private static load_variables(result: TypeScript.Api.Class,ast: TypeScript.ClassDeclaration): void {
 
-			Class.load_implements (result, ast);
+            for(var n in ast.members.members) {
 
-			Class.load_extends    (result, ast);
+                var member=ast.members.members[n];
 
-			Class.load_methods    (result, ast);
+                if(member.nodeType==typescript.NodeType.VariableDeclarator) {
 
-			Class.load_variables  (result, ast);
+                    var obj=TypeScript.Api.Variable.create(<TypeScript.VariableDeclarator>member);
 
-			return result;
-		}
-	}
+                    result.variables.push(obj);
+                }
+            }
+        }
+
+        public static create(ast: TypeScript.ClassDeclaration): TypeScript.Api.Class {
+
+            var result=new TypeScript.Api.Class();
+
+            result.name=ast.name.text;
+
+            var hasFlag=(val: number,flag: number): boolean  => {
+
+                return (val&flag)!==0;
+            };
+
+            var flags=ast.getVarFlags();
+
+            if(hasFlag(flags,typescript.VariableFlags.Exported)) {
+
+                result.isExported=true;
+            }
+
+            Class.load_comments(result,ast);
+
+            Class.load_parameters(result,ast);
+
+            Class.load_implements(result,ast);
+
+            Class.load_extends(result,ast);
+
+            Class.load_methods(result,ast);
+
+            Class.load_variables(result,ast);
+
+            return result;
+        }
+    }
 }

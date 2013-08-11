@@ -19,34 +19,22 @@ limitations under the License.
 module TypeScript.Api {
 
     export class CompilerOptions {
-    
-        public logger                   : TypeScript.ILogger;
 
-        public languageVersion          : TypeScript.LanguageVersion;
-        
-        public moduleGenTarget          : TypeScript.ModuleGenTarget;
-        
-        public generateDeclarationFiles : boolean;
-        
-        public mapSourceFiles           : boolean;
+        public logger: TypeScript.ILogger;
 
-        constructor(options:any) {
-            
-            if(!options) {
+        public languageVersion: TypeScript.LanguageVersion;
 
-                this.languageVersion          = typescript.LanguageVersion.EcmaScript5;
+        public moduleGenTarget: TypeScript.ModuleGenTarget;
 
-                this.moduleGenTarget          = typescript.ModuleGenTarget.Synchronous;
+        public removeComments: boolean;
 
-                this.generateDeclarationFiles = true;
+        constructor() {
 
-                this.mapSourceFiles           = true;
+            this.languageVersion=typescript.LanguageVersion.EcmaScript5;
 
-            } else {
-            
-                
-            
-            }
+            this.moduleGenTarget=typescript.ModuleGenTarget.Synchronous;
+
+            this.removeComments=true;
         }
     }
 }

@@ -18,134 +18,127 @@ limitations under the License.
 /// <reference path="../util/Path.ts" />
 
 module TypeScript.Api {
-    	
-	export class Node {
 
-		public path		  : string;
+    export class Node {
 
-		public references : string[];
+        public path: string;
 
-		constructor() {
-			
-			this.references = [];
-		}
-	}
+        public references: string[];
+
+        constructor() {
+
+            this.references=[];
+        }
+    }
 
     export class Topology {
 
-		// returns a dependancy graph. all paths are resolved to absolute....
-        public static graph(units: TypeScript.Api.SourceUnit[]) :  TypeScript.Api.Node [] {
-			
-			var nodes:TypeScript.Api.Node [] = [];
+        // returns a dependancy graph. all paths are resolved to absolute....
+        public static graph(units: TypeScript.Api.SourceUnit[]): TypeScript.Api.Node[] {
 
-            for(var n in units) {	
+            var nodes: TypeScript.Api.Node[]=[];
 
-				var node = new TypeScript.Api.Node();
-				
-				node.path = units[n].path;
+            for(var n in units) {
 
-				node.references = units[n].references();
+                var node=new TypeScript.Api.Node();
 
-				for(var m in node.references)
-				{
-					node.references[m] = TypeScript.Api.Path.relativeToAbsolute(node.path, node.references[m]);
+                node.path=units[n].path;
 
-					node.references[m] = node.references[m].replace(/\\/g, '/');
-				}
+                node.references=units[n].references();
 
-				node.path = node.path.replace(/\\/g, '/');
+                for(var m in node.references) {
+                    node.references[m]=TypeScript.Api.Path.relativeToAbsolute(node.path,node.references[m]);
 
-				nodes.push(node);
+                    node.references[m]=node.references[m].replace(/\\/g,'/');
+                }
+
+                node.path=node.path.replace(/\\/g,'/');
+
+                nodes.push(node);
             }
 
-			return nodes;
+            return nodes;
         }
 
 
         // based on the supplied source units, this method will attempt
         // a best guess topological sort. If cyclic references occur,
         // will return units as is.  
-        public static sort(units: TypeScript.Api.SourceUnit[]) :  TypeScript.Api.SourceUnit[] {
+        public static sort(units: TypeScript.Api.SourceUnit[]): TypeScript.Api.SourceUnit[] {
 
-            var queue:TypeScript.Api.SourceUnit[]  = [];
+            var queue: TypeScript.Api.SourceUnit[]=[];
 
-            var result:TypeScript.Api.SourceUnit[] = [];
+            var result: TypeScript.Api.SourceUnit[]=[];
 
-            var max_iterations = units.length * units.length;
+            var max_iterations=units.length*units.length;
 
-            var iteration = 0;
+            var iteration=0;
 
-            for(var n in units) 
-            {
+            for(var n in units) {
                 queue.push(units[n]);
             }
 
-            while(queue.length > 0)
-            {
-                var item = queue.shift();
+            while(queue.length>0) {
+                var item=queue.shift();
 
-                var resolved   = true;
+                var resolved=true;
 
-                var references = item.references();
+                var references=item.references();
 
                 for(var n in references) {
 
-                    var reference = TypeScript.Api.Path.relativeToAbsolute(item.path, references[n]);
-                    
-                    var unit = null;
+                    var reference=TypeScript.Api.Path.relativeToAbsolute(item.path,references[n]);
+
+                    var unit=null;
 
                     for(var m in result) // search for reference in result.
                     {
-                        if(result[m].path == reference)
-                        {
-                            unit = result[m];
+                        if(result[m].path==reference) {
+                            unit=result[m];
 
                             break;
                         }
                     }
 
-                    if(unit == null)
-                    {
-                        resolved = false;
+                    if(unit==null) {
+                        resolved=false;
 
                         break;
                     }
                 }
-                
-                if(resolved)
-                {
+
+                if(resolved) {
                     // if resolved, add to the result.
                     result.push(item)
                 }
-                else
-                {
+                else {
                     // if not resolved, put it back on the queue.
                     queue.push(item);
                 }
 
                 // increment the iteration,
-                iteration = iteration + 1;
-                
+                iteration=iteration+1;
+
                 // if we exceed the max iterations, then we have cyclic referencing.
-                if(iteration > max_iterations) {
+                if(iteration>max_iterations) {
 
                     // best guess based on traveral.
                     units.reverse();
-                    
+
                     return units;
                 }
             }
 
             // ensure declarations are first.
 
-            var declarations = [];
+            var declarations=[];
 
-            var sources      = [];
-            
-            for(var i = 0; i < result.length; i++) {
-                
-                if(result[i].path.indexOf('.d.ts') !== -1) {
-                     
+            var sources=[];
+
+            for(var i=0;i<result.length;i++) {
+
+                if(result[i].path.indexOf('.d.ts')!==-1) {
+
                     declarations.push(result[i]);
                 }
                 else {
@@ -154,15 +147,15 @@ module TypeScript.Api {
                 }
             }
 
-            result = [];
+            result=[];
 
             for(var n in declarations) {
-                
+
                 result.push(declarations[n])
             }
 
             for(var n in sources) {
-                
+
                 result.push(sources[n])
             }
 

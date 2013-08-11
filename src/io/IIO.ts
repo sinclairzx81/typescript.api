@@ -18,9 +18,9 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export interface IIO {
-	
-		readFile(filename:string, callback:{( iofile : TypeScript.Api.IOFile) : void; }): void;
-		
-	}
+    export interface IIO {
+
+        readFile(filename: string,callback: { (iofile: TypeScript.Api.IOFile): void; }): void;
+
+    }
 }

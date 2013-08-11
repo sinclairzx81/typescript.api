@@ -24,56 +24,46 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export class Compiler {
+    export class Compiler {
 
-		public compiler       : TypeScript.TypeScriptCompiler;
+        public compiler: TypeScript.TypeScriptCompiler;
 
-		public logger         : TypeScript.ILogger;
+        public logger: TypeScript.ILogger;
 
-        public processor      : TypeScript.Api.Processor;
+        public processor: TypeScript.Api.Processor;
 
-        constructor(public options:TypeScript.Api.CompilerOptions)  {
+        constructor(public options: TypeScript.Api.CompilerOptions) {
 
-            this.logger = options.logger;
+            this.logger=options.logger;
 
             // settings...
 
-            var settings = new typescript.CompilationSettings();
+            var settings=new typescript.CompilationSettings();
 
-            settings.codeGenTarget            = options.languageVersion; //TypeScript.LanguageVersion.EcmaScript5;
+            settings.codeGenTarget=options.languageVersion; //TypeScript.LanguageVersion.EcmaScript5;
 
-            settings.moduleGenTarget          = options.moduleGenTarget; //TypeScript.ModuleGenTarget.Synchronous;
-            
-            settings.generateDeclarationFiles = options.generateDeclarationFiles;
-            
-            settings.mapSourceFiles           = false; //options.mapSourceFiles;
+            settings.moduleGenTarget=options.moduleGenTarget; //TypeScript.ModuleGenTarget.Synchronous;
 
-            settings.disallowBool             = true;
+            settings.removeComments=options.removeComments;
 
-            settings.outputOption             = '';
+            settings.disallowBool=true;
 
-            settings.removeComments           = true;
+            settings.outputOption='';
 
-            
+            this.compiler=new typescript.TypeScriptCompiler(new TypeScript.Api.NullLogger(),settings,typescript.diagnosticMessages);
 
-            // the compiler...
-            
-            this.compiler = new typescript.TypeScriptCompiler(new TypeScript.Api.NullLogger(), settings, typescript.diagnosticMessages);
+            this.compiler.logger=new TypeScript.Api.NullLogger();
 
-            this.compiler.logger = new TypeScript.Api.NullLogger(); 
-
-            // compiler unit cache
-
-            this.processor   = new TypeScript.Api.Processor (this.compiler);
+            this.processor=new TypeScript.Api.Processor(this.compiler);
         }
 
-        public compile (sourceUnits:TypeScript.Api.SourceUnit[], callback: { (compiledUnits : TypeScript.Api.CompiledUnit [] ) : void;} ) : void {  
-            
+        public compile(sourceUnits: TypeScript.Api.SourceUnit[],callback: { (compiledUnits: TypeScript.Api.CompiledUnit[]): void; }): void {
+
             this.processor.input.merge(sourceUnits);
 
-            var compiled = this.processor.process();
+            var compiled=this.processor.process();
 
-            callback( compiled );
+            callback(compiled);
         }
-	}
+    }
 }

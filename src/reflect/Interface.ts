@@ -22,139 +22,139 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export class Interface extends TypeScript.Api.ReflectedType {
+    export class Interface extends TypeScript.Api.ReflectedType {
 
-		public methods    : Method    [];
+        public methods: Method[];
 
-		public variables  : Variable  [];
+        public variables: Variable[];
 
-		public parameters : string    [];
+        public parameters: string[];
 
-		public extends    : Type      [];
+        public extends: Type[];
 
-        public isExported : boolean;
+        public isExported: boolean;
 
-        public comments   : string    [];
+        public comments: string[];
 
-		constructor () {
+        constructor() {
 
             super('interface');
 
-			this.methods    = [];
+            this.methods=[];
 
-			this.variables  = [];
+            this.variables=[];
 
-			this.extends    = [];
+            this.extends=[];
 
-			this.parameters = [];
+            this.parameters=[];
 
-            this.comments   = [];
+            this.comments=[];
 
-            this.isExported = false;
-		}
+            this.isExported=false;
+        }
 
-		private static load_comments(result:TypeScript.Api.Interface, ast:TypeScript.InterfaceDeclaration) : void {
+        private static load_comments(result: TypeScript.Api.Interface,ast: TypeScript.InterfaceDeclaration): void {
 
-			var comments = ast.getDocComments();
+            var comments=ast.getDocComments();
 
-			for(var n in comments) {
+            for(var n in comments) {
 
-				result.comments.push(comments[n].content);
-			}
-		}
+                result.comments.push(comments[n].content);
+            }
+        }
 
-		private static load_parameters(result:Interface, ast:TypeScript.InterfaceDeclaration): void {
+        private static load_parameters(result: Interface,ast: TypeScript.InterfaceDeclaration): void {
 
-			if(ast.typeParameters) {
+            if(ast.typeParameters) {
 
-				if (ast.typeParameters.members) {
+                if(ast.typeParameters.members) {
 
-					for(var n in ast.typeParameters.members) {
-                         
-                        var parameter = <any>ast.typeParameters.members[n];
+                    for(var n in ast.typeParameters.members) {
 
-						result.parameters.push(parameter.name.text);
-					}
-				}
-			}
-		}
+                        var parameter=<any>ast.typeParameters.members[n];
 
-		private static load_extends (result:Interface, ast:TypeScript.InterfaceDeclaration) : void {
+                        result.parameters.push(parameter.name.text);
+                    }
+                }
+            }
+        }
 
-			if (ast.extendsList) {
+        private static load_extends(result: Interface,ast: TypeScript.InterfaceDeclaration): void {
 
-				if (ast.extendsList.members) {
+            if(ast.extendsList) {
 
-					for(var n in ast.extendsList.members) {
-                         
-						var obj = TypeScript.Api.Type.create( ast.extendsList.members[n] );
+                if(ast.extendsList.members) {
 
-						result.extends.push( obj );
-					}
-				}
-			} 
-		}
+                    for(var n in ast.extendsList.members) {
 
-		private static load_methods(result:TypeScript.Api.Interface, ast:TypeScript.InterfaceDeclaration) : void {
+                        var obj=TypeScript.Api.Type.create(ast.extendsList.members[n]);
 
-			for(var n in ast.members.members) {
+                        result.extends.push(obj);
+                    }
+                }
+            }
+        }
 
-				var member = ast.members.members[n];
+        private static load_methods(result: TypeScript.Api.Interface,ast: TypeScript.InterfaceDeclaration): void {
 
-				if(member.nodeType == typescript.NodeType.FunctionDeclaration) {
+            for(var n in ast.members.members) {
 
-					var obj = TypeScript.Api.Method.create(<TypeScript.FunctionDeclaration>member);
+                var member=ast.members.members[n];
 
-					result.methods.push(obj);
-				}
-			}
-		}
+                if(member.nodeType==typescript.NodeType.FunctionDeclaration) {
 
-		private static load_variables(result:TypeScript.Api.Interface, ast:TypeScript.InterfaceDeclaration) : void {
+                    var obj=TypeScript.Api.Method.create(<TypeScript.FunctionDeclaration>member);
 
-			for(var n in ast.members.members) {
+                    result.methods.push(obj);
+                }
+            }
+        }
 
-				var member = ast.members.members[n];
+        private static load_variables(result: TypeScript.Api.Interface,ast: TypeScript.InterfaceDeclaration): void {
 
-				if(member.nodeType == typescript.NodeType.VariableDeclarator) {
+            for(var n in ast.members.members) {
 
-					var obj = TypeScript.Api.Variable.create(<TypeScript.VariableDeclarator>member);
+                var member=ast.members.members[n];
 
-					result.variables.push(obj);
-				}
-			}
-		}
+                if(member.nodeType==typescript.NodeType.VariableDeclarator) {
+
+                    var obj=TypeScript.Api.Variable.create(<TypeScript.VariableDeclarator>member);
+
+                    result.variables.push(obj);
+                }
+            }
+        }
 
 
-		public static create(ast:TypeScript.InterfaceDeclaration): TypeScript.Api.Interface {
+        public static create(ast: TypeScript.InterfaceDeclaration): TypeScript.Api.Interface {
 
-			var result     = new TypeScript.Api.Interface();
+            var result=new TypeScript.Api.Interface();
 
-			result.name    = ast.name.text;
+            result.name=ast.name.text;
 
-            var hasFlag = (val : number, flag: number) :boolean  => {
+            var hasFlag=(val: number,flag: number): boolean  => {
 
-                return (val & flag) !== 0;
+                return (val&flag)!==0;
             };
-            
-            var flags      = ast.getVarFlags();
 
-            if(hasFlag(flags, typescript.VariableFlags.Exported)) {
-                
-                result.isExported = true;
+            var flags=ast.getVarFlags();
+
+            if(hasFlag(flags,typescript.VariableFlags.Exported)) {
+
+                result.isExported=true;
             }
 
-            Interface.load_comments   (result, ast);
+            Interface.load_comments(result,ast);
 
-			Interface.load_parameters (result, ast);
+            Interface.load_parameters(result,ast);
 
-			Interface.load_extends    (result, ast);
+            Interface.load_extends(result,ast);
 
-			Interface.load_methods    (result, ast);
+            Interface.load_methods(result,ast);
 
-			Interface.load_variables  (result, ast);
+            Interface.load_variables(result,ast);
 
-			return result;
-		}
-	}
+            return result;
+        }
+    }
 }

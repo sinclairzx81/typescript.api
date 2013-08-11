@@ -18,31 +18,31 @@ limitations under the License.
 
 module TypeScript.Api {
 
-	export class Unit {
+    export class Unit {
 
-		public path        : string;
+        public path: string;
 
-		public content     : string;
+        public content: string;
 
-		public diagnostics : TypeScript.Api.Diagnostic[];
+        public diagnostics: TypeScript.Api.Diagnostic[];
 
-		constructor(path:string, content:string, diagnostics:TypeScript.Api.Diagnostic[]) {
+        constructor(path: string,content: string,diagnostics: TypeScript.Api.Diagnostic[]) {
 
-			this.path 		 = path;
+            this.path=path;
 
-			this.content 	 = content;
+            this.content=content;
 
-			this.diagnostics = diagnostics;
-		}
+            this.diagnostics=diagnostics;
+        }
 
-		public hasError() : boolean {
+        public hasError(): boolean {
 
-			if(this.diagnostics) {
+            if(this.diagnostics) {
 
-				return this.diagnostics.length > 0;
-			}
+                return this.diagnostics.length>0;
+            }
 
-			return false;
-		}
-	}
+            return false;
+        }
+    }
 }
