@@ -1,3 +1,7 @@
+interface ITextWriter {
+
+}
+
 declare module TypeScript {
     class ArrayUtilities {
         static isArray(value: any): boolean;
@@ -675,7 +679,7 @@ declare module TypeScript {
         public text(): string;
         public message(): string;
         public adjustOffset(pos: number): void;
-        public additionalLocations(): Location[];
+        //public additionalLocations(): Location[];
         static equals(diagnostic1: Diagnostic, diagnostic2: Diagnostic): boolean;
     }
     function getDiagnosticInfoFromCode(diagnosticCode: DiagnosticCode): DiagnosticInfo;
@@ -688,21 +692,21 @@ declare class Enumerator {
     public item(): any;
     constructor(o: any);
 }
-declare module process {
-    var argv: string[];
-    var platform: string;
-    function on(event: string, handler: (any: any) => void): void;
-    module stdout {
-        function write(str: string);
-    }
-    module stderr {
-        function write(str: string);
-    }
-    module mainModule {
-        var filename: string;
-    }
-    function exit(exitCode?: number);
-}
+//declare module process {
+//    var argv: string[];
+//    var platform: string;
+//    function on(event: string, handler: (any: any) => void): void;
+//    module stdout {
+//        function write(str: string);
+//    }
+//    module stderr {
+//        function write(str: string);
+//    }
+//    module mainModule {
+//        var filename: string;
+//    }
+//    function exit(exitCode?: number);
+//}
 declare enum ByteOrderMark {
     None,
     Utf8,
@@ -5986,6 +5990,7 @@ declare module TypeScript {
         public gatherDiagnostics: boolean;
         public updateTC: boolean;
         public implicitAny: boolean;
+        public removeComments: boolean;
     }
     interface IPreProcessedFileInfo {
         settings: CompilationSettings;

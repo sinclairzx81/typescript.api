@@ -1,16 +1,20 @@
-// Copyright (c) 2013 haydn paterson (sinclair).  All rights reserved.
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*--------------------------------------------------------------------------
 
-/// <reference path="../decl/typescript.d.ts" />
+Copyright (c) 2013 haydn paterson (sinclair).  All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+--------------------------------------------------------------------------*/
+
+/// <reference path="../references.ts" />
 
 /// <reference path="../units/SourceUnit.ts" />
 /// <reference path="../units/CompiledUnit.ts" />
@@ -28,13 +32,13 @@ module TypeScript.Api {
 
         public processor      : TypeScript.Api.Processor;
 
-		constructor(public options:TypeScript.Api.CompilerOptions)  
-		{
-			this.logger = options.logger;
+        constructor(public options:TypeScript.Api.CompilerOptions)  {
 
-			// settings...
+            this.logger = options.logger;
 
-            var settings = new TypeScript.CompilationSettings();
+            // settings...
+
+            var settings = new typescript.CompilationSettings();
 
             settings.codeGenTarget            = options.languageVersion; //TypeScript.LanguageVersion.EcmaScript5;
 
@@ -42,30 +46,34 @@ module TypeScript.Api {
             
             settings.generateDeclarationFiles = options.generateDeclarationFiles;
             
-            settings.mapSourceFiles           = options.mapSourceFiles;
+            settings.mapSourceFiles           = false; //options.mapSourceFiles;
 
             settings.disallowBool             = true;
 
             settings.outputOption             = '';
 
-			// the compiler...
+            settings.removeComments           = true;
+
             
-			this.compiler = new TypeScript.TypeScriptCompiler(new TypeScript.Api.NullLogger(), settings, TypeScript.diagnosticMessages);
 
-			this.compiler.logger = new TypeScript.Api.NullLogger(); 
+            // the compiler...
+            
+            this.compiler = new typescript.TypeScriptCompiler(new TypeScript.Api.NullLogger(), settings, typescript.diagnosticMessages);
 
-			// compiler unit cache
+            this.compiler.logger = new TypeScript.Api.NullLogger(); 
+
+            // compiler unit cache
 
             this.processor   = new TypeScript.Api.Processor (this.compiler);
-		}
+        }
 
-		public compile(sourceUnits:TypeScript.Api.SourceUnit[], callback: { (compiledUnits : TypeScript.Api.CompiledUnit [] ) : void;} ) : void {  
+        public compile (sourceUnits:TypeScript.Api.SourceUnit[], callback: { (compiledUnits : TypeScript.Api.CompiledUnit [] ) : void;} ) : void {  
             
             this.processor.input.merge(sourceUnits);
 
             var compiled = this.processor.process();
 
             callback( compiled );
-		}
+        }
 	}
 }

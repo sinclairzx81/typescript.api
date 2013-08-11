@@ -1,116 +1,69 @@
-// Copyright (c) 2013 haydn paterson (sinclair).  All rights reserved.
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//   http://www.apache.org/licenses/LICENSE-2.0
+﻿/*--------------------------------------------------------------------------
+
+Copyright (c) 2013 haydn paterson (sinclair).  All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+--------------------------------------------------------------------------*/
+
+//-------------------------------------------------------------------------
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-////////////////////////////////////////////////////////////////////
+// typescript.api build script
 //
-// Note: will build the TypeScript.Api for TypeScript 0.9
+// requires: TypeScript 0.9.1 command line compiler.
 //
-// 	requires: the tsc 0.9 command line compiler...
+// notes:    run this script to build the typescipt.api. once 
+//           built run "npm install typescript" inside
+//           the ./bin directory.
 //
-//  note: if building from github, npm install typescript into bin directory.
-//
-////////////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------
 
-var path  = require('path');
+var tsc = require('./tools/compiler.js')
 
-var tools = require('./tools/tools.js');
+var io  = require('./tools/io.js')
 
-// variables
-var src_dir					         = path.join( path.dirname( global.process.mainModule.filename ), "/src/");
-var bin_dir					         = path.join( path.dirname( global.process.mainModule.filename ), "/bin/");
-var api_input_filename   	         = path.join(src_dir, 'api.ts' );
-var index_input_filename             = path.join(src_dir, 'index.ts' );
-var api_output_filename              = path.join(bin_dir, 'typescript.api.js');
-var api_input_decl_filename          = path.join(bin_dir, 'typescript.api.d.ts');
-var api_output_decl_filename         = path.join(src_dir, 'decl/typescript.api.d.ts');
-var api_light_input_decl_filename    = path.join(src_dir, 'resx/typescript.api.d.ts');
-var api_light_output_decl_filename   = path.join(bin_dir, 'decl/typescript.api.d.ts');
-var index_output_directory           = bin_dir;
-var node_decl_input_filename         = path.join(src_dir, 'resx/node.d.ts');
-var node_decl_output_filename        = path.join(bin_dir, 'decl/node.d.ts');
-var lib_decl_input_filename          = path.join(src_dir, 'resx/lib.d.ts');
-var lib_decl_output_filename         = path.join(bin_dir, 'decl/lib.d.ts');
-var ecma_decl_input_filename         = path.join(src_dir, 'resx/ecma.d.ts');
-var ecma_decl_output_filename        = path.join(bin_dir, 'decl/ecma.d.ts');
-var readme_input_filename            = path.join(src_dir, '../readme.md');
-var readme_output_filename           = path.join(bin_dir, 'readme.md');
-var package_input_filename           = path.join('./package.json');
-var package_output_filename          = path.join(bin_dir, 'package.json');
+//------------------------------------------------------------------------------------
+// paths
+//------------------------------------------------------------------------------------
 
-// thing to run after the build..
-var post_build_filename   = path.join( path.dirname( global.process.mainModule.filename ), "app.js")
+var src_directory = './src'
 
-// runs a build.
-function build () {
-	
-	console.log('-------------------------------------------------------');
-	
-	tools.builder.prepare_directory(bin_dir);
-	
-	tools.builder.prepare_directory(bin_dir + '/decl');
-	
-	console.log('compiling typescript api....');
-	tools.builder.build_single([api_input_filename], ["--declaration" ], api_output_filename , function() {
+var bin_directory = './bin'
 
-	    console.log('moving typescript.api.d.ts to src/decl for index.ts build..');
-	    tools.builder.copyfile(api_input_decl_filename, api_output_decl_filename, function() {
-		  
-	        console.log('compiling index....');
-	        tools.builder.build_modular([index_input_filename], index_output_directory, function() {
-                
-	 	        console.log('copying lib.d.ts....');
-	            tools.builder.copyfile(lib_decl_input_filename, lib_decl_output_filename, function(){	 
-	 	            
-                    console.log('copying ecma.d.ts....');
-	                tools.builder.copyfile(ecma_decl_input_filename, ecma_decl_output_filename, function(){	
-                        
-	                    console.log('copying node.d.ts....');
-	                    tools.builder.copyfile(node_decl_input_filename, node_decl_output_filename, function(){	
+//------------------------------------------------------------------------------------
+// build
+//------------------------------------------------------------------------------------
 
-                            console.log('copying typescript.api.d.ts....(client version)');
-                            tools.builder.copyfile(api_light_input_decl_filename, api_light_output_decl_filename, function(){	
-                                    
-                                console.log('removing typescript.d.ts...(build version)');
-                                tools.builder.remove(api_input_decl_filename);
+io.create_directory(bin_directory);
 
-	                            console.log('copying package.json....');
-	                            tools.builder.copyfile(package_input_filename, package_output_filename, function(){	
-							        
-	                                console.log('copying README.md....');
-	                                tools.builder.copyfile(readme_input_filename, readme_output_filename, function(){	
-								  
-	                                    console.log('running post build....');
-	                                    console.log('-------------------------------------------------------');
-	                                    tools.nodestart.start( post_build_filename );	
-	                                });
-	                            });
-                            });
-	                    });
-                    });
-                });
-	        });	
-	    });
-	});
-}
+io.create_directory(bin_directory + '/decl')
 
-// optional - run this to rebuild on source changes.
-//tools.dirwatch.watch(src_dir, null, function() {
-	//run_build();
-//});
+tsc.build([src_directory + '/index.ts'], ['--removeComments'], bin_directory + '/index.js' , function() {
 
-// run build on startup..
-build();
+    io.license('./license.txt', bin_directory + '/index.js')
 
+    io.copy(src_directory + '/resources/ecma.d.ts',           bin_directory + '/decl/ecma.d.ts')
 
+    io.copy(src_directory + '/resources/lib.d.ts',            bin_directory + '/decl/lib.d.ts')
 
+    io.copy(src_directory + '/resources/node.d.ts',           bin_directory + '/decl/node.d.ts')
 
+    io.copy(src_directory + '/resources/typescript.api.d.ts', bin_directory + '/decl/typescript.api.d.ts')
 
+    io.copy(src_directory + '/resources/typescript.d.ts',     bin_directory + '/decl/typescript.d.ts')
+
+    io.copy('./readme.md',     bin_directory + '/readme.md')
+
+    io.copy('./package.json',  bin_directory + '/package.json', function() {
+
+        require('./app.js')
+    })
+})

@@ -1,322 +1,235 @@
-// Copyright (c) 2013 haydn paterson (sinclair).  All rights reserved.
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿/*--------------------------------------------------------------------------
 
-/// <reference path="decl/typescript.d.ts" />
-/// <reference path="decl/typescript.api.d.ts" />
+Copyright (c) 2013 haydn paterson (sinclair).  All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
 
-/////////////////////////////////////////////////////////////
-// forward declarations
-/////////////////////////////////////////////////////////////
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
-declare var		 __filename : string; 
-declare var		 __dirname  : string;
-declare var 	 process    : any;
-declare var 	 global     : any;
-declare var 	 exports    : any;
-declare var      console    : any;
-declare var      require    : any;
+--------------------------------------------------------------------------*/
 
-/////////////////////////////////////////////////////////////
-// node modules.
-/////////////////////////////////////////////////////////////
+/// <reference path="references.ts" />
 
-var _vm   = require("vm");
+//--------------------------------------------------
+// IO
+//--------------------------------------------------
 
-var _fs   = require("fs");
+/// <reference path="io/Buffer.ts" />
+/// <reference path="io/IOFile.ts" />
+/// <reference path="io/IIO.ts" />
+/// <reference path="io/IOSync.ts" />
+/// <reference path="io/IORemoteAsync.ts" />
+/// <reference path="io/IOASync.ts" />
 
-var _path = require("path");
+//--------------------------------------------------
+// TextWriter
+//--------------------------------------------------
 
-/////////////////////////////////////////////////////////////
-// code to bind
-/////////////////////////////////////////////////////////////
+/// <reference path="writers/TextWriter.ts" />
 
-var typescript_filename     = _path.join(__dirname, "./node_modules/typescript/bin/typescript.js");
+//--------------------------------------------------
+// Loggers
+//--------------------------------------------------
 
-var typescript_api_filename = _path.join(__dirname, "typescript.api.js"); // typescript@0.9.0-1
+/// <reference path="loggers/BufferedLogger.ts" />
+/// <reference path="loggers/ConsoleLogger.ts" />
+/// <reference path="loggers/NullLogger.ts" />
 
-/////////////////////////////////////////////////////////////
-// compiler options..
-/////////////////////////////////////////////////////////////
+//--------------------------------------------------
+// Resolver
+//--------------------------------------------------
 
-export var allowRemote 				: boolean;;
+/// <reference path="resolve/Topology.ts" />
+/// <reference path="resolve/Resolver.ts" />
 
-export var debug       				: boolean;
+//--------------------------------------------------
+// Reflection
+//--------------------------------------------------
 
-export var compiler                 : TypeScript.Api.Compiler;
+/// <reference path="reflect/ReflectedType.ts" />
+/// <reference path="reflect/Type.ts" />
+/// <reference path="reflect/Variable.ts" />
+/// <reference path="reflect/Parameter.ts" />
+/// <reference path="reflect/Method.ts" />
+/// <reference path="reflect/Interface.ts" />
+/// <reference path="reflect/Class.ts" />
+/// <reference path="reflect/Import.ts" />
+/// <reference path="reflect/Module.ts" />
+/// <reference path="reflect/Script.ts" />
+/// <reference path="reflect/TypeResolver.ts" />
 
-export var languageVersion          : TypeScript.LanguageVersion;  // TypeScript.LanguageVersion.EcmaScript5;
 
-export var moduleTarget             : TypeScript.ModuleGenTarget;  // TypeScript.ModuleGenTarget.Synchronous;
+//--------------------------------------------------
+// Units
+//--------------------------------------------------
 
-export var generateDeclarations     : boolean; // true
+/// <reference path="units/Unit.ts" />
+/// <reference path="units/SourceUnit.ts" />
+/// <reference path="units/CompiledUnit.ts" />
+/// <reference path="units/Diagnostic.ts" />
 
-export var generateSourceMaps       : boolean; // true
+//--------------------------------------------------
+// Compiler
+//--------------------------------------------------
 
-/////////////////////////////////////////////////////////////
-// initialize defaults.
-/////////////////////////////////////////////////////////////
+/// <reference path="compile/Options.ts" />
+/// <reference path="compile/Input.ts" />
+/// <reference path="compile/Output.ts" />
+/// <reference path="compile/Processor.ts" />
+/// <reference path="compile/Compiler.ts" />
 
-function initialize() {
+//--------------------------------------------------
+// api
+//--------------------------------------------------
 
-    exports.allowRemote = false;
+module.exports     = typescript
 
-    exports.debug       = false;
+module.exports.Api = TypeScript.Api;
 
-    exports.compiler    = null;
+//--------------------------------------------------
+// check()
+//--------------------------------------------------
 
-    exports.languageVersion      = "EcmaScript5"; //typescript.LanguageVersion.EcmaScript5;
+module.exports.check = (units:TypeScript.Api.Unit[]) : boolean => {
 
-    exports.moduleTarget         = "Synchronous"; //typescript.ModuleGenTarget.Synchronous;
+    for(var n in units) {
 
-    exports.generateDeclarations = true;
+		if(units[n].hasError()) {
 
-    exports.generateSourceMaps   = true;
-
-    exports.outputOption         = '';
-    
-}
-
-initialize();
-
-/////////////////////////////////////////////////////////////
-// check: checks to see if the units are ok..
-/////////////////////////////////////////////////////////////
-
-export function check (units : TypeScript.Api.Unit[]) : boolean {
-	
-    for(var n in units)
-	{
-		if(units[n].hasError())
-		{
 			return false;
 		}
 	}
 	
-	return true;
+	return true;    
 }
 
+//--------------------------------------------------
+// resolve()
+//--------------------------------------------------
 
-/////////////////////////////////////////////////////////////
-// register: registers the .ts extension so typescript can be 
-// with require. note, using the IOSync to load.
-/////////////////////////////////////////////////////////////
+module.exports.resolve = (filename:string, callback:(resolved:TypeScript.Api.SourceUnit[])=> void) : void => {
 
-export function register () : void 
-{
-	require.extensions['.ts'] = function(_module) 
-	{
-        var output_diagnostics = (units:TypeScript.Api.Unit[]) => {
+    var param:any = null;
 
-	        for(var n in units)
-	        {
-		        for(var m in units[n].diagnostics)
-		        {
-			        console.log(_path.basename(units[n].path) + ':' + units[n].diagnostics[m].toString());
-		        }
-	        }        
-        };
-        
-		var api         = <TypeScript.Api>load_typescript_api();
-		
-		var io          = new api.IOSync();
-		
-		var logger      = new api.BufferedLogger();
-		
-		var resolver    = new api.Resolver( io, logger );
-		
-		var diagnostics = [];
-		
-		resolver.resolve([_module.filename], (sourceUnits:TypeScript.Api.SourceUnit[]) => {
-			
-            if(exports.check(sourceUnits)) {
-
-                var options = new api.CompilerOptions();
-
-                options.moduleGenTarget          = exports.moduleTarget;
-
-                options.generateDeclarationFiles = exports.generateDeclarations;
-
-                options.mapSourceFiles           = exports.generateSourceMaps;
-
-                options.languageVersion          = exports.languageVersion;
-
-                options.logger                   = logger;
-
-				var compiler = new api.Compiler( options );
-				
-				compiler.compile( sourceUnits, ( compiledUnits : TypeScript.Api.CompiledUnit[] ) =>  {
-					
-                    if( exports.check(compiledUnits) ) {
-
-						exports.run(compiledUnits, null, function(context) {
-
-							_module.exports = context;
-						});
-					}
-					else {
-
-						output_diagnostics(compiledUnits);
-					}
-				});
-			} 
-			else
-			{
-				output_diagnostics(sourceUnits);
-			}
-		});
-	}
-}
-
-/////////////////////////////////////////////////////////////
-// reset: resets the compiler.
-/////////////////////////////////////////////////////////////
-
-export function reset() : void {
-
-    var api = <TypeScript.Api>load_typescript_api();
-
-    var logger = new api.NullLogger();
-
-    var options = new api.CompilerOptions();
-
-    options.moduleGenTarget          = exports.moduleTarget;
-
-    options.generateDeclarationFiles = exports.generateDeclarations;
-
-    options.mapSourceFiles           = exports.generateSourceMaps;
-
-    options.languageVersion          = exports.languageVersion;
-
-    options.logger                   = logger;
-
-	exports.compiler = new api.Compiler( options );
-}
-
-/////////////////////////////////////////////////////////////
-// create: creates a new source unit
-/////////////////////////////////////////////////////////////
-
-export function create (path:string, content:string) : TypeScript.Api.SourceUnit {
-
-	var api = <TypeScript.Api>load_typescript_api();
-	
-	return new api.SourceUnit(path, content, [], false );
-}
-
-/////////////////////////////////////////////////////////////
-// resolve: resolves source units.
-/////////////////////////////////////////////////////////////
-
-export function resolve (sources:string[], callback :{ (units : TypeScript.Api.SourceUnit[] ) : void; }) : void  {
-
-    var getType = (obj:any):string => { return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase() };
+    if((typeof filename) === 'string') {
     
-    var _sources = [];
+        param = [filename]
 
-    switch( getType(sources) ) 
-    {
-        case "string":
+    }
 
-            _sources.push(sources);
+    if( Object.prototype.toString.call( filename ) === '[object Array]') {
+    
+        param = filename;
+    }
 
-            break;
-
-        case "array":
-
-            _sources = sources;
-
-            break;
+    if(!param) {
+    
+        throw Error('resolve() filename must be of string or array of string.')
     }
     
-	var api      = <TypeScript.Api>load_typescript_api();
+
+	var io       = new TypeScript.Api.IOAsync(); 
 	
-	var io       = new api.IOAsync();
+	var resolver = new TypeScript.Api.Resolver( io );
 	
-	var logger   = new api.NullLogger();
-	
-	if(exports.allowRemote) 			 { io = new api.IORemoteAsync(); }
-	
-	if(exports.debug)       			 { logger = new api.ConsoleLogger(); }
-	
-	var resolver = new api.Resolver( io, logger );
-	
-	resolver.resolve(_sources, callback);
+	resolver.resolve(param, callback);
 }
 
-/////////////////////////////////////////////////////////////
-// sort: sorts source units into sequential order.
-/////////////////////////////////////////////////////////////
+//--------------------------------------------------
+// reset()
+//--------------------------------------------------
 
-export function sort(sourceUnits: TypeScript.Api.SourceUnit[]) : TypeScript.Api.SourceUnit[]
-{
-    var api = <TypeScript.Api>load_typescript_api();
-    
-    return api.Topology.sort(sourceUnits);
+var compiler = null;
+
+module.exports.reset = () : void => {
+
+    var options = new TypeScript.Api.CompilerOptions();
+
+    options.moduleGenTarget          = typescript.ModuleGenTarget.Synchronous;
+
+    options.generateDeclarationFiles = true;
+
+    options.mapSourceFiles           = true;
+
+    options.languageVersion          = typescript.LanguageVersion.EcmaScript5;
+
+    options.logger                   = new TypeScript.Api.NullLogger();
+
+	compiler                         = new TypeScript.Api.Compiler( options );   
 }
 
-/////////////////////////////////////////////////////////////
-// graph: returns a graph source units.
-/////////////////////////////////////////////////////////////
+//--------------------------------------------------
+// compile()
+//--------------------------------------------------
 
-export function graph(sourceUnits: TypeScript.Api.SourceUnit[]) :  TypeScript.Api.Node []
-{
-    var api = <TypeScript.Api>load_typescript_api();
+module.exports.compile = (resolved:TypeScript.Api.SourceUnit[], callback:(compiled:TypeScript.Api.CompiledUnit[])=> void) : void => {
 
-    return api.Topology.graph(sourceUnits);
-}
+    if(!compiler) {
 
-/////////////////////////////////////////////////////////////
-// compile: compiles source units. outputs a compilation.
-/////////////////////////////////////////////////////////////
+        module.exports.reset();
+    }
 
-export function compile (sourceUnits: TypeScript.Api.SourceUnit[], callback : { (compiledUnit:TypeScript.Api.CompiledUnit[] ): void; } ) : void {
-
-	var api = <TypeScript.Api>load_typescript_api();
-
-	var logger = new api.NullLogger();
-	
-	if(exports.debug) { logger = new api.ConsoleLogger(); }
-	
-    if(!exports.compiler)
-    {
-        var options = new api.CompilerOptions();
-
-        options.moduleGenTarget          = exports.moduleTarget;
-
-        options.generateDeclarationFiles = exports.generateDeclarations;
-
-        options.mapSourceFiles           = exports.generateSourceMaps;
-
-        options.languageVersion          = exports.languageVersion;
-
-        options.logger                   = logger;
-
-	    exports.compiler = new api.Compiler( options );
-	}
-    
-    exports.compiler.compile(sourceUnits, (compiledUnits)=> {
+    compiler.compile(resolved, (compiledUnits)=> {
 
         callback(compiledUnits);
     });
 }
 
-/////////////////////////////////////////////////////////////
-// run: runs a compilation.
-/////////////////////////////////////////////////////////////
+//--------------------------------------------------
+// sort()
+//--------------------------------------------------
 
-export function run (compiledUnits:TypeScript.Api.CompiledUnit[], sandbox:any, callback :{ (context:any): void; }) : void 
-{
-	try 
-	{
+module.exports.sort = (sourceUnits: TypeScript.Api.SourceUnit[]) : any[] => {
+    
+    return TypeScript.Api.Topology.sort(sourceUnits);
+}
+
+//--------------------------------------------------
+// run()
+//--------------------------------------------------
+
+module.exports.run = (compiledUnits:TypeScript.Api.CompiledUnit[], sandbox:any, callback : (context:any) => void) : void => {
+
+    var get_default_sandbox = () : any => {
+
+	    var sandbox:any = {};
+	
+	    if (!sandbox) {
+	
+		    sandbox = {};
+		
+		    for (var n in global) {
+		
+			    sandbox[n] = global[n];
+			
+		    }
+	    }
+	
+	    sandbox.require    = require;
+	
+	    sandbox.process    = process;
+	
+	    sandbox.console    = console;
+	
+	    sandbox.global     = global;
+
+        sandbox.__dirname  = node.path.dirname(process.mainModule.filename);
+
+        sandbox.__filename = node.path.join(sandbox.__dirname, "typescript-compilation.js");
+	
+	    sandbox.exports  = {};
+	
+	    return sandbox;
+    }
+
+	try {
+
 		if(!sandbox) { 
 
             sandbox = get_default_sandbox(); 
@@ -327,20 +240,16 @@ export function run (compiledUnits:TypeScript.Api.CompiledUnit[], sandbox:any, c
 
                 if(path.indexOf('/') != -1) {
 
-                    var fullname = _path.resolve (primary_unit.path, './');
+                    var fullname = node.path.resolve (primary_unit.path, './');
 
-                    var dirname  = _path.dirname(fullname);
+                    var dirname  = node.path.dirname(fullname);
 
-                    path = _path.resolve(dirname + '/' + path, './');
+                    path = node.path.resolve(dirname + '/' + path, './');
                 }
 
                 return require(path);
             }
 
-            // snap in require override. ensure that
-            // relative module loading happens from the 
-            // primary ts unit, not the mainModule js
-            // or node_module/typescript.api
             if(compiledUnits.length > 0) { 
         
                 sandbox.require = _require;  
@@ -354,15 +263,13 @@ export function run (compiledUnits:TypeScript.Api.CompiledUnit[], sandbox:any, c
 			sources.push(compiledUnits[n].content);
 		}
 		
-		var script = _vm.createScript( sources.join('') , "typescript-compilation.js" );
+		var script = node.vm.createScript( sources.join('') , "typescript-compilation.js" );
 		
 		script.runInNewContext( sandbox );
 		
 		callback( sandbox.exports );
 		
 	} catch(e) {
-	
-		// can i do source mapping here?
 		
 		callback( null );
 		
@@ -370,113 +277,61 @@ export function run (compiledUnits:TypeScript.Api.CompiledUnit[], sandbox:any, c
 	}
 }
 
-/////////////////////////////////////////////////////////////
-// runs a compilation
-/////////////////////////////////////////////////////////////
+//--------------------------------------------------
+// register()
+//--------------------------------------------------
 
-function get_default_sandbox(): any {
+module.exports.register = () => {
 
-	var sandbox:any = {};
-	
-	if (!sandbox) {
-	
-		sandbox = {};
+	require.extensions['.ts'] = function(_module) {
+
+        var output_diagnostics = (units:TypeScript.Api.Unit[]) => {
+
+	        for(var n in units) {
+
+		        for(var m in units[n].diagnostics) {
+
+			        console.log(node.path.basename(units[n].path) + ':' + units[n].diagnostics[m].toString());
+		        }
+	        }        
+        };
 		
-		for (var n in global) {
+		var io          = new TypeScript.Api.IOSync();
 		
-			sandbox[n] = global[n];
+		var logger      = new TypeScript.Api.BufferedLogger();
+		
+		var resolver    = new TypeScript.Api.Resolver( io );
+		
+		var diagnostics = [];
+		
+        if(!compiler) {
+        
+            module.exports.reset();
+        }
+
+		resolver.resolve([_module.filename], (sourceUnits:TypeScript.Api.SourceUnit[]) => {
 			
-		}
+            if(module.exports.check(sourceUnits)) {
+				
+				compiler.compile( sourceUnits, ( compiledUnits : TypeScript.Api.CompiledUnit[] ) =>  {
+					
+                    if( module.exports.check(compiledUnits) ) {
+
+						module.exports.run(compiledUnits, null, function(context) {
+
+							_module.exports = context;
+						});
+					}
+					else {
+
+						output_diagnostics(compiledUnits);
+					}
+				});
+			} 
+			else {
+
+				output_diagnostics(sourceUnits);
+			}
+		});
 	}
-	
-	sandbox.require    = require;
-	
-	sandbox.process    = process;
-	
-	sandbox.console    = console;
-	
-	sandbox.global     = global;
-
-    sandbox.__dirname  = _path.dirname(process.mainModule.filename);
-
-    sandbox.__filename = _path.join(sandbox.__dirname, "typescript-compilation.js");
-	
-	sandbox.exports  = {};
-	
-	return sandbox;
-}
-
-/////////////////////////////////////////////////////////////
-//
-// TypeScript and TypeScript.API bindings
-//
-/////////////////////////////////////////////////////////////
-
-var cache:any               = {};
-
-function load_typescript_api() : any
-{	
-	if(cache.typescript_api)  
-    {
-		return <TypeScript.Api>cache.typescript_api;
-	}
-	 
-    var sandbox = 
-    {
-        TypeScript  : <TypeScript>load_typescript(),
-		
-        __filename  : __filename,
-		
-        __dirname   : __dirname,		
-		
-        global	    : global,
-		
-        process     : process,
-		
-        require     : require,	
-		
-        console     : console,
-		
-        exports     : null,
-
-        setInterval : setInterval,
-
-        setTimeout  : setTimeout
-    };
-	
-	cache.typescript_api = load_module(typescript_api_filename, sandbox, ["TypeScript"]).Api;
-	
-	return <TypeScript.Api>cache.typescript_api;
-}
-
-function load_typescript() : any
-{
-    if(cache.typescript)  
-    {
-        return <TypeScript>cache.typescript;
-    }
-    var sandbox:any = 
-    { 
-        exports : null
-    };
-
-    cache.typescript = load_module (typescript_filename, sandbox, ["TypeScript"]);
-	
-    return <TypeScript>cache.typescript;
-}
-
-function load_module(filename, sandbox, export_type_names) : any 
-{
-    var source = _fs.readFileSync(filename, 'utf8');
-	
-    for(var n in export_type_names) 
-    {
-        source = source.concat('\n\nexports = ' + export_type_names[n] + ';'); 	
-    }
-	
-    var script = _vm.createScript( source, _path.basename(filename) );
-	
-    script.runInNewContext( sandbox );
-	
-    return sandbox.exports;
 }

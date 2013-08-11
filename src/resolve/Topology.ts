@@ -1,25 +1,26 @@
-﻿// Copyright (c) 2013 haydn paterson (sinclair).  All rights reserved.
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿/*--------------------------------------------------------------------------
 
-/// <reference path="../decl/typescript.d.ts" />
+Copyright (c) 2013 haydn paterson (sinclair).  All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+--------------------------------------------------------------------------*/
+
 /// <reference path="../units/SourceUnit.ts" />
-/// <reference path="../units/CompiledUnit.ts" />
 /// <reference path="../util/Path.ts" />
 
+module TypeScript.Api {
+    	
+	export class Node {
 
-module TypeScript.Api 
-{	
-	export class Node
-	{
 		public path		  : string;
 
 		public references : string[];
@@ -30,15 +31,15 @@ module TypeScript.Api
 		}
 	}
 
-    export class Topology
-    {
+    export class Topology {
+
 		// returns a dependancy graph. all paths are resolved to absolute....
         public static graph(units: TypeScript.Api.SourceUnit[]) :  TypeScript.Api.Node [] {
 			
 			var nodes:TypeScript.Api.Node [] = [];
 
-            for(var n in units) 
-			{	
+            for(var n in units) {	
+
 				var node = new TypeScript.Api.Node();
 				
 				node.path = units[n].path;
@@ -64,8 +65,8 @@ module TypeScript.Api
         // based on the supplied source units, this method will attempt
         // a best guess topological sort. If cyclic references occur,
         // will return units as is.  
-        public static sort(units: TypeScript.Api.SourceUnit[]) :  TypeScript.Api.SourceUnit[]
-        {
+        public static sort(units: TypeScript.Api.SourceUnit[]) :  TypeScript.Api.SourceUnit[] {
+
             var queue:TypeScript.Api.SourceUnit[]  = [];
 
             var result:TypeScript.Api.SourceUnit[] = [];
@@ -87,8 +88,8 @@ module TypeScript.Api
 
                 var references = item.references();
 
-                for(var n in references)
-                {
+                for(var n in references) {
+
                     var reference = TypeScript.Api.Path.relativeToAbsolute(item.path, references[n]);
                     
                     var unit = null;
@@ -126,8 +127,8 @@ module TypeScript.Api
                 iteration = iteration + 1;
                 
                 // if we exceed the max iterations, then we have cyclic referencing.
-                if(iteration > max_iterations)
-                {
+                if(iteration > max_iterations) {
+
                     // best guess based on traveral.
                     units.reverse();
                     
@@ -168,8 +169,4 @@ module TypeScript.Api
             return result;
         }
     }
-
-        
-   
-
 }

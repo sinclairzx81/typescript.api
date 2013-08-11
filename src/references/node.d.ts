@@ -6,6 +6,8 @@
 //*                                               *
 //************************************************/
 
+
+
 declare var NaN: number;
 declare var Infinity: number;
 

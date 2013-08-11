@@ -1,27 +1,39 @@
 {
-  "name": "typescript.api",
-  "version": "0.6.1",
-  "description": "A compiler as a service api enabling nodejs developers to programatically resolve, compile, reflect and run typescript 0.9 source files.",
-  "main": "index.js",
-  "directories": {
-     
-  },
-  "dependencies": {"typescript": "0.9.0-1"},
-  "devDependencies": {},
-  "scripts": {
-    
-  },
+  "name"            : "typescript.api",
+
+  "version"         : "0.7.0",
+
+  "description"     : "A compiler as a service api enabling nodejs developers to programatically resolve, compile, reflect and run typescript 0.9 source files.",
+
+  "main"            : "index.js",
+
+  "directories"     : { },
+
+  "dependencies"    : {"typescript": "0.9.1"},
+
+  "devDependencies" : {},
+
+  "scripts"   : {},
+
   "repository": {
-    "type": "git",
-    "url": "https://github.com/sinclairzx81/typescript.api.git"
+
+    "type" : "git",
+
+    "url"  : "https://github.com/sinclairzx81/typescript.api.git"
+
   },
-  "keywords": [
-    "typescript", "compiler", "require", "reflect"
-  ],
+
+  "keywords": [ "typescript", "compiler", "require",  "reflect" ],
+
   "author": "sinclair",
-  "licenses": [ {
-    "type": "Apache 2.0",
-    "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+
+  "licenses": [{
+
+    "type" : "Apache 2.0",
+
+    "url"  : "http://www.apache.org/licenses/LICENSE-2.0.html"
+
   } ],
-  "readmeFilename": "README.md"
+
+  "readmeFilename": "readme.md"
 }
