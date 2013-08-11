@@ -103,7 +103,7 @@ tsapi.resolve(['./program.ts'], function(resolved) {
 
 It is important to note that the typescript.api does not automatically reference any declarations (such as lib.d.ts) for compilation. 
 Because of this, you will need to reference the appropriate *.d.ts required by your application for compilation. This is unlike the 
-tsc command line compiler which will, by default reference the lib.d.ts declaration if not stated otherwise. (see --nolib option). 
+tsc command line compiler which will, by default reference the lib.d.ts declaration if not stated otherwise. (see --noLib option). 
 
 In the context of nodejs, the dom declarations declared in lib.d.ts are unnessasary and dramatically slow compilation times. The
 typescript.api splits these declarations out to provide suitable environment declarations that you can reference in your project.
@@ -127,7 +127,7 @@ The typescript.api comes bundled with following declarations:
 It is recommended that developers copy the appropriate declarations suitable for their environment into their project structure and
 reference them accordingly. 
 
-For a full definition of this api, see  [typescript.api.d.ts](https://github.com/sinclairzx81/typescript.api/blob/master/src/resx/typescript.api.d.ts)
+For a full definition of this api, see  [typescript.api.d.ts](https://github.com/sinclairzx81/typescript.api/blob/master/src/resources/typescript.api.d.ts)
 
 For other additional declarations, see the [definitely typed](https://github.com/borisyankov/DefinitelyTyped) project.
 
