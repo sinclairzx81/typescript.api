@@ -3,7 +3,7 @@
 
   "version"         : "0.7.0",
 
-  "description"     : "A compiler as a service api enabling nodejs developers to programatically resolve, compile, reflect and run typescript 0.9 source files.",
+  "description"     : "A compiler as a service api enabling nodejs developers to programatically resolve, compile, reflect and run typescript 0.9 source files in memory.",
 
   "main"            : "index.js",
 
