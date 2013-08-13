@@ -158,6 +158,7 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+app.js
 
 # Mac crap
 .DS_Store
