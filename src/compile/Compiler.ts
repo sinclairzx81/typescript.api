@@ -34,30 +34,34 @@ module TypeScript.Api {
 
         constructor(public options: TypeScript.Api.CompilerOptions) {
 
-            this.logger=options.logger;
+            this.logger = options.logger;
 
             // settings...
 
-            var settings=new typescript.CompilationSettings();
+            var settings = new typescript.CompilationSettings();
 
-            settings.codeGenTarget=options.languageVersion; //TypeScript.LanguageVersion.EcmaScript5;
+            settings.codeGenTarget            = options.languageVersion; 
 
-            settings.moduleGenTarget=options.moduleGenTarget; //TypeScript.ModuleGenTarget.Synchronous;
+            settings.moduleGenTarget          = options.moduleGenTarget; 
 
-            settings.removeComments=options.removeComments;
+            settings.removeComments           = options.removeComments;
 
-            this.compiler=new typescript.TypeScriptCompiler(new TypeScript.Api.NullLogger(),settings);
+            settings.generateDeclarationFiles = options.generateDeclarationFiles;
 
-            this.compiler.logger=new TypeScript.Api.NullLogger();
+            settings.mapSourceFiles           = options.mapSourceFiles;
 
-            this.processor=new TypeScript.Api.Processor(this.compiler);
+            this.compiler = new typescript.TypeScriptCompiler(new TypeScript.Api.NullLogger(),settings);
+
+            this.compiler.logger = new TypeScript.Api.NullLogger();
+
+            this.processor = new TypeScript.Api.Processor(this.compiler);
         }
 
         public compile(sourceUnits: TypeScript.Api.SourceUnit[],callback: { (compiledUnits: TypeScript.Api.CompiledUnit[]): void; }): void {
 
             this.processor.input.merge(sourceUnits);
 
-            var compiled=this.processor.process();
+            var compiled = this.processor.process();
 
             callback(compiled);
         }

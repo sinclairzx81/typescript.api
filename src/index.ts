@@ -149,14 +149,18 @@ var compiler=null;
 
 interface ICompilerOptions {
 
-    languageVersion: string;
+    languageVersion          : string;
 
-    moduleGenTarget: string;
+    moduleGenTarget          : string;
+    
+    generateDeclarationFiles : boolean;
 
-    removeComments: boolean;
+    mapSourceFiles           : boolean;
+
+    removeComments           : boolean;
 }
 
-module.exports.reset=(compilerOptions?: ICompilerOptions): void => {
+module.exports.reset = (compilerOptions?: ICompilerOptions): void => {
 
     var options=new TypeScript.Api.CompilerOptions();
 
@@ -209,24 +213,33 @@ module.exports.reset=(compilerOptions?: ICompilerOptions): void => {
                     break;
             }
         }
-        if(compilerOptions.removeComments!=null) {
 
-            options.removeComments=compilerOptions.removeComments;
+        if(compilerOptions.removeComments != null) {
+
+            options.removeComments = compilerOptions.removeComments;
+        }
+
+        if(compilerOptions.generateDeclarationFiles != null) {
+            
+            options.generateDeclarationFiles = compilerOptions.generateDeclarationFiles;
+        }
+
+        if(compilerOptions.mapSourceFiles != null) {
+            
+            options.mapSourceFiles = compilerOptions.mapSourceFiles;
         }
     }
 
+    options.logger = new TypeScript.Api.NullLogger();
 
-
-    options.logger=new TypeScript.Api.NullLogger();
-
-    compiler=new TypeScript.Api.Compiler(options);
+    compiler = new TypeScript.Api.Compiler(options);
 }
 
 //--------------------------------------------------
 // create()
 //--------------------------------------------------
 
-module.exports.create=(path: string,content: string): TypeScript.Api.SourceUnit => {
+module.exports.create = (path: string,content: string): TypeScript.Api.SourceUnit => {
 
     return new TypeScript.Api.SourceUnit(path,content,[],false);
 }
@@ -235,7 +248,7 @@ module.exports.create=(path: string,content: string): TypeScript.Api.SourceUnit 
 // compile()
 //--------------------------------------------------
 
-module.exports.compile=(resolved: TypeScript.Api.SourceUnit[],callback: (compiled: TypeScript.Api.CompiledUnit[]) => void): void => {
+module.exports.compile = (resolved: TypeScript.Api.SourceUnit[],callback: (compiled: TypeScript.Api.CompiledUnit[]) => void): void => {
 
     if(!compiler) {
 
@@ -252,7 +265,7 @@ module.exports.compile=(resolved: TypeScript.Api.SourceUnit[],callback: (compile
 // sort()
 //--------------------------------------------------
 
-module.exports.sort=(sourceUnits: TypeScript.Api.SourceUnit[]): any[]=> {
+module.exports.sort = (sourceUnits: TypeScript.Api.SourceUnit[]): any[]=> {
 
     return TypeScript.Api.Topology.sort(sourceUnits);
 }
@@ -261,7 +274,7 @@ module.exports.sort=(sourceUnits: TypeScript.Api.SourceUnit[]): any[]=> {
 // run()
 //--------------------------------------------------
 
-module.exports.run=(compiledUnits: TypeScript.Api.CompiledUnit[],sandbox: any,callback: (context: any) => void): void => {
+module.exports.run = (compiledUnits: TypeScript.Api.CompiledUnit[],sandbox: any,callback: (context: any) => void): void => {
 
     var get_default_sandbox=(): any => {
 
@@ -278,13 +291,13 @@ module.exports.run=(compiledUnits: TypeScript.Api.CompiledUnit[],sandbox: any,ca
             }
         }
 
-        sandbox.require=require;
+        sandbox.require = require;
 
-        sandbox.process=process;
+        sandbox.process = process;
 
-        sandbox.console=console;
+        sandbox.console = console;
 
-        sandbox.global=global;
+        sandbox.global = global;
 
         sandbox.__dirname=node.path.dirname(process.mainModule.filename);
 
@@ -317,7 +330,7 @@ module.exports.run=(compiledUnits: TypeScript.Api.CompiledUnit[],sandbox: any,ca
                 return require(path);
             }
 
-    if(compiledUnits.length>0) {
+    if(compiledUnits.length > 0) {
 
                 sandbox.require=_require;
             }
@@ -326,6 +339,7 @@ module.exports.run=(compiledUnits: TypeScript.Api.CompiledUnit[],sandbox: any,ca
         var sources=[];
 
         for(var n in compiledUnits) {
+
             sources.push(compiledUnits[n].content);
         }
 

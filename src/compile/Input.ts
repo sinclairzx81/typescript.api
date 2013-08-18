@@ -93,9 +93,9 @@ module TypeScript.Api {
             });
 
             // scan for additions and updates.
-            for(var i=0;i<units.length;i++) {
+            for(var i = 0;i < units.length; i++) {
 
-                var local=this.fetch(units[i].path)
+                var local = this.fetch(units[i].path)
 
                 if(local) {
                     if(!this.same(local,units[i])) {

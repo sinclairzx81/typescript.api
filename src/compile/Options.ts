@@ -20,21 +20,29 @@ module TypeScript.Api {
 
     export class CompilerOptions {
 
-        public logger: TypeScript.ILogger;
+        public logger                   : TypeScript.ILogger;
 
-        public languageVersion: TypeScript.LanguageVersion;
+        public languageVersion          : TypeScript.LanguageVersion;
 
-        public moduleGenTarget: TypeScript.ModuleGenTarget;
+        public moduleGenTarget          : TypeScript.ModuleGenTarget;
 
-        public removeComments: boolean;
+        public removeComments           : boolean;
+
+        public generateDeclarationFiles : boolean;
+
+        public mapSourceFiles           : boolean;
 
         constructor() {
 
-            this.languageVersion=typescript.LanguageVersion.EcmaScript5;
+            this.languageVersion          = typescript.LanguageVersion.EcmaScript5;
 
-            this.moduleGenTarget=typescript.ModuleGenTarget.Synchronous;
+            this.moduleGenTarget          = typescript.ModuleGenTarget.Synchronous;
 
-            this.removeComments=true;
+            this.removeComments           = true;
+
+            this.generateDeclarationFiles = false;
+
+            this.mapSourceFiles           = false;
         }
     }
 }

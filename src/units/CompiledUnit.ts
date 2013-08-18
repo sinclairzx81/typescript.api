@@ -20,41 +20,50 @@ limitations under the License.
 /// <reference path="Unit.ts" />
 
 module TypeScript.Api {
+    
     export class CompiledUnit extends TypeScript.Api.Unit {
-        public ast: TypeScript.AST;
 
-        public sourcemap: string;
+        public ast         : TypeScript.AST;
 
-        public references: string[];
+        public sourcemap   : string;
 
-        public script: TypeScript.Api.Script;
+        public references  : string[];
 
-        public state: string;
+        public script      : TypeScript.Api.Script;
 
-        constructor(path: string,
+        public state       : string;
 
-            content: string,
+        public declaration : string;
 
-            diagnostics: TypeScript.Api.Diagnostic[],
+        constructor(path        : string,
 
-            ast: TypeScript.AST,
+                    content     : string,
 
-            sourcemap: string,
+                    diagnostics : TypeScript.Api.Diagnostic[],
 
-            script: TypeScript.Api.Script,
+                    ast         : TypeScript.AST,
 
-            references: string[]) {
-            super(path,content,diagnostics);
+                    sourcemap   : string,
 
-            this.state='default';
+                    script      : TypeScript.Api.Script,
 
-            this.ast=ast;
+                    declaration : string,
 
-            this.sourcemap=sourcemap;
+                    references  : string[]) {
 
-            this.script=script;
+            super(path, content, diagnostics);
 
-            this.references=references;
+            this.state       = 'default';
+
+            this.ast         = ast;
+
+            this.sourcemap   = sourcemap;
+
+            this.script      = script;
+
+            this.declaration = declaration;
+
+            this.references  = references;
         }
     }
 }

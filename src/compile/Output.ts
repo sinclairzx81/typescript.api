@@ -87,7 +87,7 @@ module TypeScript.Api {
             path=path.replace(/\\/g,'/').replace(/.ts$/,'.d.ts');
 
             for(var filename in this.files) {
-
+                
                 if(filename.replace(/\\/g,'/')==path) {
 
                     return this.files[filename];
@@ -99,7 +99,7 @@ module TypeScript.Api {
 
         public get_source_map(path: string): string {
 
-            path=path.replace(/\\/g,'/').replace(/.ts$/,'.js.map');
+            path = path.replace(/\\/g,'/').replace(/.ts$/,'.js.map');
 
             for(var filename in this.files) {
 

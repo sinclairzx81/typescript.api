@@ -39,13 +39,13 @@ var program = require("./program.ts");
 
 ### methods
 
+* [reset](#reset)
 * [register](#register)
 * [create](#create)
 * [resolve](#resolve)
 * [compile](#compile)
 * [check](#check)
 * [run](#run)
-* [reset](#reset)
 * [sort](#sort)
 
 <a name="manual_compilation" />
@@ -181,6 +181,8 @@ compiledUnit = {
 
 	sourcemap     : string,   // (public) The sourcemap for this unit.
 
+	declaration   : string,   // (public) The declaration file for this unit.
+
 	reflection    : object,   // (public) The units reflected members.  
 };
 
@@ -188,6 +190,39 @@ compiledUnit = {
 
 ## methods
 
+<a name="reset" />
+### reset (options)
+
+Resets the compiler. Optionally allows the caller to set compiler options.  
+
+```javascript	
+
+var tsapi = require("typescript.api")
+
+tsapi.reset()
+```
+
+Additionally, It is possible to specify reset with the following options.
+
+```javascript
+
+var tsapi = require("typescript.api")
+
+tsapi.reset({
+
+    languageVersion          : "EcmaScript5", // (default)EcmaScript5 | EcmaScript3
+
+    moduleGenTarget			 : "Synchronous", // (default)Synchronous | ASynchronous
+
+    removeComments			 : true,          // (default) true
+
+    generateDeclarationFiles : false,		  // (default) false
+
+    mapSourceFiles           : false          // (default) false
+
+})
+
+```
 
 <a name="register" />
 ### typescript.register ()
@@ -384,34 +419,6 @@ tsapi.compile([sourceUnit], function(compiled) {
 
 	})
 })
-```
-<a name="reset" />
-### reset (options)
-
-Resets the compiler.  
-
-```javascript	
-
-var tsapi = require("typescript.api")
-
-tsapi.reset()
-```
-
-Additionally, It is possible to specify reset with the following options.
-
-```javascript
-
-var tsapi = require("typescript.api")
-
-tsapi.reset({
-
-    languageVersion : "EcmaScript5", // EcmaScript5 | EcmaScript3
-
-    moduleGenTarget : "Synchronous", // Synchronous | ASynchronous
-
-    removeComments  : true
-})
-
 ```
 
 <a name="sort" />

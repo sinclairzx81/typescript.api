@@ -23,38 +23,40 @@ module TypeScript.Api {
 
     export class LoadParameter {
 
-        public parent_filename: string;
+        public parent_filename : string;
 
-        public filename: string;
+        public filename        : string;
 
-        constructor(parent_filename: string,filename: string) {
+        constructor(parent_filename: string, filename: string) {
 
-            this.parent_filename=parent_filename;
+            this.parent_filename = parent_filename;
 
-            this.filename=TypeScript.Api.Path.relativeToAbsolute(parent_filename,filename);
+            this.filename = TypeScript.Api.Path.relativeToAbsolute(parent_filename, filename);
         }
     }
 
     export class Resolver {
-        private pending: TypeScript.Api.LoadParameter[];
 
-        private closed: TypeScript.Api.LoadParameter[];
+        private pending : TypeScript.Api.LoadParameter[];
 
-        private units: TypeScript.Api.SourceUnit[];
+        private closed  : TypeScript.Api.LoadParameter[];
+
+        private units   : TypeScript.Api.SourceUnit[];
 
         constructor(public io: TypeScript.Api.IIO) {
 
-            this.pending=[];
+            this.pending = [];
 
-            this.closed=[];
+            this.closed  = [];
 
-            this.units=[];
+            this.units   = [];
         }
 
         public resolve(sources: string[],callback: { (units: TypeScript.Api.SourceUnit[]): void; }): void {
 
             for(var n in sources) {
-                var parameter=new TypeScript.Api.LoadParameter(process.mainModule.filename,sources[n]);
+
+                var parameter = new TypeScript.Api.LoadParameter(process.mainModule.filename,sources[n]);
 
                 this.pending.push(parameter);
             }
@@ -63,23 +65,28 @@ module TypeScript.Api {
         }
 
         private load(callback: { (unit: TypeScript.Api.SourceUnit[]): void; }): void {
-            var parameter=this.pending.pop();
+            
+            var parameter = this.pending.pop();
 
             if(!this.visited(parameter)) {
+
                 this.closed.push(parameter);
 
                 var parent_filename=parameter.parent_filename;
 
                 this.io.readFile(parameter.filename,(iofile: TypeScript.Api.IOFile) => {
+                    
                     // create unit from iofile.
 
-                    var unit=new TypeScript.Api.SourceUnit(iofile.path,iofile.content,[],iofile.remote);
+                    var unit = new TypeScript.Api.SourceUnit(iofile.path,iofile.content,[],iofile.remote);
 
-                    if(iofile.errors.length>0) {
+                    if(iofile.errors.length > 0) {
+
                         for(var n in iofile.errors) {
-                            var error=iofile.errors[n];
 
-                            var diagnostic=new TypeScript.Api.Diagnostic("resolve",parent_filename,error.text,error.message);
+                            var error = iofile.errors[n];
+
+                            var diagnostic = new TypeScript.Api.Diagnostic("resolve", parent_filename, error.text, error.message);
 
                             unit.diagnostics.push(diagnostic);
                         }
@@ -87,9 +94,11 @@ module TypeScript.Api {
 
                     // if no errors..
 
-                    if(unit.diagnostics.length==0) {
+                    if(unit.diagnostics.length == 0) {
+
                         for(var n in unit.references()) {
-                            var parameter=new TypeScript.Api.LoadParameter(unit.path,unit.references()[n]);
+
+                            var parameter = new TypeScript.Api.LoadParameter(unit.path,unit.references()[n]);
 
                             this.pending.push(parameter);
                         }
@@ -97,7 +106,7 @@ module TypeScript.Api {
 
                     // convert path to forward slashes
 
-                    unit.path=TypeScript.Api.Path.toForwardSlashes(unit.path);
+                    unit.path = TypeScript.Api.Path.toForwardSlashes(unit.path);
 
                     // push unit on resolved.
 
@@ -108,25 +117,31 @@ module TypeScript.Api {
                 });
             }
             else {
+
                 this.next(callback);
             }
         }
 
         private next(callback): void {
-            if(this.pending.length>0) {
+
+            if(this.pending.length > 0) {
+
                 this.load(callback);
 
                 return;
             }
 
-            this.units=TypeScript.Api.Topology.sort(this.units);
+            this.units = TypeScript.Api.Topology.sort(this.units);
 
             callback(this.units);
         }
 
         private visited(parameter: TypeScript.Api.LoadParameter): boolean {
+
             for(var n in this.closed) {
+
                 if(this.closed[n].filename==parameter.filename) {
+
                     return true;
                 }
             }
