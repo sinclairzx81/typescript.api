@@ -88,15 +88,15 @@ limitations under the License.
 // api
 //--------------------------------------------------
 
-module.exports=typescript
+module.exports = typescript
 
-module.exports.Api=TypeScript.Api;
+module.exports.Api = TypeScript.Api;
 
 //--------------------------------------------------
 // check()
 //--------------------------------------------------
 
-module.exports.check=(units: TypeScript.Api.Unit[]): boolean => {
+module.exports.check = (units: TypeScript.Api.Unit[]): boolean => {
 
     for(var n in units) {
 
@@ -113,9 +113,9 @@ module.exports.check=(units: TypeScript.Api.Unit[]): boolean => {
 // resolve()
 //--------------------------------------------------
 
-module.exports.resolve=(filename: string,callback: (resolved: TypeScript.Api.SourceUnit[]) => void): void => {
+module.exports.resolve = (filename: string,callback: (resolved: TypeScript.Api.SourceUnit[]) => void): void => {
 
-    var param: any=null;
+    var param: any = null;
 
     if((typeof filename)==='string') {
 
@@ -145,7 +145,7 @@ module.exports.resolve=(filename: string,callback: (resolved: TypeScript.Api.Sou
 // reset()
 //--------------------------------------------------
 
-var compiler=null;
+var compiler = null;
 
 interface ICompilerOptions {
 
@@ -162,7 +162,7 @@ interface ICompilerOptions {
 
 module.exports.reset = (compilerOptions?: ICompilerOptions): void => {
 
-    var options=new TypeScript.Api.CompilerOptions();
+    var options = new TypeScript.Api.CompilerOptions();
 
     if(compilerOptions) {
 
@@ -172,19 +172,19 @@ module.exports.reset = (compilerOptions?: ICompilerOptions): void => {
 
                 case "EcmaScript5":
 
-                    options.languageVersion=typescript.LanguageVersion.EcmaScript5;
+                    options.languageVersion = typescript.LanguageVersion.EcmaScript5;
 
                     break;
 
                 case "EcmaScript3":
 
-                    options.languageVersion=typescript.LanguageVersion.EcmaScript3;
+                    options.languageVersion = typescript.LanguageVersion.EcmaScript3;
 
                     break;
 
                 default:
 
-                    options.languageVersion=typescript.LanguageVersion.EcmaScript5;
+                    options.languageVersion = typescript.LanguageVersion.EcmaScript5;
 
                     break;
             }
@@ -196,19 +196,19 @@ module.exports.reset = (compilerOptions?: ICompilerOptions): void => {
 
                 case "Synchronous":
 
-                    options.moduleGenTarget=typescript.ModuleGenTarget.Synchronous;
+                    options.moduleGenTarget = typescript.ModuleGenTarget.Synchronous;
 
                     break;
 
                 case "Asynchronous":
 
-                    options.moduleGenTarget=typescript.ModuleGenTarget.Asynchronous;
+                    options.moduleGenTarget = typescript.ModuleGenTarget.Asynchronous;
 
                     break;
 
                 default:
 
-                    options.moduleGenTarget=typescript.ModuleGenTarget.Synchronous;
+                    options.moduleGenTarget = typescript.ModuleGenTarget.Synchronous;
 
                     break;
             }
@@ -241,7 +241,7 @@ module.exports.reset = (compilerOptions?: ICompilerOptions): void => {
 
 module.exports.create = (path: string,content: string): TypeScript.Api.SourceUnit => {
 
-    return new TypeScript.Api.SourceUnit(path,content,[],false);
+    return new TypeScript.Api.SourceUnit(path, content, [], false);
 }
 
 //--------------------------------------------------
@@ -250,12 +250,17 @@ module.exports.create = (path: string,content: string): TypeScript.Api.SourceUni
 
 module.exports.compile = (resolved: TypeScript.Api.SourceUnit[],callback: (compiled: TypeScript.Api.CompiledUnit[]) => void): void => {
 
+    if(Object.prototype.toString.call( resolved ) !== '[object Array]') {
+    
+        throw Error('typescript.api : the compile() expects an array of source units.')
+    }
+
     if(!compiler) {
 
         module.exports.reset();
     }
 
-    compiler.compile(resolved,(compiledUnits) => {
+    compiler.compile(resolved, (compiledUnits) => {
 
         callback(compiledUnits);
     });
@@ -274,15 +279,20 @@ module.exports.sort = (sourceUnits: TypeScript.Api.SourceUnit[]): any[]=> {
 // run()
 //--------------------------------------------------
 
-module.exports.run = (compiledUnits: TypeScript.Api.CompiledUnit[],sandbox: any,callback: (context: any) => void): void => {
+module.exports.run = (compiled: TypeScript.Api.CompiledUnit[], sandbox: any, callback: (context: any) => void): void => {
+    
+    if(Object.prototype.toString.call( compiled ) !== '[object Array]') {
+    
+        throw Error('typescript.api : the run() expects an array of compiled units.')
+    }
 
-    var get_default_sandbox=(): any => {
+    var get_default_sandbox = (): any => {
 
-        var sandbox: any={};
+        var sandbox: any = {};
 
         if(!sandbox) {
 
-            sandbox={};
+            sandbox = {};
 
             for(var n in global) {
 
@@ -299,11 +309,11 @@ module.exports.run = (compiledUnits: TypeScript.Api.CompiledUnit[],sandbox: any,
 
         sandbox.global = global;
 
-        sandbox.__dirname=node.path.dirname(process.mainModule.filename);
+        sandbox.__dirname = node.path.dirname(process.mainModule.filename);
 
-        sandbox.__filename=node.path.join(sandbox.__dirname,"typescript-compilation.js");
+        sandbox.__filename = node.path.join(sandbox.__dirname, "typescript-compilation.js");
 
-        sandbox.exports={};
+        sandbox.exports = {};
 
         return sandbox;
     }
@@ -312,11 +322,11 @@ module.exports.run = (compiledUnits: TypeScript.Api.CompiledUnit[],sandbox: any,
 
         if(!sandbox) {
 
-            sandbox=get_default_sandbox();
+            sandbox = get_default_sandbox();
 
-            var _require=(path: string) => {
+            var _require = (path: string) => {
 
-                var primary_unit=compiledUnits[compiledUnits.length-1];
+                var primary_unit=compiled[compiled.length-1];
 
                 if(path.indexOf('/')!=-1) {
 
@@ -330,7 +340,7 @@ module.exports.run = (compiledUnits: TypeScript.Api.CompiledUnit[],sandbox: any,
                 return require(path);
             }
 
-    if(compiledUnits.length > 0) {
+            if(compiled.length > 0) {
 
                 sandbox.require=_require;
             }
@@ -338,9 +348,9 @@ module.exports.run = (compiledUnits: TypeScript.Api.CompiledUnit[],sandbox: any,
 
         var sources=[];
 
-        for(var n in compiledUnits) {
+        for(var n in compiled) {
 
-            sources.push(compiledUnits[n].content);
+            sources.push(compiled[n].content);
         }
 
         var script=node.vm.createScript(sources.join(''),"typescript-compilation.js");
