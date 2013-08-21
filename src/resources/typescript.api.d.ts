@@ -149,17 +149,18 @@ declare module typescript.api
     {
         public ast          : any;
         public sourcemap    : string;
+        public declaration  : string;
         public script       : typescript.api.Script;
         public references   : string[];
     }
 
     interface ICompilerOptions {
 
-        languageVersion: string;
-
-        moduleGenTarget: string;
-
-        removeComments: boolean;
+        languageVersion          : string;
+        moduleGenTarget          : string;
+        generateDeclarationFiles : boolean;
+        mapSourceFiles           : boolean;
+        removeComments           : boolean;
     }
 
     export function reset    (options?:ICompilerOptions) : void;

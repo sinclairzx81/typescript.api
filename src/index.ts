@@ -346,14 +346,21 @@ module.exports.run = (compiled: TypeScript.Api.CompiledUnit[], sandbox: any, cal
             }
         }
 
-        var sources=[];
+        var sources = [];
 
         for(var n in compiled) {
 
             sources.push(compiled[n].content);
         }
 
-        var script=node.vm.createScript(sources.join(''),"typescript-compilation.js");
+        var compiled_filename = "typescript-compilation.js"
+
+        if(compiled.length > 0) {
+        
+            compiled_filename = compiled[compiled.length - 1].path
+        }
+
+        var script=node.vm.createScript(sources.join(''), compiled_filename);
 
         script.runInNewContext(sandbox);
 
