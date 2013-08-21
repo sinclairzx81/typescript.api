@@ -26,13 +26,19 @@ module TypeScript.Api {
 
     export class Compiler {
 
-        public compiler: TypeScript.TypeScriptCompiler;
+        public compiler  : TypeScript.TypeScriptCompiler;
 
-        public logger: TypeScript.ILogger;
+        public logger    : TypeScript.ILogger;
 
-        public processor: TypeScript.Api.Processor;
+        public processor : TypeScript.Api.Processor;
 
-        constructor(public options: TypeScript.Api.CompilerOptions) {
+        constructor(public options: TypeScript.Api.ICompilerOptions) {
+
+            // normalize compiler options.
+
+            options = TypeScript.Api.NormalizeCompilerOptions(options)
+
+            // apply logger
 
             this.logger = options.logger;
 

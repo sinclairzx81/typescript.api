@@ -15,34 +15,121 @@ limitations under the License.
 --------------------------------------------------------------------------*/
 
 /// <reference path="../references.ts" />
+/// <reference path="../loggers/NullLogger.ts" />
 
 module TypeScript.Api {
 
-    export class CompilerOptions {
+    export interface ICompilerOptions {
+    
+        logger ?                   : TypeScript.ILogger;
 
-        public logger                   : TypeScript.ILogger;
+        languageVersion  ?         : any; // TypeScript.LanguageVersion;
 
-        public languageVersion          : TypeScript.LanguageVersion;
+        moduleGenTarget ?          : any; // TypeScript.ModuleGenTarget;
 
-        public moduleGenTarget          : TypeScript.ModuleGenTarget;
+        removeComments ?           : boolean;
 
-        public removeComments           : boolean;
+        generateDeclarationFiles ? : boolean;
 
-        public generateDeclarationFiles : boolean;
+        mapSourceFiles ?           : boolean;        
+    }
 
-        public mapSourceFiles           : boolean;
+    export function NormalizeCompilerOptions(options:ICompilerOptions) : ICompilerOptions {
+    
+        if(!options) {
+        
+            return {
+            
+                logger                   : new TypeScript.Api.NullLogger(),
 
-        constructor() {
+                languageVersion          : typescript.LanguageVersion.EcmaScript5,
 
-            this.languageVersion          = typescript.LanguageVersion.EcmaScript5;
+                moduleGenTarget          : typescript.ModuleGenTarget.Synchronous,
 
-            this.moduleGenTarget          = typescript.ModuleGenTarget.Synchronous;
+                removeComments           : true,
 
-            this.removeComments           = true;
+                generateDeclarationFiles : false,
 
-            this.generateDeclarationFiles = false;
-
-            this.mapSourceFiles           = false;
+                mapSourceFiles           : false
+            }
         }
+
+        if(options.logger == null) {
+        
+            options.logger = new TypeScript.Api.NullLogger();
+        }
+
+        if(options.languageVersion) {
+
+            switch(options.languageVersion) {
+
+                case "EcmaScript5":
+
+                    options.languageVersion = typescript.LanguageVersion.EcmaScript5;
+
+                    break;
+
+                case "EcmaScript3":
+
+                    options.languageVersion = typescript.LanguageVersion.EcmaScript3;
+
+                    break;
+
+                default:
+
+                    throw Error('ICompilerOptions: unknown languageVersion, only "EcmaScript3" or "EcmaScript5" supported')
+
+                    break;
+            }
+        }
+        else 
+        {
+            options.languageVersion = typescript.LanguageVersion.EcmaScript5;
+        }
+
+        if(options.moduleGenTarget) {
+
+            switch(options.moduleGenTarget) {
+
+                case "Synchronous":
+
+                    options.moduleGenTarget = typescript.ModuleGenTarget.Synchronous;
+
+                    break;
+
+                case "Asynchronous":
+
+                    options.moduleGenTarget = typescript.ModuleGenTarget.Asynchronous;
+
+                    break;
+
+                default:
+
+                    throw Error('ICompilerOptions: unknown moduleGenTarget, only "Synchronous" or "Asynchronous" supported')
+
+                    break;
+            }
+        }
+        else
+        {
+            options.moduleGenTarget = typescript.ModuleGenTarget.Synchronous;
+        }
+
+        if(options.removeComments == null) {
+
+            options.removeComments = true;
+        }
+
+        if(options.generateDeclarationFiles == null) {
+            
+            options.generateDeclarationFiles = false;
+        }
+
+        if(options.mapSourceFiles == null) {
+            
+            options.mapSourceFiles = false;
+        }
+
+        return options;
     }
 }
