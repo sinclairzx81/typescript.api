@@ -328,13 +328,13 @@ module.exports.run = (compiled: TypeScript.Api.CompiledUnit[], sandbox: any, cal
 
                 var primary_unit=compiled[compiled.length-1];
 
-                if(path.indexOf('/')!=-1) {
+                if(path.indexOf('/') != -1) {
 
-                    var fullname=node.path.resolve(primary_unit.path,'./');
+                    var fullname = node.path.resolve(primary_unit.path, './');
 
-                    var dirname=node.path.dirname(fullname);
+                    var dirname = node.path.dirname(fullname);
 
-                    path=node.path.resolve(dirname+'/'+path,'./');
+                    path = node.path.resolve(dirname + '/' + path, './');
                 }
 
                 return require(path);
@@ -342,7 +342,7 @@ module.exports.run = (compiled: TypeScript.Api.CompiledUnit[], sandbox: any, cal
 
             if(compiled.length > 0) {
 
-                sandbox.require=_require;
+                sandbox.require = _require;
             }
         }
 
@@ -357,7 +357,7 @@ module.exports.run = (compiled: TypeScript.Api.CompiledUnit[], sandbox: any, cal
 
         if(compiled.length > 0) {
         
-            compiled_filename = compiled[compiled.length - 1].path
+            compiled_filename = compiled[compiled.length - 1].path;
         }
 
         var script=node.vm.createScript(sources.join(''), compiled_filename);
