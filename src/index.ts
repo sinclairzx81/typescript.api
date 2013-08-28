@@ -250,11 +250,10 @@ module.exports.run = (compiled: TypeScript.Api.CompiledUnit[], sandbox: any, cal
     sandbox.process = process;
 
     sandbox.require = tsapi_require;
-
+    
     sandbox.module  = {};
 
     sandbox.exports = {};
-
 
     if(compiled.length > 0) {
 
