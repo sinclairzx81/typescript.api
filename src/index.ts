@@ -209,6 +209,8 @@ function default_sandbox(): any {
     return sandbox;
 }
 
+declare var exports;
+
 module.exports.run = (compiled: TypeScript.Api.CompiledUnit[], sandbox: any, callback: (context: any) => void): void => {
 
     if(Object.prototype.toString.call(compiled) !== '[object Array]') {
@@ -248,6 +250,8 @@ module.exports.run = (compiled: TypeScript.Api.CompiledUnit[], sandbox: any, cal
     sandbox.process = process;
 
     sandbox.module  = module;
+
+    sandbox.exports = exports;
 
     sandbox.require = tsapi_require;
 
