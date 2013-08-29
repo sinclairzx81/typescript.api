@@ -161,6 +161,8 @@ declare module typescript.api
         generateDeclarationFiles : boolean;
         mapSourceFiles           : boolean;
         removeComments           : boolean;
+	    noImplicitAny            : boolean;
+	    allowBool                : boolean;
     }
 
     export function reset    (options?:ICompilerOptions) : void;
