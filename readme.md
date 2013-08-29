@@ -202,7 +202,7 @@ var tsapi = require("typescript.api")
 tsapi.reset()
 ```
 
-Additionally, It is possible to specify reset with the following options.
+Additionally, It is possible to specify reset with the following options. all of which are optional.
 
 ```javascript
 
@@ -218,7 +218,11 @@ tsapi.reset({
 
     generateDeclarationFiles : false,		  // (default) false
 
-    mapSourceFiles           : false          // (default) false
+    mapSourceFiles           : false,         // (default) false
+
+	noImplicitAny            : false,         // (default) false
+
+	allowBool                : false          // (default) false
 
 })
 

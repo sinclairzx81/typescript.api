@@ -56,6 +56,10 @@ module TypeScript.Api {
 
             settings.mapSourceFiles           = options.mapSourceFiles;
 
+            settings.noImplicitAny            = options.noImplicitAny;
+
+            settings.allowBool                = options.allowBool;
+
             this.compiler = new typescript.TypeScriptCompiler(new TypeScript.Api.NullLogger(),settings);
 
             this.compiler.logger = new TypeScript.Api.NullLogger();

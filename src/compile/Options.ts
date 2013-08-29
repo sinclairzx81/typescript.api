@@ -31,7 +31,11 @@ module TypeScript.Api {
 
         generateDeclarationFiles ? : boolean;
 
-        mapSourceFiles ?           : boolean;        
+        mapSourceFiles ?           : boolean;
+        
+        noImplicitAny ?            : boolean;
+        
+        allowBool    ?             : boolean;     
     }
 
     export function NormalizeCompilerOptions(options:ICompilerOptions) : ICompilerOptions {
@@ -50,7 +54,11 @@ module TypeScript.Api {
 
                 generateDeclarationFiles : false,
 
-                mapSourceFiles           : false
+                mapSourceFiles           : false,
+
+                noImplicitAny            : false,
+
+                allowBool                : false
             }
         }
 
@@ -128,6 +136,16 @@ module TypeScript.Api {
         if(options.mapSourceFiles == null) {
             
             options.mapSourceFiles = false;
+        }
+
+        if(options.noImplicitAny == null) {
+            
+            options.noImplicitAny = false;
+        }
+
+        if(options.allowBool == null) {
+            
+            options.allowBool = false;
         }
 
         return options;
