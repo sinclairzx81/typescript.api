@@ -119,11 +119,16 @@ module.exports.resolve = (filename: string,callback: (resolved: TypeScript.Api.S
 
     if((typeof filename) === 'string') {
 
-        param = [filename]
+        param = [TypeScript.Api.Path.toAbsolute(filename)]
 
     }
 
     if(Object.prototype.toString.call(filename) === '[object Array]') {
+
+        for(var i = 0; i < filename.length; i++) {
+        
+            filename[i] = TypeScript.Api.Path.toAbsolute(filename[i])
+        }
 
         param = filename;
     }

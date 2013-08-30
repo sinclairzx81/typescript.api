@@ -55,9 +55,14 @@ module TypeScript.Api {
             return false;
         }
 
+        public static toAbsolute(path:string) : string {
+            
+            return TypeScript.Api.Path.toForwardSlashes( node.path.resolve(path) );
+        }
+
         public static toForwardSlashes(path: string): string {
 
-			return path.replace(/\\/gi,"/")
+			return path.replace(/\\/g,'/')
 		}
 
         public static relativeToAbsolute(absolute_parent_path: string,relative_path: string): string {
@@ -69,7 +74,7 @@ module TypeScript.Api {
                 return node.path.join(absolute_parent_directory,relative_path);
             }
 
-            return relative_path;
+            return TypeScript.Api.Path.toForwardSlashes(relative_path);
         }
     }
 }
