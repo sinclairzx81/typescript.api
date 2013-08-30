@@ -24,30 +24,34 @@ module TypeScript.Api {
 
     export class Output {
 
-        public files: string[];
+        public files  : string[];
 
-        public mapper: any[];
+        public mapper : any[];
 
         constructor() {
-            this.files=[];
 
-            this.mapper=[];
+            this.files = [];
+
+            this.mapper = [];
         }
 
         public javascript_filenames(): string[] {
 
-            var result=[];
+            var result = [];
 
             for(var n in this.mapper) {
 
                 result.push(n);
             }
+
             return result;
         }
 
-        public writeFile(fileName: string,contents: string,writeByteOrderMark: boolean): void {
+        public writeFile(fileName: string, contents: string, writeByteOrderMark: boolean): void {
 
-            this.files[fileName]=contents;
+            //console.log(fileName)
+
+            this.files[fileName] = contents;
 
             return this.files[fileName];
         }
@@ -69,11 +73,9 @@ module TypeScript.Api {
 
         public get_content(path: string): string {
 
-            path=path.replace(/\\/g,'/').replace(/.ts$/,'.js');
-
             for(var filename in this.files) {
 
-                if(filename.replace(/\\/g,'/')==path) {
+                if(filename.replace(/\\/g,'/') == path) {
 
                     return this.files[filename];
                 }
@@ -84,11 +86,9 @@ module TypeScript.Api {
 
         public get_declararion(path: string): string {
 
-            path=path.replace(/\\/g,'/').replace(/.ts$/,'.d.ts');
-
             for(var filename in this.files) {
                 
-                if(filename.replace(/\\/g,'/')==path) {
+                if(filename.replace(/\\/g,'/') == path) {
 
                     return this.files[filename];
                 }
@@ -99,11 +99,9 @@ module TypeScript.Api {
 
         public get_source_map(path: string): string {
 
-            path = path.replace(/\\/g,'/').replace(/.ts$/,'.js.map');
-
             for(var filename in this.files) {
 
-                if(filename.replace(/\\/g,'/')==path) {
+                if(filename.replace(/\\/g,'/') == path) {
 
                     return this.files[filename];
                 }
@@ -114,9 +112,7 @@ module TypeScript.Api {
 
         public get_reflection(path: string,ast: TypeScript.Script): TypeScript.Api.Script {
 
-            
-
-            return TypeScript.Api.Script.create(path,ast);
+            return TypeScript.Api.Script.create(path, ast);
         }
     }
 }

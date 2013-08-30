@@ -222,7 +222,9 @@ tsapi.reset({
 
 	noImplicitAny            : false,         // (default) false
 
-	allowBool                : false          // (default) false
+	allowBool                : false,         // (default) false
+
+	outputMany               : true           // (default) true
 
 })
 

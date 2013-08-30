@@ -157,12 +157,20 @@ declare module typescript.api
     interface ICompilerOptions {
 
         languageVersion          : string;
+
         moduleGenTarget          : string;
+
         generateDeclarationFiles : boolean;
+
         mapSourceFiles           : boolean;
+
         removeComments           : boolean;
+
 	    noImplicitAny            : boolean;
+
 	    allowBool                : boolean;
+
+        outputMany               : boolean;
     }
 
     export function reset    (options?:ICompilerOptions) : void;

@@ -35,7 +35,9 @@ module TypeScript.Api {
         
         noImplicitAny ?            : boolean;
         
-        allowBool    ?             : boolean;     
+        allowBool    ?             : boolean;
+        
+        outputMany   ?             : boolean;  
     }
 
     export function NormalizeCompilerOptions(options:ICompilerOptions) : ICompilerOptions {
@@ -58,7 +60,9 @@ module TypeScript.Api {
 
                 noImplicitAny            : false,
 
-                allowBool                : false
+                allowBool                : false,
+
+                outputMany               : false
             }
         }
 
@@ -146,6 +150,11 @@ module TypeScript.Api {
         if(options.allowBool == null) {
             
             options.allowBool = false;
+        }
+
+        if(options.outputMany == null) {
+            
+            options.outputMany = false;
         }
 
         return options;

@@ -60,7 +60,18 @@ module TypeScript.Api {
 
             settings.allowBool                = options.allowBool;
 
-            this.compiler = new typescript.TypeScriptCompiler(new TypeScript.Api.NullLogger(),settings);
+            this.compiler = new typescript.TypeScriptCompiler(new TypeScript.Api.NullLogger(), settings);
+
+            if(options.outputMany == false) {
+            
+                this.compiler.settings.outFileOption = '/outFileOption.js';
+
+                this.compiler.settings.sourceRoot = 'sourceRoot.js'
+
+                this.compiler.settings.mapRoot = 'mapRoot.js'
+
+                this.compiler.settings.outDirOption = 'outDirOption.js'
+            }
 
             this.compiler.logger = new TypeScript.Api.NullLogger();
 

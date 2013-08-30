@@ -183,7 +183,7 @@ module TypeScript.Api {
             });
         }
 
-        public static create(name: string,ast: TypeScript.Script): TypeScript.Api.Script {
+        public static create(name: string, ast: TypeScript.Script): TypeScript.Api.Script {
 
             var result=new TypeScript.Api.Script();
 
