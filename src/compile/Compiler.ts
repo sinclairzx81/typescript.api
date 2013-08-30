@@ -26,11 +26,11 @@ module TypeScript.Api {
 
     export class Compiler {
 
-        public compiler  : TypeScript.TypeScriptCompiler;
+        public compiler: TypeScript.TypeScriptCompiler;
 
-        public logger    : TypeScript.ILogger;
+        public logger: TypeScript.ILogger;
 
-        public processor : TypeScript.Api.Processor;
+        public processor: TypeScript.Api.Processor;
 
         constructor(public options: TypeScript.Api.ICompilerOptions) {
 
@@ -40,37 +40,31 @@ module TypeScript.Api {
 
             // apply logger
 
-            this.logger = options.logger;
+            this.logger=options.logger;
 
             // settings...
 
             var settings = new typescript.CompilationSettings();
 
-            settings.codeGenTarget            = options.languageVersion; 
+            settings.codeGenTarget = options.languageVersion;
 
-            settings.moduleGenTarget          = options.moduleGenTarget; 
+            settings.moduleGenTarget = options.moduleGenTarget;
 
-            settings.removeComments           = options.removeComments;
+            settings.removeComments = options.removeComments;
 
             settings.generateDeclarationFiles = options.generateDeclarationFiles;
 
-            settings.mapSourceFiles           = options.mapSourceFiles;
+            settings.mapSourceFiles = options.mapSourceFiles;
 
-            settings.noImplicitAny            = options.noImplicitAny;
+            settings.noImplicitAny = options.noImplicitAny;
 
-            settings.allowBool                = options.allowBool;
+            settings.allowBool = options.allowBool;
 
             this.compiler = new typescript.TypeScriptCompiler(new TypeScript.Api.NullLogger(), settings);
 
             if(options.outputMany == false) {
-            
-                this.compiler.settings.outFileOption = 'out.js';
 
-                //this.compiler.settings.sourceRoot    = 'sourceRoot.js'
-
-                //this.compiler.settings.mapRoot       = 'mapRoot.js'
-
-                //this.compiler.settings.outDirOption  = 'outDirOption.js'
+                this.compiler.settings.outFileOption = 'output.js';
             }
 
             this.compiler.logger = new TypeScript.Api.NullLogger();

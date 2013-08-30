@@ -154,7 +154,7 @@ module TypeScript.Api {
 
         if(options.outputMany == null) {
             
-            options.outputMany = false;
+            options.outputMany = true;
         }
 
         return options;
