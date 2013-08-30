@@ -62,7 +62,7 @@ module TypeScript.Api {
 
                 allowBool                : false,
 
-                outputMany               : false
+                outputMany               : true
             }
         }
 
