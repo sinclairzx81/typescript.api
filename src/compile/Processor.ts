@@ -312,7 +312,8 @@ module TypeScript.Api {
 
                             var references  = [];
 
-                            compiled.push(new TypeScript.Api.CompiledUnit('out.js', content, diagnostics, ast, sourcemap, script, declaration, references));
+                            compiled.push(new TypeScript.Api.CompiledUnit(<string>this.compiler.settings.outFileOption, 
+                                                                content, diagnostics, ast, sourcemap, script, declaration, references));
                         
                     }
                 }
