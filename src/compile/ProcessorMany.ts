@@ -240,21 +240,21 @@ module TypeScript.Api {
 
                         if(unit) {
 
-                            var ast = document.script;
+                            var ast         = document.script;
 
-                            var path = unit.path.replace(/\\/g,'/');
+                            var path        = unit.path.replace(/\\/g,'/');
 
-                            var content = this.output.get_content(unit.path.replace(/.ts$/,'.js'));
+                            var content     = this.output.get_content(unit.path.replace(/.ts$/,'.js'));
 
-                            var sourcemap = this.output.get_source_map(unit.path.replace(/.ts$/,'.js.map'));
+                            var sourcemap   = this.output.get_source_map(unit.path.replace(/.ts$/,'.js.map'));
 
                             var declaration = this.output.get_declararion(unit.path.replace(/.ts$/,'.d.ts'));
 
-                            var script = this.output.get_reflection(unit.path, ast);
+                            var script      = this.output.get_reflection(unit.path, ast);
 
                             var diagnostics = unit.diagnostics;
 
-                            var references = unit.references();
+                            var references  = unit.references();
 
                             compiled.push(new TypeScript.Api.CompiledUnit(path, content, diagnostics, ast, sourcemap, script, declaration, references));
                         }

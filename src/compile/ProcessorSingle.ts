@@ -207,48 +207,70 @@ module TypeScript.Api {
 
             this.run_emit();
 
-            var compiled = [];
+            //------------------------------------------
+            // fetch single output from output cache.
+            //------------------------------------------
 
-            for(var file in this.output.files) {
+            var content     = this.output.get_content('/');
 
-                var filename = this.output.mapper[file];
+            var sourcemap   = this.output.get_source_map('/.map');
 
-                if(filename) {
-                    
-                    var document = this.compiler.getDocument(filename);
+            var declaration = this.output.get_declararion('/.d.ts');
 
-                    if(document) {
+            //------------------------------------------
+            // gather diagnostics from source units.
+            //------------------------------------------
+            var diagnostics = [];
 
-                        var ast         = document.script;
-
-                        var content     = this.output.get_content('/');
-
-                        var sourcemap   = this.output.get_source_map('/.map');
-
-                        var script      = this.output.get_reflection('/',ast);
-
-                        var declaration = this.output.get_declararion('/.d.ts');
-
-                        var diagnostics = [];
-
-                        for(var i = 0; i < this.input.units.length; i++) {
+            for(var i = 0; i < this.input.units.length; i++) {
                         
-                            for(var j = 0; j < this.input.units[i].diagnostics.length; j++) {
+                for(var j = 0; j < this.input.units[i].diagnostics.length; j++) {
                             
-                                diagnostics.push(this.input.units[i].diagnostics[j])
-                            }
-                        }
-
-                        var references  = [];
-
-                        compiled.push(new TypeScript.Api.CompiledUnit('output.js', content, diagnostics, ast, sourcemap, script, declaration, references));
-                    }
+                    diagnostics.push(this.input.units[i].diagnostics[j])
                 }
             }
 
-            TypeScript.Api.TypeResolver.resolve(compiled.map((unit) => { return unit.script; }));
+            //------------------------------------------
+            // gather asts from source units.
+            //------------------------------------------
 
-            return compiled;
+            var asts = []
+
+            for(var i = 0; i < this.input.units.length; i++) {
+
+                var document = this.compiler.getDocument(this.input.units[i].path);
+
+                if(document) {
+                    
+                    asts.push(document.script)
+                    
+                }
+            }
+
+            TypeScript.Api.TypeResolver.resolve(asts);
+
+            //------------------------------------------
+            // combine scripts for reflection.
+            //------------------------------------------
+
+            var script = new TypeScript.Api.Script();
+
+            for(var i = 0; i < asts.length; i++) {
+
+                var _script = TypeScript.Api.Script.create('output.ts', asts[i]);
+
+                for(var j = 0; j < _script.modules.length;    j++) script.modules.push(_script.modules[j])
+
+                for(var j = 0; j < _script.interfaces.length; j++) script.interfaces.push(_script.interfaces[j])
+
+                for(var j = 0; j < _script.classes.length;    j++) script.classes.push(_script.classes[j])
+
+                for(var j = 0; j < _script.methods.length;    j++) script.methods.push(_script.methods[j])
+
+                for(var j = 0; j < _script.variables.length;  j++) script.variables.push(_script.variables[j])                                                                            
+            }
+
+            return [new TypeScript.Api.CompiledUnit('output.js', content, diagnostics, null, sourcemap, script, declaration, [])];
         }
     }
 }
