@@ -20,59 +20,61 @@ limitations under the License.
 /// <reference path="../units/CompiledUnit.ts" />
 /// <reference path="../loggers/NullLogger.ts" />
 /// <reference path="Options.ts" />
-/// <reference path="Processor.ts" />
+/// <reference path="IProcessor.ts" />
+/// <reference path="ProcessorSingle.ts" />
+/// <reference path="ProcessorMany.ts" />
 
 module TypeScript.Api {
 
     export class Compiler {
 
-        public compiler: TypeScript.TypeScriptCompiler;
+        public compiler  : TypeScript.TypeScriptCompiler;
 
-        public logger: TypeScript.ILogger;
+        public logger    : TypeScript.ILogger;
 
-        public processor: TypeScript.Api.Processor;
+        public processor : TypeScript.Api.IProcessor;
 
         constructor(public options: TypeScript.Api.ICompilerOptions) {
 
-            // normalize compiler options.
+            options = TypeScript.Api.NormalizeCompilerOptions(options);
 
-            options = TypeScript.Api.NormalizeCompilerOptions(options)
-
-            // apply logger
-
-            this.logger=options.logger;
+            this.logger = options.logger;
 
             // settings...
 
             var settings = new typescript.CompilationSettings();
 
-            settings.codeGenTarget = options.languageVersion;
+            settings.codeGenTarget            = options.languageVersion;
 
-            settings.moduleGenTarget = options.moduleGenTarget;
+            settings.moduleGenTarget          = options.moduleGenTarget;
 
-            settings.removeComments = options.removeComments;
+            settings.removeComments           = options.removeComments;
 
             settings.generateDeclarationFiles = options.generateDeclarationFiles;
 
-            settings.mapSourceFiles = options.mapSourceFiles;
+            settings.mapSourceFiles           = options.mapSourceFiles;
 
-            settings.noImplicitAny = options.noImplicitAny;
+            settings.noImplicitAny            = options.noImplicitAny;
 
-            settings.allowBool = options.allowBool;
+            settings.allowBool                = options.allowBool;
 
             this.compiler = new typescript.TypeScriptCompiler(new TypeScript.Api.NullLogger(), settings);
 
-            if(options.outputMany == false) {
-
-                this.compiler.settings.outFileOption = 'output.js';
-            }
-
             this.compiler.logger = new TypeScript.Api.NullLogger();
 
-            this.processor = new TypeScript.Api.Processor(this.compiler);
+            if(!options.outputMany) {
+                
+                this.processor = new TypeScript.Api.ProcessorSingle(this.compiler);
+
+                this.compiler.settings.outFileOption = 'output.js';
+
+                return;
+            }
+            
+            this.processor = new TypeScript.Api.ProcessorMany(this.compiler);
         }
 
-        public compile(sourceUnits: TypeScript.Api.SourceUnit[],callback: { (compiledUnits: TypeScript.Api.CompiledUnit[]): void; }): void {
+        public compile(sourceUnits: TypeScript.Api.SourceUnit[], callback: { (compiledUnits: TypeScript.Api.CompiledUnit[]): void; }): void {
 
             this.processor.input.merge(sourceUnits);
 

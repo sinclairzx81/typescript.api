@@ -16,42 +16,39 @@ limitations under the License.
 
 /// <reference path="../references.ts" />
 /// <reference path="../reflect/TypeResolver.ts" />
+/// <reference path="../units/SourceUnit.ts" />
 /// <reference path="../units/CompiledUnit.ts" />
+/// <reference path="IProcessor.ts" />
 /// <reference path="Input.ts" />
 /// <reference path="Output.ts" />
 
 module TypeScript.Api {
 
-    // Processor: Manages all calls the the TypeScript compiler. 
-    // handles scanning incoming sources for added and updated
-    // state and informs the compiler to emit.
+    /**
+    *   ProcessorMany: Handles compilation for multiple output.
+    */
+    export class ProcessorMany implements TypeScript.Api.IProcessor {
 
-    export class Processor {
+        public input  : TypeScript.Api.Input;
 
-        public input: TypeScript.Api.Input;
-
-        public output: TypeScript.Api.Output;
+        public output : TypeScript.Api.Output;
 
         constructor(public compiler: TypeScript.TypeScriptCompiler) {
 
-            this.input = new TypeScript.Api.Input();
+            this.input  = new TypeScript.Api.Input();
 
             this.output = new TypeScript.Api.Output();
         }
 
         //-------------------------------------------------------------------------
-        //
-        //  PREPROCESSING...
-        //
+        //  utility...
         //-------------------------------------------------------------------------
-
-        public add_unit(unit: TypeScript.Api.SourceUnit): void {
+        
+        private add_unit(unit: TypeScript.Api.SourceUnit) : void {
 
             var snapshot = typescript.ScriptSnapshot.fromString(unit.content);
 
             var references = typescript.getReferencedFiles(unit.path,snapshot);
-
-            //this.compiler.addSourceUnit(unit.path,snapshot,1 /*ByteOrderMark.Utf8*/,0,false,references);
 
             var _references = unit.references()
 
@@ -60,10 +57,10 @@ module TypeScript.Api {
                 _references[n] = Path.relativeToAbsolute(unit.path, _references[n])
             }
 
-            this.compiler.addSourceUnit(unit.path, snapshot, 1, 0, false, _references);
+            this.compiler.addSourceUnit(unit.path, snapshot, 1 /*ByteOrderMark.Utf8*/ , 0, false, _references);
         }
 
-        public update_unit(unit: TypeScript.Api.SourceUnit): void {
+        private update_unit(unit: TypeScript.Api.SourceUnit): void {
 
             var snapshot = typescript.ScriptSnapshot.fromString(unit.content);
 
@@ -74,13 +71,15 @@ module TypeScript.Api {
             this.compiler.updateSourceUnit(unit.path, snapshot, 0, false, textChange);
         }
 
-        public syntax_check_unit(unit: TypeScript.Api.SourceUnit): void {
+        private syntax_check_unit(unit: TypeScript.Api.SourceUnit): void {
 
             var diagnostics = this.compiler.getSyntacticDiagnostics(unit.path);
 
             for(var i = 0;i < diagnostics.length; i++) {
 
-                var diagnostic = new TypeScript.Api.Diagnostic("syntax",diagnostics[i].fileName(),diagnostics[i].text(),diagnostics[i].message());
+                var diagnostic = new TypeScript.Api.Diagnostic("syntax", diagnostics[i].fileName(),
+                                                                         diagnostics[i].text(),
+                                                                         diagnostics[i].message());
 
                 diagnostic.computeLineInfo(unit.content, diagnostics[i].start());
 
@@ -88,9 +87,7 @@ module TypeScript.Api {
             }
         }
 
-        public type_check_unit(unit: TypeScript.Api.SourceUnit): void {
-
-            this.compiler.pullTypeCheck();
+        private type_check_unit(unit: TypeScript.Api.SourceUnit): void {
 
             var diagnostics = this.compiler.getSemanticDiagnostics(unit.path);
 
@@ -104,31 +101,10 @@ module TypeScript.Api {
             }
         }
 
-        public emit_unit(unit: TypeScript.Api.SourceUnit): void {
-
-            try {
-
-                this.compiler.emitUnit(unit.path,this.output,(inputFile: string,outputFile: string): void => {
-
-                    this.output.mapper[outputFile]=inputFile;
-                });
-
-            } catch(e) { }
-        }
-
-        public emit_declaration(unit: TypeScript.Api.SourceUnit): void {
-
-            try {
-
-                this.compiler.emitUnitDeclarations(unit.path)
-            }
-            catch(e) { }
-        }
-
         //-------------------------------------------------------------------------
-        //  Update Compiler State
+        //  update phase.
         //------------------------------------------------------------------------- 
-        public update_compiler_state(): void {
+        private update_units(): void {
 
             for(var i = 0; i < this.input.units.length; i++) {
 
@@ -154,105 +130,98 @@ module TypeScript.Api {
                 }
             }
         }
+        //-------------------------------------------------------------------------
+        //  typecheck phase.
+        //------------------------------------------------------------------------- 
+        private run_typecheck() : void {
+        
+            this.compiler.pullTypeCheck();
+        }
 
         //-------------------------------------------------------------------------
-        //  Emit Compiler State
+        //  diagnostics phase.
         //------------------------------------------------------------------------- 
-        private emit_compiler_state(): void {
+        private run_diagnostics (): void {
 
-            if(this.compiler.emitOptions.outputMany) {
+            for(var i = 0; i < this.input.units.length; i++) {
 
-                for(var i = 0; i < this.input.units.length; i++) {
+                var unit=this.input.units[i];
 
-                    var unit=this.input.units[i];
+                switch(unit.state) {
 
-                    switch(unit.state) {
+                    case 'added':
 
-                        case 'added':
+                    case 'updated':
 
-                        case 'updated':
+                        unit.diagnostics = [];
 
-                            unit.diagnostics = [];
+                        this.syntax_check_unit(unit);
 
-                            this.syntax_check_unit(unit);
+                        this.type_check_unit(unit);
 
-                            this.type_check_unit(unit);
+                        break;
 
-                            this.emit_unit(unit);
+                    default:
 
-                            if(this.compiler.settings.generateDeclarationFiles) {
+                        break;
+                }
+            }
+        }
 
-                                this.emit_declaration(unit)
+        //-------------------------------------------------------------------------
+        //  emit phase.
+        //-------------------------------------------------------------------------
+        private run_emit(): void {
+        
+            for(var i = 0; i < this.input.units.length; i++) {
+
+                var unit=this.input.units[i];
+
+                switch(unit.state) {
+
+                    case 'added':
+
+                    case 'updated':
+
+                        try {
+
+                            this.compiler.emitUnit(unit.path, this.output, (inputFile: string,outputFile: string): void => {
+
+                                this.output.mapper[outputFile] = inputFile;
+                            });
+
+                        } catch(e) { }
+
+                        if(this.compiler.settings.generateDeclarationFiles) {
+
+                            try {
+
+                                this.compiler.emitUnitDeclarations(unit.path)
                             }
+                            catch(e) { }
+                        }
 
-                            break;
+                        break;
 
-                        default:
+                    default:
 
-                            break;
-                    }
+                        break;
                 }
-
-                return;
-            }
-
-
-            this.compiler.emitAll(this.output, (inputFile: string,outputFile: string): void => {
-
-                this.output.mapper[outputFile] = inputFile;
-            });
-
-            if(this.compiler.settings.generateDeclarationFiles) {
-
-                this.compiler.emitAllDeclarations();
-            }
+            }            
         }
 
         //-------------------------------------------------------------------------
-        //  Output Single
+        //  process.
         //------------------------------------------------------------------------- 
-        public output_single(): TypeScript.Api.CompiledUnit[] {
+        public process(): TypeScript.Api.CompiledUnit[] {
 
-            var compiled = [];
+            this.update_units();
 
-            for(var file in this.output.files) {
+            this.run_typecheck();
 
-                var filename = this.output.mapper[file];
+            this.run_diagnostics();
 
-                if(filename) {
-
-                    var document = this.compiler.getDocument(filename);
-
-                    if(document) {
-
-                        var ast = document.script;
-
-                        var content = this.output.get_content('/');
-
-                        var sourcemap = this.output.get_source_map('/.map');
-
-                        var script = this.output.get_reflection('/',ast);
-
-                        var declaration = this.output.get_declararion('/.d.ts');
-
-                        var diagnostics = [];
-
-                        var references = [];
-
-                        compiled.push(new TypeScript.Api.CompiledUnit('output.js', content, diagnostics, ast, sourcemap, script, declaration, references));
-                    }
-                }
-            }
-
-            TypeScript.Api.TypeResolver.resolve(compiled.map((unit) => { return unit.script; }));
-
-            return compiled;
-        }
-
-        //-------------------------------------------------------------------------
-        //  Output Many
-        //------------------------------------------------------------------------- 
-        public output_many(): TypeScript.Api.CompiledUnit[] {
+            this.run_emit();
 
             // get result.
             var compiled = [];
@@ -293,8 +262,6 @@ module TypeScript.Api {
                 }
             }
 
-
-
             TypeScript.Api.TypeResolver.resolve(compiled.map((unit) => { return unit.script; }));
 
             // ensure that the compiled units
@@ -326,23 +293,7 @@ module TypeScript.Api {
             }
 
             return compiled;
-        }
 
-        //-------------------------------------------------------------------------
-        //  PROCESS
-        //------------------------------------------------------------------------- 
-        public process(): TypeScript.Api.CompiledUnit[] {
-
-            this.update_compiler_state();
-
-            this.emit_compiler_state();
-
-            if(this.compiler.emitOptions.outputMany) {
-
-                return this.output_many();
-            }
-
-            return this.output_single();
         }
     }
 }

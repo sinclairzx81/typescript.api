@@ -81,7 +81,9 @@ limitations under the License.
 /// <reference path="compile/Options.ts" />
 /// <reference path="compile/Input.ts" />
 /// <reference path="compile/Output.ts" />
-/// <reference path="compile/Processor.ts" />
+/// <reference path="compile/IProcessor.ts" />
+/// <reference path="compile/ProcessorSingle.ts" />
+/// <reference path="compile/ProcessorMany.ts" />
 /// <reference path="compile/Compiler.ts" />
 
 //--------------------------------------------------
