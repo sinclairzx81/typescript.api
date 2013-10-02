@@ -183,7 +183,7 @@ compiledUnit = {
 
 	declaration   : string,   // (public) The declaration file for this unit.
 
-	reflection    : object,   // (public) The units reflected members.  
+	script        : object,   // (public) reflected metadata for this unit.
 };
 
 ```
