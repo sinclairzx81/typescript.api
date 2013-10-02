@@ -159,6 +159,7 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 app.js
+program.ts
 vwd.webinfo
 
 # Mac crap

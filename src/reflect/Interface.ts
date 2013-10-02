@@ -71,9 +71,9 @@ module TypeScript.Api {
 
                     for(var n in ast.typeParameters.members) {
 
-                        var parameter=<any>ast.typeParameters.members[n];
+                        var parameter = <any>ast.typeParameters.members[n];
 
-                        result.parameters.push(parameter.name.text);
+                        result.parameters.push(parameter.name.text());
                     }
                 }
             }
