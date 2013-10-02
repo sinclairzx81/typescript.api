@@ -172,11 +172,11 @@ module.exports.create = (path: string, content: string): TypeScript.Api.SourceUn
 // compile()
 //--------------------------------------------------
 
-module.exports.compile=(resolved: TypeScript.Api.SourceUnit[],callback: (compiled: TypeScript.Api.CompiledUnit[]) => void): void => {
+module.exports.compile = (resolved: TypeScript.Api.SourceUnit[],callback: (compiled: TypeScript.Api.CompiledUnit[]) => void): void => {
 
     if(Object.prototype.toString.call(resolved) !== '[object Array]') {
     
-        throw Error('typescript.api : the compile() expects an array of source units.')
+        throw Error('typescript.api : the compile() method expects an array of source units.')
     }
 
     if(!compiler) {
@@ -225,14 +225,26 @@ module.exports.run = (compiled: TypeScript.Api.CompiledUnit[], sandbox: any, cal
         throw Error('typescript.api : the run() expects an array of compiled units.')
     }
 
+    // quick utility to test if a object is empty.
+    var is_empty = (obj:any) : boolean => {
+
+        if(obj == null) return true;
+
+        for (var key in obj) {
+
+            if (obj.hasOwnProperty.call(obj, key)) return false;
+        }
+
+        return true;
+    }
     // tsapi require override. note: because code 
     // executing in a vm is run from the tsapi 
     // node_module path, this method intercepts paths
     // and attempts to resolve them from the parent
-    // ts files path. 
+    // ts files path.
     var tsapi_require = (path: string) => {
 
-        var primary_unit = compiled[compiled.length-1];
+        var primary_unit = compiled[compiled.length - 1];
 
         if(path.indexOf('/') != -1) {
 
@@ -257,10 +269,13 @@ module.exports.run = (compiled: TypeScript.Api.CompiledUnit[], sandbox: any, cal
     sandbox.process = process;
 
     sandbox.require = tsapi_require;
-    
-    sandbox.module  = {};
 
     sandbox.exports = {};
+
+    sandbox.module  = {
+    
+        exports : sandbox.exports
+    };
 
     if(compiled.length > 0) {
 
@@ -293,6 +308,15 @@ module.exports.run = (compiled: TypeScript.Api.CompiledUnit[], sandbox: any, cal
         var script = node.vm.createScript(sources.join(''), sandbox.__filename);
 
         script.runInNewContext(sandbox);
+
+        // note: if sandbox.exports is empty, the export
+        // happend on module.exports. In this instance, 
+        // assign the module.exports to the exports and 
+        // callback.
+        if(is_empty(sandbox.exports)) {
+        
+            sandbox.exports = sandbox.module.exports;
+        }
 
         callback(sandbox.exports);
 
@@ -341,13 +365,14 @@ module.exports.register = () => {
 
             if(module.exports.check(resolved)) {
 
-                compiler.compile(resolved,(compiled: TypeScript.Api.CompiledUnit[]) => {
+                compiler.compile(resolved, (compiled: TypeScript.Api.CompiledUnit[]) => {
 
                     if(module.exports.check(compiled)) {
 
-                        module.exports.run(compiled,null,function(context) {
+                        module.exports.run(compiled, null, function(context) {
 
-                            _module.exports=context;
+                            _module.exports = context;
+                            
                         });
                     }
                     else {
