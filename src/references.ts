@@ -66,9 +66,11 @@ var shim = () : any => {
         setTimeout  : setTimeout
     }
     
-    var source = node.fs.readFileSync(node.path.join(__dirname, './node_modules/typescript/bin/typescript.js'), 'utf8');
+	var typescript_filename = require.resolve('typescript');
+	
+    var source = node.fs.readFileSync(typescript_filename, 'utf8');
 
-    var script = node.vm.createScript( source.concat('\n\nexports =  TypeScript;'), './node_modules/typescript/bin/typescript.js' );
+    var script = node.vm.createScript(source.concat('\n\nexports =  TypeScript;'), typescript_filename);
 	
     script.runInNewContext( sandbox );
 	
