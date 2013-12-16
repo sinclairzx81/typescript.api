@@ -224,7 +224,7 @@ module TypeScript.Api {
             this.run_emit();
 
             // get result.
-            var compiled = [];
+            var compiled: TypeScript.Api.CompiledUnit[] = [];
 
             for(var file in this.output.files) {
 
@@ -262,7 +262,7 @@ module TypeScript.Api {
                 }
             }
 
-            TypeScript.Api.TypeResolver.resolve(compiled.map((unit) => { return unit.script; }));
+            TypeScript.Api.TypeResolver.resolve(compiled.map((unit) => unit.script));
 
             // ensure that the compiled units
             // are of the same order as the source

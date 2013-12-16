@@ -42,12 +42,9 @@ module TypeScript.Api {
                 if(error) {
 
                     var text="could not resolve source unit.";
+                    var message = "could not resolve source unit " + path + ".";
 
-                    var message="could not resolve source unit "+path+".";
-
-                    var error=new TypeScript.Api.IOFileError(text,message);
-
-                    callback(new TypeScript.Api.IOFile(path,null,[error],false));
+                    callback(new TypeScript.Api.IOFile(path, null, [new TypeScript.Api.IOFileError(text, message)],false));
                 }
                 else {
 
@@ -87,14 +84,10 @@ module TypeScript.Api {
             });
 
             request.on('error',(error) => {
-
                 var text="could not resolve source unit.";
-
                 var message="could not resolve source unit "+path+".";
 
-                var error=new TypeScript.Api.IOFileError(text,message);
-
-                callback(new TypeScript.Api.IOFile(path,null,[error],true));
+                callback(new TypeScript.Api.IOFile(path, null, [new TypeScript.Api.IOFileError(text, message)],true));
             });
 
             request.end();

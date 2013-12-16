@@ -9,11 +9,13 @@
 
   "directories"     : { },
 
-  "dependencies"    : {"typescript": "0.9.1-1"},
+  "dependencies"    : {"typescript": "0.9.5"},
 
   "devDependencies" : {},
 
-  "scripts"   : {},
+  "scripts"   : {
+    "build": "node build.js"
+  },
 
   "repository": {
 
